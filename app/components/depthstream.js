@@ -57,7 +57,7 @@ class DepthStream{
     });
 
     //Create a THREE video texture
-    this.streamVideoTex = new THREE.Texture( this.videoElement );
+    this.streamVideoTex = new THREE.VideoTexture( this.videoElement );
     this.streamVideoTex.needsUpdate = true;
 
     //Set filtering and type
