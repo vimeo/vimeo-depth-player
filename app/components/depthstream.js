@@ -3,6 +3,8 @@ import * as THREE from 'three';
 
 import GuiManager from './gui';
 
+import Util from './util';
+
 // bundling of GLSL code
 const glsl = require('glslify');
 
@@ -17,20 +19,46 @@ class DepthStream{
     let fragSrc = glsl.file('../shaders/rgbd_stream.frag');
     let vertSrc = glsl.file('../shaders/rgbd_stream.vert');
 
-    //Replace the URL - TODO if iOS mobile use HLS natively
-    let url = streamURL.replace('hls', 'dash');
 
-    //Create a DASH.js player
-    this.player = dashjs.MediaPlayer().create();
+    if(Util.isiOS()){
+      this.videoElement = document.getElementById(videoElementID);
+      this.videoElement.src = streamURL;
+      this.videoElement.crossOrigin = '*';
+      this.videoElement.load();
+      this.videoElement.addEventListener("contextmenu", e=>{
+        e.preventDefault();
+        e.stopPropagation();
+      }, false);
+      if (this.videoElement.hasAttribute("controls")) {
+            this.videoElement.removeAttribute("controls")
+      }
+    } else {
+      //Replace the URL - TODO if iOS mobile use HLS natively
+      let url = streamURL.replace('hls', 'dash');
 
-    //Initialize the player
-    this.player.initialize(document.querySelector("#" + videoElementID), url, true);
+      //Create a DASH.js player
+      this.player = dashjs.MediaPlayer().create();
 
-    //Get the video element
-    this.videoElement = document.getElementById(videoElementID);
+      //Initialize the player
+      this.player.initialize(document.querySelector("#" + videoElementID), url, true);
+
+      //Get the video element
+      this.videoElement = document.getElementById(videoElementID);
+    }
+
+
+    //GUI functionality
+    this.gui = new GuiManager();
+    this.gui.addFunction('Play', ()=>{
+      this.videoElement.play();
+    });
+    this.gui.addFunction('Stop', ()=>{
+      this.videoElement.pause();
+    });
 
     //Create a THREE video texture
-    this.streamVideoTex = new THREE.VideoTexture(this.videoElement);
+    this.streamVideoTex = new THREE.Texture( this.videoElement );
+    this.streamVideoTex.needsUpdate = true;
 
     //Set filtering and type
     this.streamVideoTex.minFilter = THREE.NearestFilter;
@@ -57,7 +85,9 @@ class DepthStream{
 
     return this.mesh;
   }
-
+  update(){
+    this.streamVideoTex.needsUpdate = true;
+  }
 }
 
 export default DepthStream;

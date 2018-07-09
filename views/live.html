@@ -23,7 +23,7 @@
     <script src="js/bundle.js"></script>
 
     <!-- Temp video player -->
-    <video id="live-vimeo" controls></video>
+    <video id="live-vimeo" controls autoplay muted playsinline></video>
 
     <script>
     //Create a new scene wrapper (holds the THREE scene under .scene / .camera / .controls ...etc)
@@ -42,7 +42,13 @@
       let depthStream = new DepthStream('live-vimeo', response.url);
 
       glScene.scene.add(depthStream);
+
+      glScene.on('tick', ()=>{
+          depthStream.update();
+      });
     });
+
+
     </script>
   </body>
 </html>
