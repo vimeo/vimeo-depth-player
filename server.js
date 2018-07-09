@@ -23,9 +23,15 @@ if(process.env.NODE_ENV !== 'production'){
 
 /*
 * Routes
+* - /
 * - /depthkit
 * - /live
 */
+app.get('/', (request, response)=>{
+  console.log(`[Server] A ${request.method} request was made to ${request.url}`);
+  response.sendFile(`${__dirname}/views/index.html`);
+});
+
 app.get('/depthkit', (request, response)=>{
   console.log(`[Server] A ${request.method} request was made to ${request.url}`);
   response.sendFile(`${__dirname}/views/depthkit.html`);

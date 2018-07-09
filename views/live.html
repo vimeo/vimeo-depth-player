@@ -42,10 +42,6 @@
       let depthStream = new DepthStream('live-vimeo', response.url);
 
       glScene.scene.add(depthStream);
-
-      glScene.on('tick', ()=>{
-          depthStream.update();
-      });
     });
 
 
