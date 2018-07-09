@@ -51,10 +51,12 @@ app.get('/video/:id', (request, response) => {
   }, function(error, body, status_code, headers) {
     if (error) {
       response.status(500).send(error);
+      console.log('[Server] ' + error);
     }
     else {
       if (body["files"] == null) {
         response.status(401).send({ error: "You don't have access to this video's files."});
+        console.log('[Server] You do not have access to this video file.');
         return;
       }
 
