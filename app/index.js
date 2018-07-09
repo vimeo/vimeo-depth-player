@@ -7,6 +7,8 @@ import Scene from './components/scene';
 
 import VimeoClient from './components/vimeo';
 
+import DepthStream from './components/depthstream';
+
 
 
 /*
@@ -17,6 +19,7 @@ import VimeoClient from './components/vimeo';
 * TODO - Package the functionality into a library that could
 * easily be distributed and installed
 */
+window.DepthStream = DepthStream;
 window.DepthKit = DepthKit;
 window.THREE = THREE;
 window.Scene = Scene;

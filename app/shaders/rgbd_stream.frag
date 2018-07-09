@@ -1,21 +1,17 @@
+uniform float time;
+uniform vec2 resolution;
 uniform sampler2D map;
-uniform float opacity;
 
-uniform float uvdy;
-uniform float uvdx;
-
-varying float visibility;
 varying vec2 vUv;
-varying vec3 vNormal;
-varying vec3 vPos;
+void main()	{
+  vec2 colorUVS = vUv;
 
-void main() {
+  //Cut the upper UV portion
+  colorUVS.y *= 0.5;
+  colorUVS.y += 0.5;
 
-    if ( visibility < 0.9 ) discard;
+  //Sample the texture
+  vec4 colorSample = texture2D(map, colorUVS);
 
-    vec4 color = texture2D(map, vUv);
-    color.w = opacity;
-
-    gl_FragColor = color;
-
+  gl_FragColor = vec4(colorSample.rgb, 1.0);
 }

@@ -1355,7 +1355,85 @@ var DepthKit = function () {
 
 exports.default = DepthKit;
 
-},{"./gui":3,"glslify":10,"three":11}],3:[function(require,module,exports){
+},{"./gui":4,"glslify":11,"three":12}],3:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _three = require('three');
+
+var THREE = _interopRequireWildcard(_three);
+
+var _gui = require('./gui');
+
+var _gui2 = _interopRequireDefault(_gui);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+// bundling of GLSL code
+var glsl = require('glslify');
+
+var DepthStream = function DepthStream(videoElementID, streamURL) {
+  _classCallCheck(this, DepthStream);
+
+  //Save guard
+  if (!videoElementID || !streamURL) {
+    console.warn('[Client] Depth stream video element not specified');
+  }
+
+  var fragSrc = glsl(["#define GLSLIFY 1\nuniform float time;\nuniform vec2 resolution;\nuniform sampler2D map;\n\nvarying vec2 vUv;\nvoid main()\t{\n  vec2 colorUVS = vUv;\n\n  //Cut the upper UV portion\n  colorUVS.y *= 0.5;\n  colorUVS.y += 0.5;\n\n  //Sample the texture\n  vec4 colorSample = texture2D(map, colorUVS);\n\n  gl_FragColor = vec4(colorSample.rgb, 1.0);\n}\n"]);
+  var vertSrc = glsl(["#define GLSLIFY 1\nuniform float time;\nuniform vec2 resolution;\nuniform sampler2D map;\n\nvarying vec2 vUv;\n\nconst float  _Epsilon = .03;\n\n// RGB to HSV\nvec3 rgb2hsv(vec3 c)\n{\n    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);\n    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));\n    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));\n\n    float d = q.x - min(q.w, q.y);\n    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + _Epsilon)), d / (q.x + _Epsilon), q.x);\n}\n\nvoid main()\t{\n  vUv = uv;\n\n  vec2 depthUVS = vUv;\n  depthUVS.y *= 0.5;\n\n  vec4 perPointPos = vec4(position, 1.0);\n\n  vec4 depthSample = texture2D(map, depthUVS);\n  vec3 hsvDepthSample = rgb2hsv(depthSample.rgb);\n\n  perPointPos.z += hsvDepthSample.x * 1.5;\n\n  vec4 worldPos = projectionMatrix * modelViewMatrix * perPointPos;\n  gl_Position = worldPos;\n\n  gl_PointSize = 3.0;\n}\n"]);
+
+  //Replace the URL - TODO if iOS mobile use HLS natively
+  var url = streamURL.replace('hls', 'dash');
+
+  //Create a DASH.js player
+  this.player = dashjs.MediaPlayer().create();
+
+  //Initialize the player
+  this.player.initialize(document.querySelector("#" + videoElementID), url, true);
+
+  //Get the video element
+  this.videoElement = document.getElementById(videoElementID);
+
+  //Create a THREE video texture
+  this.streamVideoTex = new THREE.VideoTexture(this.videoElement);
+
+  //Set filtering and type
+  this.streamVideoTex.minFilter = THREE.NearestFilter;
+  this.streamVideoTex.magFilter = THREE.LinearFilter;
+  this.streamVideoTex.format = THREE.RGBFormat;
+  this.streamVideoTex.generateMipmaps = false;
+
+  this.material = new THREE.ShaderMaterial({
+    uniforms: {
+      "map": {
+        type: "t",
+        value: this.streamVideoTex
+      }
+    },
+    vertexShader: vertSrc,
+    fragmentShader: fragSrc,
+    transparent: true
+  });
+
+  var geo = new THREE.PlaneBufferGeometry(1.3, 1, 256, 256);
+  this.mesh = new THREE.Points(geo, this.material);
+
+  this.mesh.stream = this;
+
+  return this.mesh;
+};
+
+exports.default = DepthStream;
+
+},{"./gui":4,"glslify":11,"three":12}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1431,7 +1509,7 @@ var GuiManager = function () {
 
 exports.default = GuiManager;
 
-},{"dat.gui":8}],4:[function(require,module,exports){
+},{"dat.gui":9}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1591,7 +1669,7 @@ var Scene = function (_EventEmitter) {
 
 exports.default = Scene;
 
-},{"./controls":1,"./util":5,"event-emitter-es6":9,"three":11}],5:[function(require,module,exports){
+},{"./controls":1,"./util":6,"event-emitter-es6":10,"three":12}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1630,7 +1708,7 @@ var Util = function () {
 
 exports.default = Util;
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1759,7 +1837,7 @@ var VimeoClient = function () {
 
 exports.default = VimeoClient;
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 'use strict';
 
 var _three = require('three');
@@ -1778,6 +1856,10 @@ var _vimeo = require('./components/vimeo');
 
 var _vimeo2 = _interopRequireDefault(_vimeo);
 
+var _depthstream = require('./components/depthstream');
+
+var _depthstream2 = _interopRequireDefault(_depthstream);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
@@ -1790,13 +1872,14 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 * TODO - Package the functionality into a library that could
 * easily be distributed and installed
 */
-//Import three.js
+window.DepthStream = _depthstream2.default; //Import three.js
+
 window.DepthKit = _depthkit2.default;
 window.THREE = THREE;
 window.Scene = _scene2.default;
 window.VimeoClient = _vimeo2.default;
 
-},{"./components/depthkit":2,"./components/scene":4,"./components/vimeo":6,"three":11}],8:[function(require,module,exports){
+},{"./components/depthkit":2,"./components/depthstream":3,"./components/scene":5,"./components/vimeo":7,"three":12}],9:[function(require,module,exports){
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -4328,7 +4411,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 })));
 
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -4579,7 +4662,7 @@ var EventEmitter = function () {
 
 module.exports = EventEmitter;
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 module.exports = function(strings) {
   if (typeof strings === 'string') strings = [strings]
   var exprs = [].slice.call(arguments,1)
@@ -4591,7 +4674,7 @@ module.exports = function(strings) {
   return parts.join('')
 }
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -50576,4 +50659,4 @@ module.exports = function(strings) {
 
 })));
 
-},{}]},{},[7]);
+},{}]},{},[8]);
