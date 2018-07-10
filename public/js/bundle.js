@@ -1414,7 +1414,7 @@ var DepthStream = function () {
       }
     } else {
       //Replace the URL - TODO if iOS mobile use HLS natively
-      var url = streamURL.replace('https', 'http');
+      var url = streamURL;
       console.log(url);
 
       //Create a DASH.js player

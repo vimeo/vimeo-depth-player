@@ -35,7 +35,7 @@ class DepthStream{
       }
     } else {
       //Replace the URL - TODO if iOS mobile use HLS natively
-      let url = streamURL.replace('https', 'http');
+      let url = streamURL;
       console.log(url);
 
 
