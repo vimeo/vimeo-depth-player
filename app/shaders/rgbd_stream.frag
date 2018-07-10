@@ -12,6 +12,6 @@ void main()	{
 
   //Sample the texture
   vec4 colorSample = texture2D(map, colorUVS);
-
+  if(colorSample.r < 0.01) discard;
   gl_FragColor = vec4(colorSample.rgb, 1.0);
 }

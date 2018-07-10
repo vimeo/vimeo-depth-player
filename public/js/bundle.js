@@ -1396,7 +1396,7 @@ var DepthStream = function () {
       console.warn('[Client] Depth stream video element not specified');
     }
 
-    var fragSrc = glsl(["#define GLSLIFY 1\nuniform float time;\nuniform vec2 resolution;\nuniform sampler2D map;\n\nvarying vec2 vUv;\nvoid main()\t{\n  vec2 colorUVS = vUv;\n\n  //Cut the upper UV portion\n  colorUVS.y *= 0.5;\n  colorUVS.y += 0.5;\n\n  //Sample the texture\n  vec4 colorSample = texture2D(map, colorUVS);\n\n  gl_FragColor = vec4(colorSample.rgb, 1.0);\n}\n"]);
+    var fragSrc = glsl(["#define GLSLIFY 1\nuniform float time;\nuniform vec2 resolution;\nuniform sampler2D map;\n\nvarying vec2 vUv;\nvoid main()\t{\n  vec2 colorUVS = vUv;\n\n  //Cut the upper UV portion\n  colorUVS.y *= 0.5;\n  colorUVS.y += 0.5;\n\n  //Sample the texture\n  vec4 colorSample = texture2D(map, colorUVS);\n  if(colorSample.r < 0.01) discard;\n  gl_FragColor = vec4(colorSample.rgb, 1.0);\n}\n"]);
     var vertSrc = glsl(["#define GLSLIFY 1\nuniform float time;\nuniform vec2 resolution;\nuniform sampler2D map;\n\nvarying vec2 vUv;\n\nconst float  _Epsilon = .03;\n\n// RGB to HSV\nvec3 rgb2hsv(vec3 c)\n{\n    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);\n    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));\n    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));\n\n    float d = q.x - min(q.w, q.y);\n    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + _Epsilon)), d / (q.x + _Epsilon), q.x);\n}\n\nvoid main()\t{\n  vUv = uv;\n\n  vec2 depthUVS = vUv;\n  depthUVS.y *= 0.5;\n\n  vec4 perPointPos = vec4(position, 1.0);\n\n  vec4 depthSample = texture2D(map, depthUVS);\n  vec3 hsvDepthSample = rgb2hsv(depthSample.rgb);\n\n  perPointPos.z += hsvDepthSample.x * 1.5;\n\n  vec4 worldPos = projectionMatrix * modelViewMatrix * perPointPos;\n  gl_Position = worldPos;\n\n  gl_PointSize = 3.0;\n}\n"]);
 
     if (_util2.default.isiOS()) {
@@ -1457,7 +1457,7 @@ var DepthStream = function () {
     });
 
     var geo = new THREE.PlaneBufferGeometry(1.3, 1, 256, 256);
-    this.mesh = new THREE.Points(geo, this.material);
+    this.mesh = new THREE.Mesh(geo, this.material);
 
     this.mesh.stream = this;
 
@@ -1773,17 +1773,20 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 */
 var VimeoClient = function () {
   function VimeoClient() {
-    var quality = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'hd';
+    var quality = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'hls';
 
     _classCallCheck(this, VimeoClient);
 
+    if (quality == null) {
+      console.warn('[Vimeo] you have to specifiy the quality parameter');
+    }
     /*
     * Set the desired quality.
     * - 'hd'
     * - 'sd'
     * - 'hls'
     */
-    this.selectedQuality = quality.toLowerCase();
+    this.selectedQuality = quality;
 
     //Props to be parsed from the API response
     this.type;
@@ -1814,58 +1817,66 @@ var VimeoClient = function () {
             if (response.status === 200) {
 
               //Save the file list of each request to a member object of the instance
-              _this.files = obj.files;
+              if (obj.play == null) {
+                reject('[Vimeo] no video found');
+              }
 
-              // if(obj.description){
-              //   this.props = JSON.parse(obj.description);
-              // } else {
-              //   //TODO Find a better way to do this!
-              //   this.props.textureWidth = 640;
-              //   this.props.textureHeight = 960;
-              // }
+              _this.files = obj.play;
 
-              //Iterate over the file list and find the one that matchs our quality setting (e.g 'hd')
-              var _iteratorNormalCompletion = true;
-              var _didIteratorError = false;
-              var _iteratorError = undefined;
+              if (obj.description) {
+                _this.props = JSON.parse(obj.description);
+              }
 
-              try {
-                for (var _iterator = _this.files[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                  var file = _step.value;
+              if (_this.selectedQuality == 'hls') {
+                _this.url = _this.files.hls.link;
+                _this.type = 'application/x-mpegURL';
+              } else if (_this.selectedQuality == 'dash') {
+                _this.url = _this.files.dash.link;
+                _this.type = 'application/x-mpegURL';
+              } else {
+                //Iterate over the file list and find the one that matchs our quality setting (e.g 'hd')
+                var _iteratorNormalCompletion = true;
+                var _didIteratorError = false;
+                var _iteratorError = undefined;
 
-                  if (file.quality === _this.selectedQuality) {
-
-                    //Save the link
-                    _this.url = file.link;
-
-                    //Save the type
-                    _this.type = file.type;
-
-                    //Save the framerate
-                    _this.fps = file.fps;
-
-                    //Fix the width and height based on the vimeo video sizes
-                    _this.props.textureWidth = file.width;
-                    _this.props.textureHeight = file.height;
-                  }
-                }
-
-                //Resolve the promise and return the url for the video and the props object
-              } catch (err) {
-                _didIteratorError = true;
-                _iteratorError = err;
-              } finally {
                 try {
-                  if (!_iteratorNormalCompletion && _iterator.return) {
-                    _iterator.return();
+                  for (var _iterator = _this.files.progressive[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var file = _step.value;
+
+                    console.log(file);
+                    if (file.width === _this.selectedQuality) {
+
+                      //Save the link
+                      _this.url = file.link;
+
+                      //Save the type
+                      _this.type = file.type;
+
+                      //Save the framerate
+                      _this.fps = file.fps;
+
+                      //Fix the width and height based on the vimeo video sizes
+                      _this.props.textureWidth = file.width;
+                      _this.props.textureHeight = file.height;
+                    }
                   }
+                } catch (err) {
+                  _didIteratorError = true;
+                  _iteratorError = err;
                 } finally {
-                  if (_didIteratorError) {
-                    throw _iteratorError;
+                  try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                      _iterator.return();
+                    }
+                  } finally {
+                    if (_didIteratorError) {
+                      throw _iteratorError;
+                    }
                   }
                 }
               }
 
+              //Resolve the promise and return the url for the video and the props object
               resolve({
                 'url': _this.url,
                 'props': _this.props,

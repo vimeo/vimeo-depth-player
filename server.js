@@ -12,6 +12,8 @@ app.use(express.static('public'));
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  // "Accept", "application/vnd.vimeo.*+json;version=" + apiVersion
+  res.header("Accept", "application/vnd.vimeo.*+json;version=3.4");
   next();
 });
 
@@ -55,14 +57,15 @@ app.get('/video/:id', (request, response) => {
     method: 'GET',
     path: `/videos/${request.params.id}`,
   }, function(error, body, status_code, headers) {
+
     if (error) {
       response.status(500).send(error);
       console.log('[Server] ' + error);
     }
     else {
-      if (body["files"] == null) {
+      // console.log(body.files);
+      if (body["files"] == null && body["play"] == null) {
         response.status(401).send({ error: "You don't have access to this video's files."});
-        console.log('[Server] You do not have access to this video file.');
         return;
       }
 

@@ -79,7 +79,7 @@ class DepthStream{
     });
 
     let geo = new THREE.PlaneBufferGeometry(1.3, 1, 256, 256);
-    this.mesh = new THREE.Points(geo, this.material);
+    this.mesh = new THREE.Mesh(geo, this.material);
 
     this.mesh.stream = this;
 

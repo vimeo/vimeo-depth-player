@@ -2,15 +2,17 @@
 * A promise based wrapper for the vimeo API
 */
 class VimeoClient{
-  constructor(quality='hd'){
-
+  constructor(quality='hls'){
+    if(quality == null){
+      console.warn('[Vimeo] you have to specifiy the quality parameter');
+    }
     /*
     * Set the desired quality.
     * - 'hd'
     * - 'sd'
     * - 'hls'
     */
-    this.selectedQuality = quality.toLowerCase();
+    this.selectedQuality = quality;
 
     //Props to be parsed from the API response
     this.type;
@@ -37,35 +39,45 @@ class VimeoClient{
           if(response.status === 200){
 
             //Save the file list of each request to a member object of the instance
-            this.files = obj.files;
+            if(obj.play == null){
+              reject('[Vimeo] no video found');
+            }
 
-            // if(obj.description){
-            //   this.props = JSON.parse(obj.description);
-            // } else {
-            //   //TODO Find a better way to do this!
-            //   this.props.textureWidth = 640;
-            //   this.props.textureHeight = 960;
-            // }
+            this.files = obj.play;
 
-            //Iterate over the file list and find the one that matchs our quality setting (e.g 'hd')
-            for(let file of this.files){
-              if(file.quality === this.selectedQuality){
+            if(obj.description){
+              this.props = JSON.parse(obj.description);
+            }
+            
+            if(this.selectedQuality == 'hls'){
+              this.url = this.files.hls.link;
+              this.type = 'application/x-mpegURL';
+            } else if(this.selectedQuality == 'dash'){
+              this.url = this.files.dash.link;
+              this.type = 'application/x-mpegURL';
+            } else {
+              //Iterate over the file list and find the one that matchs our quality setting (e.g 'hd')
+              for(let file of this.files.progressive){
+                console.log(file);
+                if(file.width === this.selectedQuality){
 
-                //Save the link
-                this.url = file.link;
+                  //Save the link
+                  this.url = file.link;
 
-                //Save the type
-                this.type = file.type;
+                  //Save the type
+                  this.type = file.type;
 
-                //Save the framerate
-                this.fps = file.fps;
+                  //Save the framerate
+                  this.fps = file.fps;
 
-                //Fix the width and height based on the vimeo video sizes
-                this.props.textureWidth = file.width;
-                this.props.textureHeight = file.height;
+                  //Fix the width and height based on the vimeo video sizes
+                  this.props.textureWidth = file.width;
+                  this.props.textureHeight = file.height;
 
+                }
               }
             }
+
 
             //Resolve the promise and return the url for the video and the props object
             resolve({
