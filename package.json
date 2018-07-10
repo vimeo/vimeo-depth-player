@@ -12,6 +12,7 @@
   "author": "Or Fleisher <contact@orfleisher.com>",
   "license": "MIT",
   "dependencies": {
+    "cors": "^2.8.4",
     "express": "^4.16.2",
     "three": "^0.89.0",
     "vimeo": "^2.0.2"

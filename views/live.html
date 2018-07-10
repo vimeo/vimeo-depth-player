@@ -34,7 +34,7 @@
       console.log(`[Client] is WebGL supported on this browser? ${supported}`);
     });
 
-    const vimeo = new VimeoClient('hls');
+    const vimeo = new VimeoClient('dash');
 
     //Request the video and use the values to build the character
     vimeo.requestVideo('279348234').then(response=>{

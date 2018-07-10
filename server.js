@@ -3,16 +3,19 @@ const Vimeo = require('vimeo').Vimeo;
 
 // Import the express library and create an express app
 const express = require('express');
+const cors = require('cors')
 const app = express();
 
 //Expose the public folder to the client
 app.use(express.static('public'));
 
-//Implement CORS headers
+//Setup cors
+app.use(cors());
+
+//Implement vimeo API version 3.4 header
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  // "Accept", "application/vnd.vimeo.*+json;version=" + apiVersion
   res.header("Accept", "application/vnd.vimeo.*+json;version=3.4");
   next();
 });

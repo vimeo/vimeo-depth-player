@@ -23,7 +23,8 @@ class DepthStream{
     if(Util.isiOS()){
       this.videoElement = document.getElementById(videoElementID);
       this.videoElement.src = streamURL;
-      this.videoElement.crossOrigin = '*';
+      this.videoElement.crossOrigin = 'anonymous';
+      this.videoElement.setAttribute('crossorigin', 'anonymous');
       this.videoElement.load();
       this.videoElement.addEventListener("contextmenu", e=>{
         e.preventDefault();
@@ -34,7 +35,9 @@ class DepthStream{
       }
     } else {
       //Replace the URL - TODO if iOS mobile use HLS natively
-      let url = streamURL.replace('hls', 'dash');
+      let url = streamURL.replace('https', 'http');
+      console.log(url);
+
 
       //Create a DASH.js player
       this.player = dashjs.MediaPlayer().create();
@@ -44,6 +47,8 @@ class DepthStream{
 
       //Get the video element
       this.videoElement = document.getElementById(videoElementID);
+      this.videoElement.crossOrigin = 'anonymous';
+      this.videoElement.setAttribute('crossorigin', 'anonymous');
     }
 
 

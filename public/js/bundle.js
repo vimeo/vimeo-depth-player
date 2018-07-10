@@ -1402,7 +1402,8 @@ var DepthStream = function () {
     if (_util2.default.isiOS()) {
       this.videoElement = document.getElementById(videoElementID);
       this.videoElement.src = streamURL;
-      this.videoElement.crossOrigin = '*';
+      this.videoElement.crossOrigin = 'anonymous';
+      this.videoElement.setAttribute('crossorigin', 'anonymous');
       this.videoElement.load();
       this.videoElement.addEventListener("contextmenu", function (e) {
         e.preventDefault();
@@ -1413,7 +1414,8 @@ var DepthStream = function () {
       }
     } else {
       //Replace the URL - TODO if iOS mobile use HLS natively
-      var url = streamURL.replace('hls', 'dash');
+      var url = streamURL.replace('https', 'http');
+      console.log(url);
 
       //Create a DASH.js player
       this.player = dashjs.MediaPlayer().create();
@@ -1423,6 +1425,8 @@ var DepthStream = function () {
 
       //Get the video element
       this.videoElement = document.getElementById(videoElementID);
+      this.videoElement.crossOrigin = 'anonymous';
+      this.videoElement.setAttribute('crossorigin', 'anonymous');
     }
 
     //GUI functionality
@@ -1832,6 +1836,7 @@ var VimeoClient = function () {
                 _this.type = 'application/x-mpegURL';
               } else if (_this.selectedQuality == 'dash') {
                 _this.url = _this.files.dash.link;
+                console.log(_this.url);
                 _this.type = 'application/x-mpegURL';
               } else {
                 //Iterate over the file list and find the one that matchs our quality setting (e.g 'hd')

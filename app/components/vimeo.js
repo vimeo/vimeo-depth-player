@@ -48,12 +48,13 @@ class VimeoClient{
             if(obj.description){
               this.props = JSON.parse(obj.description);
             }
-            
+
             if(this.selectedQuality == 'hls'){
               this.url = this.files.hls.link;
               this.type = 'application/x-mpegURL';
             } else if(this.selectedQuality == 'dash'){
               this.url = this.files.dash.link;
+              console.log(this.url);
               this.type = 'application/x-mpegURL';
             } else {
               //Iterate over the file list and find the one that matchs our quality setting (e.g 'hd')
