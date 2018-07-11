@@ -1826,7 +1826,7 @@ var VimeoClient = function () {
 
               _this.files = obj.play;
 
-              if (obj.description) {
+              if (obj.description && obj.description.match(/^{/)) {
                 _this.props = JSON.parse(obj.description);
               }
 

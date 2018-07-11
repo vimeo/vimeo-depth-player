@@ -13,7 +13,10 @@
   "license": "MIT",
   "dependencies": {
     "cors": "^2.8.4",
+    "ejs": "^2.6.1",
     "express": "^4.16.2",
+    "express-ejs-layouts": "^2.4.0",
+    "path": "^0.12.7",
     "three": "^0.89.0",
     "vimeo": "^2.0.2"
   },
