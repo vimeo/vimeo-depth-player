@@ -1620,12 +1620,21 @@ var Scene = function (_EventEmitter) {
 
     if (!_this.hasGL) return _possibleConstructorReturn(_this);
 
+    var fontLoader = new THREE.FontLoader();
+    fontLoader.load('./assets/helvetiker.json', function (font) {
+      _this.font = font;
+    });
+
     //THREE scene
     _this.scene = new THREE.Scene();
 
     //Set the height and weight
     _this.width = window.innerWidth;
     _this.height = window.innerHeight;
+
+    _this.light = new THREE.PointLight();
+    _this.light.position.set(0, 2.5, 0);
+    _this.scene.add(_this.light);
 
     //THREE Camera
     _this.camera = new THREE.PerspectiveCamera(75, _this.width / _this.height, 0.1, 1000);
@@ -1657,7 +1666,7 @@ var Scene = function (_EventEmitter) {
     // this.controls.autoRotate = true;
 
     var grid = new THREE.GridHelper();
-    _this.scene.add(grid);
+    // this.scene.add(grid);
 
     //Setup event listeners for events and handle the states
     window.addEventListener('resize', function (e) {
