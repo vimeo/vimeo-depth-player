@@ -17,8 +17,8 @@
     "express": "^4.16.2",
     "express-ejs-layouts": "^2.4.0",
     "path": "^0.12.7",
+    "sync-request": "^6.0.0",
     "three": "^0.89.0",
-    "unfurl-url": "^1.0.0",
     "vimeo": "^2.0.2"
   },
   "devDependencies": {

@@ -72,42 +72,17 @@ app.get('/video/:id', (request, response) => {
       }
 
       if (body.live.status == "streaming") {
-        var unfurl = require('unfurl-url');
+        var sync_req = require('sync-request');
 
-        unfurl.url(body.play.dash.link, function(error, url) {
-          dash_unfurled = true;
-          if (!error) {
-            body.play.dash.link = url;
-          }
-
-          RenderVideoFilesResponse(response, body);
-        });
-
-        unfurl.url(body.play.hls.link, function(error, url) {
-          hls_unfurled = true;
-          if (!error) {
-            body.play.hls.link = url;
-          }
-
-          RenderVideoFilesResponse(response, body);
-        });
+        body.play.dash.link = sync_req('GET', body.play.dash.link).url;
+        body.play.hls.link = sync_req('GET', body.play.hls.link).url;
       }
-      else {
-        response.status(200).send(body);
-      }
+      
+      response.status(200).send(body);
     }
   });
 
 });
-
-var dash_unfurled = false;
-var hls_unfurled = false;
-
-function RenderVideoFilesResponse(response, json) {
-  if (dash_unfurled && hls_unfurled) {
-    response.status(200).send(json);
-  }
-}
 
 const listener = app.listen(process.env.PORT, () => {
   console.log(`[Server] Running on port: ${listener.address().port} 🚢`);

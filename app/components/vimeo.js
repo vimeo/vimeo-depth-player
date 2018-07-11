@@ -49,42 +49,42 @@ class VimeoClient {
               this.props = JSON.parse(obj.description);
             }
 
-            if (obj.live.status == "streaming") {
-              console.log("This video is live!");
-              this.url = this.files.dash.link;
-              this.type = 'application/x-mpegURL';
+            if (this.selectedQuality == 'auto') {
+              this.selectedQuality = 'dash';
+              // todo: if mobile safari, play hls
+              // todo: detect if stream even has dash/hls and fall back to highest progressive
+              console.log("[VimeoClient] Selected quality: " + this.selectedQuality);
             }
 
-            // if (this.selectedQuality == 'hls') {
-            //   this.url = this.files.hls.link;
-            //   this.type = 'application/x-mpegURL';
-            // } 
-            // else if (this.selectedQuality == 'dash') {
-            //   this.url = this.files.dash.link;
-            //   console.log(this.url);
-            //   this.type = 'application/x-mpegURL';
-            // } 
-            // else {
-            //   // Iterate over the file list and find the one that matchs our quality setting (e.g 'hd')
-            //   for (let file of this.files.progressive) {
-            //     // console.log(file);
-            //     if (file.width === this.selectedQuality) {
-            //       //Save the link
-            //       this.url = file.link;
+            if (this.selectedQuality == 'hls') {
+              this.url = this.files.hls.link;
+              this.type = 'application/x-mpegURL';
+            } 
+            else if (this.selectedQuality == 'dash') {
+              this.url = this.files.dash.link;
+              this.type = 'application/x-mpegURL';
+            } 
+            else {
+              // Iterate over the file list and find the one that matchs our quality setting (e.g 'hd')
+              for (let file of this.files.progressive) {
+                // console.log(file);
+                if (file.width === this.selectedQuality) {
+                  //Save the link
+                  this.url = file.link;
 
-            //       //Save the type
-            //       this.type = file.type;
+                  //Save the type
+                  this.type = file.type;
 
-            //       //Save the framerate
-            //       this.fps = file.fps;
+                  //Save the framerate
+                  this.fps = file.fps;
 
-            //       //Fix the width and height based on the vimeo video sizes
-            //       this.props.textureWidth = file.width;
-            //       this.props.textureHeight = file.height;
+                  //Fix the width and height based on the vimeo video sizes
+                  this.props.textureWidth = file.width;
+                  this.props.textureHeight = file.height;
 
-            //     }
-            //   }
-            // }
+                }
+              }
+            }
 
 
             //Resolve the promise and return the url for the video and the props object

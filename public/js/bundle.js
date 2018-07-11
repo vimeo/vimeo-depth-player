@@ -1830,43 +1830,60 @@ var VimeoClient = function () {
                 _this.props = JSON.parse(obj.description);
               }
 
-              if (obj.live.status == "streaming") {
-                console.log("This video is live!");
-                _this.url = _this.files.dash.link;
-                _this.type = 'application/x-mpegURL';
+              if (_this.selectedQuality == 'auto') {
+                _this.selectedQuality = 'dash';
+                // todo: if mobile safari, play hls
+                // todo: detect if stream even has dash/hls and fall back to highest progressive
+                console.log("[VimeoClient] Selected quality: " + _this.selectedQuality);
               }
 
-              // if (this.selectedQuality == 'hls') {
-              //   this.url = this.files.hls.link;
-              //   this.type = 'application/x-mpegURL';
-              // } 
-              // else if (this.selectedQuality == 'dash') {
-              //   this.url = this.files.dash.link;
-              //   console.log(this.url);
-              //   this.type = 'application/x-mpegURL';
-              // } 
-              // else {
-              //   // Iterate over the file list and find the one that matchs our quality setting (e.g 'hd')
-              //   for (let file of this.files.progressive) {
-              //     // console.log(file);
-              //     if (file.width === this.selectedQuality) {
-              //       //Save the link
-              //       this.url = file.link;
+              if (_this.selectedQuality == 'hls') {
+                _this.url = _this.files.hls.link;
+                _this.type = 'application/x-mpegURL';
+              } else if (_this.selectedQuality == 'dash') {
+                _this.url = _this.files.dash.link;
+                _this.type = 'application/x-mpegURL';
+              } else {
+                // Iterate over the file list and find the one that matchs our quality setting (e.g 'hd')
+                var _iteratorNormalCompletion = true;
+                var _didIteratorError = false;
+                var _iteratorError = undefined;
 
-              //       //Save the type
-              //       this.type = file.type;
+                try {
+                  for (var _iterator = _this.files.progressive[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var file = _step.value;
 
-              //       //Save the framerate
-              //       this.fps = file.fps;
+                    // console.log(file);
+                    if (file.width === _this.selectedQuality) {
+                      //Save the link
+                      _this.url = file.link;
 
-              //       //Fix the width and height based on the vimeo video sizes
-              //       this.props.textureWidth = file.width;
-              //       this.props.textureHeight = file.height;
+                      //Save the type
+                      _this.type = file.type;
 
-              //     }
-              //   }
-              // }
+                      //Save the framerate
+                      _this.fps = file.fps;
 
+                      //Fix the width and height based on the vimeo video sizes
+                      _this.props.textureWidth = file.width;
+                      _this.props.textureHeight = file.height;
+                    }
+                  }
+                } catch (err) {
+                  _didIteratorError = true;
+                  _iteratorError = err;
+                } finally {
+                  try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                      _iterator.return();
+                    }
+                  } finally {
+                    if (_didIteratorError) {
+                      throw _iteratorError;
+                    }
+                  }
+                }
+              }
 
               //Resolve the promise and return the url for the video and the props object
               resolve({
