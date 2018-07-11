@@ -1,0 +1,24 @@
+
+<!-- WebGL canvas container -->
+<div id="gl_canvas_container"></div>
+
+<!-- Temp video player -->
+<video id="vimeo-video" controls autoplay muted playsinline></video>
+
+<script>
+  // Create a new scene wrapper (holds the THREE scene under .scene / .camera / .controls ...etc)
+  const glScene = new Scene();
+
+  //Check for webGL support and log
+  glScene.on('webgl_support', supported => {
+    console.log(`[Client] is WebGL supported on this browser? ${supported}`);
+  });
+
+  const vimeo = new VimeoClient('auto');
+
+  // Request the video and use the values to build the character
+  vimeo.requestVideo('<%= video_id %>').then(response => {
+    let depthStream = new DepthStream('vimeo-video', response.url);
+    glScene.scene.add(depthStream);
+  });
+</script>

@@ -1,9 +1,9 @@
 /*
 * A promise based wrapper for the vimeo API
 */
-class VimeoClient{
-  constructor(quality='hls'){
-    if(quality == null){
+class VimeoClient {
+  constructor(quality = 'hls') {
+    if (quality == null) {
       console.warn('[Vimeo] you have to specifiy the quality parameter');
     }
     /*
@@ -21,10 +21,10 @@ class VimeoClient{
     this.url;
     this.files;
   }
-  requestVideo(vimeoVideoID){
+  requestVideo(vimeoVideoID) {
 
     //Safeguard the request
-    if(!vimeoVideoID){
+    if (!vimeoVideoID){
       console.warn('[Client] Can not request a video without providing a video ID');
       return;
     }
@@ -32,36 +32,43 @@ class VimeoClient{
     //The function returns a promise based on the request made inside
     return new Promise((resolve, reject)=>{
       //Use the fetch API (returns a promise) and assemble the complete request path - e.g http://myawesomeapp.com/video/vimeo_video_id
-      fetch(`${window.location.protocol}//${window.location.host}/video/${vimeoVideoID}`).then(response=>{
+      fetch(`${window.location.protocol}//${window.location.host}/video/${vimeoVideoID}`).then(response => {
 
         //Unpack the response and get the object back using .json() method from the fetch API
-        response.json().then(obj=>{
-          if(response.status === 200){
+        response.json().then(obj => {
+          if (response.status === 200) {
 
             //Save the file list of each request to a member object of the instance
-            if(obj.play == null){
+            if (obj.play == null){
               reject('[Vimeo] no video found');
             }
 
             this.files = obj.play;
 
-            if(obj.description){
+            if (obj.description && obj.description.match(/^{/)) {
               this.props = JSON.parse(obj.description);
             }
 
-            if(this.selectedQuality == 'hls'){
+            if (this.selectedQuality == 'auto') {
+              this.selectedQuality = 'dash';
+              // todo: if mobile safari, play hls
+              // todo: detect if stream even has dash/hls and fall back to highest progressive
+              console.log("[VimeoClient] Selected quality: " + this.selectedQuality);
+            }
+
+            if (this.selectedQuality == 'hls') {
               this.url = this.files.hls.link;
               this.type = 'application/x-mpegURL';
-            } else if(this.selectedQuality == 'dash'){
+            } 
+            else if (this.selectedQuality == 'dash') {
               this.url = this.files.dash.link;
-              console.log(this.url);
               this.type = 'application/x-mpegURL';
-            } else {
-              //Iterate over the file list and find the one that matchs our quality setting (e.g 'hd')
-              for(let file of this.files.progressive){
+            } 
+            else {
+              // Iterate over the file list and find the one that matchs our quality setting (e.g 'hd')
+              for (let file of this.files.progressive) {
                 // console.log(file);
-                if(file.width === this.selectedQuality){
-
+                if (file.width === this.selectedQuality) {
                   //Save the link
                   this.url = file.link;
 

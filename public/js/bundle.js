@@ -1826,8 +1826,15 @@ var VimeoClient = function () {
 
               _this.files = obj.play;
 
-              if (obj.description) {
+              if (obj.description && obj.description.match(/^{/)) {
                 _this.props = JSON.parse(obj.description);
+              }
+
+              if (_this.selectedQuality == 'auto') {
+                _this.selectedQuality = 'dash';
+                // todo: if mobile safari, play hls
+                // todo: detect if stream even has dash/hls and fall back to highest progressive
+                console.log("[VimeoClient] Selected quality: " + _this.selectedQuality);
               }
 
               if (_this.selectedQuality == 'hls') {
@@ -1835,10 +1842,9 @@ var VimeoClient = function () {
                 _this.type = 'application/x-mpegURL';
               } else if (_this.selectedQuality == 'dash') {
                 _this.url = _this.files.dash.link;
-                console.log(_this.url);
                 _this.type = 'application/x-mpegURL';
               } else {
-                //Iterate over the file list and find the one that matchs our quality setting (e.g 'hd')
+                // Iterate over the file list and find the one that matchs our quality setting (e.g 'hd')
                 var _iteratorNormalCompletion = true;
                 var _didIteratorError = false;
                 var _iteratorError = undefined;
@@ -1849,7 +1855,6 @@ var VimeoClient = function () {
 
                     // console.log(file);
                     if (file.width === _this.selectedQuality) {
-
                       //Save the link
                       _this.url = file.link;
 
