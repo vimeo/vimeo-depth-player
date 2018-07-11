@@ -17,8 +17,8 @@ app.use(expressLayouts);
 //Setup cors
 app.use(cors());
 
-//Implement vimeo API version 3.4 header
 app.use(function(req, res, next) {
+  console.log(`[Server] A ${req.method} request was made to ${req.url}`);
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
@@ -33,35 +33,34 @@ if (process.env.NODE_ENV !== 'production') {
 /*
 * Public Routes
 * - /
+* - /experiments    # homepage
 * - /experiments/:project
 * - /experiments/:project/:video_id 
 * - /:video_id
 */
 
 app.get('/', (request, response) => {
-  console.log(`[Server] A ${request.method} request was made to ${request.url}`);
-  response.sendFile(`${__dirname}/views/index.html`);
+  response.render('index', { layout: false });
 });
 
-app.get('/:video_id', (request, response) => {
-  console.log(`[Server] A ${request.method} request was made to ${request.url}`);
-  response.render('video', { video_id: request.params.video_id });
+app.get('/experiments', (request, response) => {
+  response.render('experiments');
 });
 
 app.get('/experiments/:project', (request, response) => {
-  console.log(`[Server] A ${request.method} request was made to ${request.url}`);
   response.render('experiments/' + request.params.project);
 });
 
 app.get('/experiments/:project/:video_id', (request, response) => {
-  console.log(`[Server] A ${request.method} request was made to ${request.url}`);
   response.render('experiments/' + request.params.project, { video_id: request.params.video_id });
+});
+
+app.get('/:video_id', (request, response) => {
+  response.render('video', { video_id: request.params.video_id });
 });
 
 // The route for getting videos from the vimeo API
 app.get('/video/:id', (request, response) => {
-  console.log(`[Server] A ${request.method} request was made to ${request.url}`);
-
   // Create an API instance using your key
   let api = new Vimeo(null, null, process.env.VIMEO_TOKEN);
 
