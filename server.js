@@ -34,7 +34,7 @@ if (process.env.NODE_ENV !== 'production') {
 * Public Routes
 * - /
 * - /experiments/:project
-* - /experiments/:project/:video_id 
+* - /experiments/:project/:video_id
 * - /:video_id
 */
 
@@ -50,7 +50,7 @@ app.get('/:video_id', (request, response) => {
 
 app.get('/experiments/:project', (request, response) => {
   console.log(`[Server] A ${request.method} request was made to ${request.url}`);
-  response.render('experiments/' + request.params.project);
+  response.render('experiments/' + request.params.project, { video_id: null });
 });
 
 app.get('/experiments/:project/:video_id', (request, response) => {
@@ -70,7 +70,7 @@ app.get('/video/:id', (request, response) => {
     method: 'GET',
     path: `/videos/${request.params.id}`,
     headers: { 'Accept': 'application/vnd.vimeo.*+json;version=3.4' },
-  }, 
+  },
   function(error, body, status_code, headers) {
     if (error) {
       response.status(500).send(error);
@@ -88,7 +88,7 @@ app.get('/video/:id', (request, response) => {
         body.play.dash.link = sync_req('GET', body.play.dash.link).url;
         body.play.hls.link = sync_req('GET', body.play.hls.link).url;
       }
-      
+
       response.status(200).send(body);
     }
   });

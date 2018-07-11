@@ -1,20 +1,4 @@
-<!-- Loading animation container -->
-<div id="loader" class="loading">
-  <!-- We make this div spin -->
-  <div class="spinner">
-    <!-- Mask of the quarter of circle -->
-    <div class="mask">
-      <!-- Inner masked circle -->
-      <div class="maskedCircle"></div>
-    </div>
-  </div>
-</div>
 
-<!-- Vimeo play button -->
-<div id="play" class="play-button"></div>
-
-<!-- WebGL canvas -->
-<div id="gl_canvas_container"></div>
 
 <script>
   //Create a new scene wrapper (holds the THREE scene under .scene / .camera / .controls ...etc)
@@ -31,14 +15,16 @@
   //We will store all the character instance in here so we can hit play (kind of) together
   let characters = [];
 
-  //Save a reference to the loader so we can get rid of it once everything loads
-  const loader = document.getElementById('loader');
 
-  //Save a reference to the play button so we can get rid of it once everything loads
-  const play = document.getElementById('play');
 
   //Request the video and use the values to build the character
-  vimeo.requestVideo('<%= video_id %>').then(response=>{
+  vimeo.requestVideo('<%= video_id || 274161280 %>').then(response=>{
+
+    //Save a reference to the loader so we can get rid of it once everything loads
+    const loader = document.getElementById('loader');
+
+    //Save a reference to the play button so we can get rid of it once everything loads
+    const play = document.getElementById('play');
 
     //Response has .url with the link to the file and .props for the DepthKit engine
     // console.log(response.url, response.props);
