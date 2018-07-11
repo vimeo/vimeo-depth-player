@@ -70,11 +70,44 @@ app.get('/video/:id', (request, response) => {
         response.status(401).send({ error: "You don't have access to this video's files." });
         return;
       }
-      response.status(200).send(body);
+
+      if (body.live.status == "streaming") {
+        var unfurl = require('unfurl-url');
+
+        unfurl.url(body.play.dash.link, function(error, url) {
+          dash_unfurled = true;
+          if (!error) {
+            body.play.dash.link = url;
+          }
+
+          RenderVideoFilesResponse(response, body);
+        });
+
+        unfurl.url(body.play.hls.link, function(error, url) {
+          hls_unfurled = true;
+          if (!error) {
+            body.play.hls.link = url;
+          }
+
+          RenderVideoFilesResponse(response, body);
+        });
+      }
+      else {
+        response.status(200).send(body);
+      }
     }
   });
 
 });
+
+var dash_unfurled = false;
+var hls_unfurled = false;
+
+function RenderVideoFilesResponse(response, json) {
+  if (dash_unfurled && hls_unfurled) {
+    response.status(200).send(json);
+  }
+}
 
 const listener = app.listen(process.env.PORT, () => {
   console.log(`[Server] Running on port: ${listener.address().port} 🚢`);

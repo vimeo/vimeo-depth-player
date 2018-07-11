@@ -18,6 +18,7 @@
     "express-ejs-layouts": "^2.4.0",
     "path": "^0.12.7",
     "three": "^0.89.0",
+    "unfurl-url": "^1.0.0",
     "vimeo": "^2.0.2"
   },
   "devDependencies": {
