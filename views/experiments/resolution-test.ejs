@@ -1,5 +1,4 @@
 
-
 <script>
   //Create a new scene wrapper (holds the THREE scene under .scene / .camera / .controls ...etc)
   const glScene = new Scene();
@@ -14,8 +13,6 @@
 
   //We will store all the character instance in here so we can hit play (kind of) together
   let characters = [];
-
-
 
   //Request the video and use the values to build the character
   vimeo.requestVideo('<%= video_id || 274161280 %>').then(response=>{
