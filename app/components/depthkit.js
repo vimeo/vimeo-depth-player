@@ -24,19 +24,19 @@ const VERTS_TALL = 256;
 
 export default class DepthKit {
 
-    constructor(_type = 'mesh', _props, _movie) {
+    constructor(_type = 'mesh', _props, _movie, appendVideoToDOM = false) {
 
         //Load the shaders
         let rgbdFrag = glsl.file('../shaders/rgbd.frag');
         let rgbdVert = glsl.file('../shaders/rgbd.vert');
 
-        this.gui = new GuiManager();
-        this.gui.addFunction('Play', ()=>{
-          this.play();
-        });
-        this.gui.addFunction('Stop', ()=>{
-          this.stop();
-        });
+        // this.gui = new GuiManager();
+        // this.gui.addFunction('Play', ()=>{
+        //   this.play();
+        // });
+        // this.gui.addFunction('Stop', ()=>{
+        //   this.stop();
+        // });
 
         //Video element
         this.video = document.createElement('video');
@@ -48,7 +48,7 @@ export default class DepthKit {
         this.video.id = 'depthkit-vimeo';
 
         //Append the original video from vimeo to the DOM
-        document.body.append(this.video);
+        if(appendVideoToDOM) document.body.append(this.video);
 
         //Create a video texture to be passed to the shader
         this.videoTexture = new THREE.VideoTexture(this.video);

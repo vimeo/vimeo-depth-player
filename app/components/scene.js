@@ -33,7 +33,7 @@ class Scene extends EventEmitter {
 
     //THREE Camera
     this.camera = new THREE.PerspectiveCamera(75, this.width / this.height, 0.1, 1000);
-    this.camera.position.z = 1.0;
+    this.camera.position.z = 3.5;
     this.camera.position.y = 0.5;
 
     //THREE WebGL renderer

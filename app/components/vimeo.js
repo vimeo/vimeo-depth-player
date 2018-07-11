@@ -59,7 +59,7 @@ class VimeoClient{
             } else {
               //Iterate over the file list and find the one that matchs our quality setting (e.g 'hd')
               for(let file of this.files.progressive){
-                console.log(file);
+                // console.log(file);
                 if(file.width === this.selectedQuality){
 
                   //Save the link

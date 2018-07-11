@@ -37,7 +37,7 @@ app.get('/', (request, response)=>{
   response.sendFile(`${__dirname}/views/index.html`);
 });
 
-app.get('/depthkit', (request, response)=>{
+app.get('/playback', (request, response)=>{
   console.log(`[Server] A ${request.method} request was made to ${request.url}`);
   response.sendFile(`${__dirname}/views/depthkit.html`);
 });

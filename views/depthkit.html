@@ -27,26 +27,45 @@
 
     const vimeo = new VimeoClient(2048);
 
+    let characters = [];
+
     //Request the video and use the values to build the character
     vimeo.requestVideo('274161280').then(response=>{
 
       //Response has .url with the link to the file and .props for the DepthKit engine
       // console.log(response.url, response.props);
+      for(let res in vimeo.files.progressive){
+        console.log(res);
 
-      //Create the DepthKit character
-      let character = new DepthKit('mesh', response.props, response.url);
+        response.props.textureWidth = vimeo.files.progressive[res].width;
+        response.props.textureHeight = vimeo.files.progressive[res].height;
 
-      //Position and rotation adjustments
-      character.rotation.z = Math.PI / 2;
-      character.rotation.y = Math.PI;
-      character.position.z = 0.5;
-      character.position.y = 0.5;
+        //Create the DepthKit character
+        let character;
+        if(res == 5){
+          character = new DepthKit('mesh', response.props, vimeo.files.progressive[res].link, true);
+        } else {
+          character = new DepthKit('mesh', response.props, vimeo.files.progressive[res].link);
+        }
 
-      //Set to loop and hit play 🎬
-      character.depthkit.setLoop(true);
-      character.depthkit.play();
 
-      glScene.scene.add(character);
+        let recenteredX = res - 2.5;
+
+        //Position and rotation adjustments
+        character.rotation.z = Math.PI / 2;
+        character.rotation.y = Math.PI;
+        character.position.x = recenteredX;
+        character.position.z = 0.5;
+        character.position.y = 0.5;
+
+        //Set to loop and hit play 🎬
+        character.depthkit.setLoop(true);
+        characters.push(character);
+        // character.depthkit.play();
+
+        glScene.scene.add(character);
+      }
+
     });
     </script>
   </body>
