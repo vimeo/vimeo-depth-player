@@ -81,7 +81,6 @@ class VimeoClient {
                   //Fix the width and height based on the vimeo video sizes
                   this.props.textureWidth = file.width;
                   this.props.textureHeight = file.height;
-
                 }
               }
             }

@@ -33,6 +33,8 @@ if (process.env.NODE_ENV !== 'production') {
 /*
 * Public Routes
 * - /
+* - /experiments/:project
+* - /experiments/:project/:video_id 
 * - /:video_id
 */
 
@@ -42,9 +44,18 @@ app.get('/', (request, response) => {
 });
 
 app.get('/:video_id', (request, response) => {
-  // console.log(request.headers['user-agent']);
   console.log(`[Server] A ${request.method} request was made to ${request.url}`);
   response.render('video', { video_id: request.params.video_id });
+});
+
+app.get('/experiments/:project', (request, response) => {
+  console.log(`[Server] A ${request.method} request was made to ${request.url}`);
+  response.render('experiments/' + request.params.project);
+});
+
+app.get('/experiments/:project/:video_id', (request, response) => {
+  console.log(`[Server] A ${request.method} request was made to ${request.url}`);
+  response.render('experiments/' + request.params.project, { video_id: request.params.video_id });
 });
 
 // The route for getting videos from the vimeo API
@@ -71,7 +82,7 @@ app.get('/video/:id', (request, response) => {
         return;
       }
 
-      if (body.live.status == "streaming") {
+      if (body.live && body.live.status == "streaming") {
         var sync_req = require('sync-request');
 
         body.play.dash.link = sync_req('GET', body.play.dash.link).url;

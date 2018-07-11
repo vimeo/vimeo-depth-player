@@ -11,7 +11,7 @@ import Util from './util';
 import EventEmitter from 'event-emitter-es6';
 
 class Scene extends EventEmitter {
-  constructor(domElement, clearColor='black') {
+  constructor(domElement, clearColor = 'black') {
 
     //Since we extend EventEmitter we need to instance it from here
     super();
@@ -24,8 +24,8 @@ class Scene extends EventEmitter {
     if (!this.hasGL) return;
 
     let fontLoader = new THREE.FontLoader();
-    fontLoader.load('./assets/helvetiker.json', (font)=>{
-        this.font = font;
+    fontLoader.load('/assets/helvetiker.json', (font)=>{
+      this.font = font;
     });
 
     //THREE scene
@@ -97,7 +97,6 @@ class Scene extends EventEmitter {
   }
 
   onWindowResize(e) {
-
     // Full width and height
     this.width = window.innerWidth;
     this.height = window.innerHeight;
@@ -112,7 +111,6 @@ class Scene extends EventEmitter {
     this.renderer.setSize(this.width, this.height);
 
   }
-
 }
 
 export default Scene;
