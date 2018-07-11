@@ -1621,7 +1621,7 @@ var Scene = function (_EventEmitter) {
     if (!_this.hasGL) return _possibleConstructorReturn(_this);
 
     var fontLoader = new THREE.FontLoader();
-    fontLoader.load('./assets/helvetiker.json', function (font) {
+    fontLoader.load('/assets/helvetiker.json', function (font) {
       _this.font = font;
     });
 
@@ -1703,7 +1703,6 @@ var Scene = function (_EventEmitter) {
   }, {
     key: 'onWindowResize',
     value: function onWindowResize(e) {
-
       // Full width and height
       this.width = window.innerWidth;
       this.height = window.innerHeight;
