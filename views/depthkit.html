@@ -47,7 +47,7 @@
     glScene.on('webgl_support', supported=>{
       console.log(`[Client] is WebGL supported on this browser? ${supported}`);
     });
-
+    
     //A Vimeo client-to-server wrapper
     const vimeo = new VimeoClient(2048);
 
@@ -80,7 +80,23 @@
         }
 
 
+
         let recenteredX = res - 2.5;
+
+        const simpleMat = new THREE.MeshPhongMaterial();
+        const textResolution = new THREE.TextGeometry( `${vimeo.files.progressive[res].width}x${vimeo.files.progressive[res].height}`, {
+      		font: glScene.font,
+      		size: 80,
+      		height: 5,
+      		curveSegments: 12,
+      		bevelEnabled: true,
+      		bevelThickness: 5,
+      		bevelSize: 8,
+      		bevelSegments: 5
+      	});
+        const textMesh = new THREE.Mesh(textResolution, simpleMat);
+        textMesh.scale.set(0.001, 0.001, 0.001);
+        textMesh.position.set(recenteredX - 0.3, 1.2, -0.5);
 
         //Position and rotation adjustments
         character.rotation.z = Math.PI / 2;
@@ -95,6 +111,7 @@
         // character.depthkit.play();
 
         glScene.scene.add(character);
+        glScene.scene.add(textMesh);
       }
 
       //Get rid of the loader

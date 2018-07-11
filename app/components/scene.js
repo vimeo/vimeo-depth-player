@@ -23,6 +23,11 @@ class Scene extends EventEmitter {
 
     if (!this.hasGL) return;
 
+    let fontLoader = new THREE.FontLoader();
+    fontLoader.load('./assets/helvetiker.json', (font)=>{
+        this.font = font;
+    });
+
     //THREE scene
     this.scene = new THREE.Scene();
 
@@ -30,6 +35,9 @@ class Scene extends EventEmitter {
     this.width = window.innerWidth;
     this.height = window.innerHeight;
 
+    this.light = new THREE.PointLight();
+    this.light.position.set(0, 2.5, 0);
+    this.scene.add(this.light);
 
     //THREE Camera
     this.camera = new THREE.PerspectiveCamera(75, this.width / this.height, 0.1, 1000);
@@ -61,7 +69,7 @@ class Scene extends EventEmitter {
     // this.controls.autoRotate = true;
 
     let grid = new THREE.GridHelper();
-    this.scene.add(grid);
+    // this.scene.add(grid);
 
     //Setup event listeners for events and handle the states
     window.addEventListener('resize', e => this.onWindowResize(e), false);
