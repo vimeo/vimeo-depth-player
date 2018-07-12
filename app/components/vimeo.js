@@ -32,7 +32,7 @@ class VimeoClient {
     //The function returns a promise based on the request made inside
     return new Promise((resolve, reject)=>{
       //Use the fetch API (returns a promise) and assemble the complete request path - e.g http://myawesomeapp.com/video/vimeo_video_id
-      fetch(`${window.location.protocol}//${window.location.host}/video/${vimeoVideoID}`).then(response => {
+      fetch(`/video/${vimeoVideoID}`).then(response => {
 
         //Unpack the response and get the object back using .json() method from the fetch API
         response.json().then(obj => {
