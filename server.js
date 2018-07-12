@@ -48,7 +48,7 @@ app.get('/experiments', (request, response) => {
 });
 
 app.get('/experiments/:project', (request, response) => {
-  response.render('experiments/' + request.params.project);
+  response.render('experiments/' + request.params.project, { video_id: null });
 });
 
 app.get('/experiments/:project/:video_id', (request, response) => {
@@ -57,16 +57,6 @@ app.get('/experiments/:project/:video_id', (request, response) => {
 
 app.get('/:video_id', (request, response) => {
   response.render('video', { video_id: request.params.video_id });
-});
-
-app.get('/experiments/:project', (request, response) => {
-  console.log(`[Server] A ${request.method} request was made to ${request.url}`);
-  response.render('experiments/' + request.params.project, { video_id: null });
-});
-
-app.get('/experiments/:project/:video_id', (request, response) => {
-  console.log(`[Server] A ${request.method} request was made to ${request.url}`);
-  response.render('experiments/' + request.params.project, { video_id: request.params.video_id });
 });
 
 // The route for getting videos from the vimeo API
