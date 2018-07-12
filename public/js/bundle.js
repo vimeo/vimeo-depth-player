@@ -1011,6 +1011,10 @@ var _gui = require('./gui');
 
 var _gui2 = _interopRequireDefault(_gui);
 
+var _util = require('./util');
+
+var _util2 = _interopRequireDefault(_util);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
@@ -1079,6 +1083,10 @@ var DepthPlayer = function () {
             this.video.id = 'vimeo-depth-player';
             this.video.crossOrigin = 'anonymous';
             this.video.setAttribute('crossorigin', 'anonymous');
+            if (_util2.default.isiOS()) {
+                this.video.setAttribute('webkit-playsinline', 'webkit-playsinline');
+                this.video.setAttribute('playsinline', 'playsinline');
+            }
             this.video.src = _video;
             this.video.autoplay = false;
             this.video.loop = false;
@@ -1409,7 +1417,7 @@ var DepthPlayer = function () {
 
 exports.default = DepthPlayer;
 
-},{"./gui":3,"./props":4,"./style":6,"./type":7,"glslify":13,"three":14}],3:[function(require,module,exports){
+},{"./gui":3,"./props":4,"./style":6,"./type":7,"./util":8,"glslify":13,"three":14}],3:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {

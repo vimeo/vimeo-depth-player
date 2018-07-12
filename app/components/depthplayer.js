@@ -13,6 +13,8 @@ import Style from './style';
 // dat.GUI wrapper
 import GuiManager from './gui';
 
+import Util from './util';
+
 // GLSLIFY - bundles all the GLSL code along with the JS
 const glsl = require('glslify');
 
@@ -75,6 +77,10 @@ export default class DepthPlayer{
         this.video.id = 'vimeo-depth-player';
         this.video.crossOrigin = 'anonymous';
         this.video.setAttribute('crossorigin', 'anonymous');
+        if(Util.isiOS()){
+          this.video.setAttribute('webkit-playsinline', 'webkit-playsinline');
+          this.video.setAttribute('playsinline', 'playsinline');
+        }
         this.video.src = _video;
         this.video.autoplay = false;
         this.video.loop = false;

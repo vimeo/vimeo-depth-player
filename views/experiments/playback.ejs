@@ -1,3 +1,5 @@
+<script src="/js/gltfloader.js"></script>
+
 <div id="loader" class="loading">
   <div class="spinner">
     <div class="mask">
@@ -18,6 +20,7 @@
   glScene.on('webgl_support', supported=>{
     console.log(`[Client] is WebGL supported on this browser? ${supported}`);
   });
+
 
   // A Vimeo client-to-server wrapper special for volumetric video
   const vimeo = new Sandbox.VimeoClient(2048);
