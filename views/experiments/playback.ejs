@@ -1,0 +1,63 @@
+<div id="loader" class="loading">
+  <div class="spinner">
+    <div class="mask">
+      <div class="maskedCircle"></div>
+    </div>
+  </div>
+</div>
+
+<div id="play" class="play-button"></div>
+<div id="gl_canvas_container"></div>
+
+<script>
+  //Create a new scene wrapper (holds the THREE scene under .scene / .camera / .controls ...etc)
+  const glScene = new Sandbox.Scene();
+  glScene.camera.position.set(0, 0.5, 0.5);
+
+  //Check for webGL support and log
+  glScene.on('webgl_support', supported=>{
+    console.log(`[Client] is WebGL supported on this browser? ${supported}`);
+  });
+
+  // A Vimeo client-to-server wrapper special for volumetric video
+  const vimeo = new Sandbox.VimeoClient(2048);
+
+  //Request the video and use the values to build the character
+  vimeo.requestVideo('<%= video_id || 279527916 %>').then(response=>{
+
+    //Save a reference to the loader so we can get rid of it once everything loads
+    const loader = document.getElementById('loader');
+
+    //Save a reference to the play button so we can get rid of it once everything loads
+    const play = document.getElementById('play');
+
+    //Instance the Depth Plaer using the response from the Vimeo API
+    let character = new Sandbox.DepthPlayer(Sandbox.Style.Mesh,
+                                            response.props,
+                                            response.url,
+                                            response.selectedQuality,
+                                            response.type);
+
+    //Set to loop
+    character.player.setLoop(true);
+    character.position.set(0, 0.7, 0);
+    character.rotation.y = -Math.PI;
+    character.rotation.z = Math.PI / 2;
+
+    //Add the Object3D to the scene
+    glScene.scene.add(character);
+
+    //Get rid of the loader and show the play button
+    setTimeout(() => {
+      loader.style.display = 'none';
+      play.style.display = 'block';
+
+      //Register the event listener
+      play.addEventListener('click', (e)=>{
+        play.style.display = 'none';
+        character.player.play();
+      }, false);
+    }, 500);
+
+  });
+</script>

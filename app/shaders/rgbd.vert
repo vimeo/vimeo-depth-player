@@ -123,7 +123,7 @@ void main() {
     }
     visibility *= 1.0 - maxDisparity;
 
-    float z = (depth * (maxdepth - mindepth) + mindepth) * -1.0;
+    float z = (depth * (maxdepth - mindepth) + mindepth) * DEPTH_ORDER;
     vec4 worldPos = extrinsics * vec4((imageCoordinates * imageDimensions - principalPoint) * z / focalLength, z, 1.0);
     worldPos.w = 1.0;
     if(isPoints) gl_PointSize = pointSize;

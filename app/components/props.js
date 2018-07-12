@@ -30,12 +30,12 @@ const _DepthKit = {
   "y": 1030.56298828125
   },
   "extrinsics": {
-  "e00": Math.cos(Math.PI / 2),
-  "e01": -Math.sin(Math.PI / 2),
+  "e00": 1,
+  "e01": 0,
   "e02": 0,
   "e03": 0,
-  "e10": Math.sin(Math.PI / 2),
-  "e11": Math.cos(Math.PI / 2),
+  "e10": 0,
+  "e11": 1,
   "e12": 0,
   "e13": 0,
   "e20": 0,

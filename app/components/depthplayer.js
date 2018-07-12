@@ -47,12 +47,6 @@ export default class DepthPlayer{
         return;
       }
 
-      if(_props == null && _type == Type.DepthKit){
-        _props = Props.DepthKit;
-      } else if(_props == null && _type == Type.RealSense){
-        _props = Props.RealSense;
-      }
-      
       // this.gui = new GuiManager();
 
       // Load the shaders src
@@ -168,6 +162,19 @@ export default class DepthPlayer{
 
       //Make the shader material double sided
       this.material.side = THREE.DoubleSide;
+
+      if(_type == Type.DepthKit){
+        this.material.defines.DEPTH_ORDER = '1.0';
+
+        if(_props == null){
+          _props = Props.DepthKit;
+        }
+      } else if(_type == Type.RealSense){
+        this.material.defines.DEPTH_ORDER = '-1.0';
+        if(_props == null){
+          _props = Props.RealSense;
+        }
+      }
 
       //Switch a few things based on selected rendering type and create the volumetric asset
       switch (_style) {

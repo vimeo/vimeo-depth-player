@@ -70,11 +70,12 @@
       character.position.x = recenteredX;
       character.position.z = 0.5;
       character.position.y = 0.5;
+      character.rotation.y = -Math.PI;
+      character.rotation.z = Math.PI / 2;
 
       //Set to loop and hit play 🎬
       character.player.setLoop(true);
       characters.push(character);
-      // character.depthkit.play();
 
       glScene.scene.add(character);
       glScene.scene.add(textMesh);
