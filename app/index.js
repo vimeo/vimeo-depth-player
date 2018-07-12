@@ -9,6 +9,12 @@ import VimeoClient from './components/vimeo';
 
 import DepthStream from './components/depthstream';
 
+import DepthPlayer from './components/depthplayer';
+
+import Type from './components/type';
+
+import Style from './components/style';
+
 
 
 /*
@@ -19,8 +25,18 @@ import DepthStream from './components/depthstream';
 * TODO - Package the functionality into a library that could
 * easily be distributed and installed
 */
-window.DepthStream = DepthStream;
-window.DepthKit = DepthKit;
+
 window.THREE = THREE;
-window.Scene = Scene;
-window.VimeoClient = VimeoClient;
+
+// Cleaner solution to avoid trashing the window object for now
+const Sandbox = {
+  'DepthStream': DepthStream,
+  'DepthKit': DepthKit,
+  'Scene': Scene,
+  'VimeoClient': VimeoClient,
+  'DepthPlayer': DepthPlayer,
+  'Style': Style,
+  'Type': Type
+}
+
+window.Sandbox = Sandbox;

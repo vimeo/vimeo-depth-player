@@ -30,14 +30,6 @@ export default class DepthKit {
         let rgbdFrag = glsl.file('../shaders/rgbd.frag');
         let rgbdVert = glsl.file('../shaders/rgbd.vert');
 
-        // this.gui = new GuiManager();
-        // this.gui.addFunction('Play', ()=>{
-        //   this.play();
-        // });
-        // this.gui.addFunction('Stop', ()=>{
-        //   this.stop();
-        // });
-
         //Video element
         this.video = document.createElement('video');
         this.video.crossOrigin = 'anonymous';

@@ -1023,16 +1023,8 @@ var DepthKit = function () {
         _classCallCheck(this, DepthKit);
 
         //Load the shaders
-        var rgbdFrag = glsl(["#define GLSLIFY 1\nuniform sampler2D map;\nuniform float opacity;\n\nuniform float uvdy;\nuniform float uvdx;\n\nvarying float visibility;\nvarying vec2 vUv;\nvarying vec3 vNormal;\nvarying vec3 vPos;\n\nvoid main() {\n\n    if ( visibility < 0.9 ) discard;\n\n    vec4 color = texture2D(map, vUv);\n    color.w = opacity;\n\n    gl_FragColor = color;\n\n}\n"]);
-        var rgbdVert = glsl(["#define GLSLIFY 1\nuniform float mindepth;\nuniform float maxdepth;\n\nuniform float width;\nuniform float height;\n\nuniform bool isPoints;\nuniform float pointSize;\n\nuniform float time;\n\nuniform vec2 focalLength;\nuniform vec2 principalPoint;\nuniform vec2 imageDimensions;\nuniform vec4 crop;\nuniform vec2 meshDensity;\nuniform mat4 extrinsics;\n\nvarying vec3 vNormal;\nvarying vec3 vPos;\n\nuniform sampler2D map;\n\nvarying float visibility;\nvarying vec2 vUv;\n\nconst float _DepthSaturationThreshhold = 0.5; //a given pixel whose saturation is less than half will be culled (old default was .5)\nconst float _DepthBrightnessThreshold = 0.5; //a given pixel whose brightness is less than half will be culled (old default was .9)\nconst float  _Epsilon = .03;\n\nvec3 rgb2hsv(vec3 c)\n{\n    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);\n    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));\n    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));\n\n    float d = q.x - min(q.w, q.y);\n    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + _Epsilon)), d / (q.x + _Epsilon), q.x);\n}\n\nfloat depthForPoint(vec2 texturePoint)\n{\n    vec4 depthsample = texture2D(map, texturePoint);\n    vec3 depthsamplehsv = rgb2hsv(depthsample.rgb);\n    return depthsamplehsv.g > _DepthSaturationThreshhold && depthsamplehsv.b > _DepthBrightnessThreshold ? depthsamplehsv.r : 0.0;\n}\n\nvoid main() {\n    vec4 texSize = vec4(1.0 / width, 1.0 / height, width, height);\n\n    vec2 centerpix = texSize.xy * .5;\n    vec2 textureStep = 1.0 / meshDensity;\n    vec2 basetex = floor(position.xy * textureStep * texSize.zw) * texSize.xy;\n    vec2 imageCoordinates = crop.xy + (basetex * crop.zw);\n    basetex.y = 1.0 - basetex.y;\n\n    vec2 depthTexCoord = basetex * vec2(1.0, 0.5) + centerpix;\n    vec2 colorTexCoord = basetex * vec2(1.0, 0.5) + vec2(0.0, 0.5) + centerpix;\n\n    vUv = colorTexCoord;\n    vPos = (modelMatrix * vec4(position, 1.0 )).xyz;\n    vNormal = normalMatrix * normal;\n\n    //check neighbors\n    //texture coords come in as [0.0 - 1.0] for this whole plane\n    float depth = depthForPoint(depthTexCoord);\n\n    float neighborDepths[8];\n    neighborDepths[0] = depthForPoint(depthTexCoord + vec2(0.0,  textureStep.y));\n    neighborDepths[1] = depthForPoint(depthTexCoord + vec2(textureStep.x, 0.0));\n    neighborDepths[2] = depthForPoint(depthTexCoord + vec2(0.0, -textureStep.y));\n    neighborDepths[3] = depthForPoint(depthTexCoord + vec2(-textureStep.x, 0.0));\n    neighborDepths[4] = depthForPoint(depthTexCoord + vec2(-textureStep.x, -textureStep.y));\n    neighborDepths[5] = depthForPoint(depthTexCoord + vec2(textureStep.x,  textureStep.y));\n    neighborDepths[6] = depthForPoint(depthTexCoord + vec2(textureStep.x, -textureStep.y));\n    neighborDepths[7] = depthForPoint(depthTexCoord + vec2(-textureStep.x,  textureStep.y));\n\n    visibility = 1.0;\n    int numDudNeighbors = 0;\n    //search neighbor verts in order to see if we are near an edge\n    //if so, clamp to the surface closest to us\n    if (depth < _Epsilon || (1.0 - depth) < _Epsilon)\n    {\n        // float depthDif = 1.0;\n        float nearestDepth = 1.0;\n        for (int i = 0; i < 8; i++)\n        {\n            float depthNeighbor = neighborDepths[i];\n            if (depthNeighbor >= _Epsilon && (1.0 - depthNeighbor) > _Epsilon)\n            {\n                // float thisDif = abs(nearestDepth - depthNeighbor);\n                if (depthNeighbor < nearestDepth)\n                {\n                    // depthDif = thisDif;\n                    nearestDepth = depthNeighbor;\n                }\n            }\n            else\n            {\n                numDudNeighbors++;\n            }\n        }\n\n        depth = nearestDepth;\n        visibility = 0.8;\n\n        // blob filter\n        if (numDudNeighbors > 6)\n        {\n            visibility = 0.0;\n        }\n    }\n\n    // internal edge filter\n    float maxDisparity = 0.0;\n    for (int i = 0; i < 8; i++)\n    {\n        float depthNeighbor = neighborDepths[i];\n        if (depthNeighbor >= _Epsilon && (1.0 - depthNeighbor) > _Epsilon)\n        {\n            maxDisparity = max(maxDisparity, abs(depth - depthNeighbor));\n        }\n    }\n    visibility *= 1.0 - maxDisparity;\n\n    float z = depth * (maxdepth - mindepth) + mindepth;\n    vec4 worldPos = extrinsics * vec4((imageCoordinates * imageDimensions - principalPoint) * z / focalLength, z, 1.0);\n    worldPos.w = 1.0;\n    if(isPoints) gl_PointSize = pointSize;\n    gl_Position = projectionMatrix * modelViewMatrix * worldPos;\n}\n"]);
-
-        // this.gui = new GuiManager();
-        // this.gui.addFunction('Play', ()=>{
-        //   this.play();
-        // });
-        // this.gui.addFunction('Stop', ()=>{
-        //   this.stop();
-        // });
+        var rgbdFrag = glsl(["#define GLSLIFY 1\nuniform sampler2D map;\nuniform float opacity;\n\nuniform float uvdy;\nuniform float uvdx;\n\nvarying float visibility;\nvarying vec2 vUv;\nvarying vec3 vNormal;\nvarying vec3 vPos;\n\nvoid main() {\n\n    if ( visibility < 0.9 ) discard;\n    vec4 color = texture2D(map, vUv);\n\n    color.w = opacity;\n\n    gl_FragColor = color;\n\n}\n"]);
+        var rgbdVert = glsl(["#define GLSLIFY 1\nuniform float mindepth;\nuniform float maxdepth;\n\nuniform float width;\nuniform float height;\n\nuniform bool isPoints;\nuniform float pointSize;\n\nuniform float time;\n\nuniform vec2 focalLength;\nuniform vec2 principalPoint;\nuniform vec2 imageDimensions;\nuniform vec4 crop;\nuniform vec2 meshDensity;\nuniform mat4 extrinsics;\n\nvarying vec3 vNormal;\nvarying vec3 vPos;\n\nuniform sampler2D map;\n\nvarying float visibility;\nvarying vec2 vUv;\n\nconst float _DepthSaturationThreshhold = 0.5; //a given pixel whose saturation is less than half will be culled (old default was .5)\nconst float _DepthBrightnessThreshold = 0.5; //a given pixel whose brightness is less than half will be culled (old default was .9)\nconst float  _Epsilon = .03;\n\nvec3 rgb2hsv(vec3 c)\n{\n    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);\n    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));\n    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));\n\n    float d = q.x - min(q.w, q.y);\n    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + _Epsilon)), d / (q.x + _Epsilon), q.x);\n}\n\nfloat depthForPoint(vec2 texturePoint)\n{\n    vec4 depthsample = texture2D(map, texturePoint);\n    vec3 depthsamplehsv = rgb2hsv(depthsample.rgb);\n    return depthsamplehsv.g > _DepthSaturationThreshhold && depthsamplehsv.b > _DepthBrightnessThreshold ? depthsamplehsv.r : 0.0;\n}\n\nvoid main() {\n    vec4 texSize = vec4(1.0 / width, 1.0 / height, width, height);\n\n    vec2 centerpix = texSize.xy * .5;\n    vec2 textureStep = 1.0 / meshDensity;\n    vec2 basetex = floor(position.xy * textureStep * texSize.zw) * texSize.xy;\n    vec2 imageCoordinates = crop.xy + (basetex * crop.zw);\n    basetex.y = 1.0 - basetex.y;\n\n    vec2 depthTexCoord = basetex * vec2(1.0, 0.5) + centerpix;\n    vec2 colorTexCoord = basetex * vec2(1.0, 0.5) + vec2(0.0, 0.5) + centerpix;\n\n    vUv = colorTexCoord;\n    vPos = (modelMatrix * vec4(position, 1.0 )).xyz;\n    vNormal = normalMatrix * normal;\n\n    //check neighbors\n    //texture coords come in as [0.0 - 1.0] for this whole plane\n    float depth = depthForPoint(depthTexCoord);\n\n    float neighborDepths[8];\n    neighborDepths[0] = depthForPoint(depthTexCoord + vec2(0.0,  textureStep.y));\n    neighborDepths[1] = depthForPoint(depthTexCoord + vec2(textureStep.x, 0.0));\n    neighborDepths[2] = depthForPoint(depthTexCoord + vec2(0.0, -textureStep.y));\n    neighborDepths[3] = depthForPoint(depthTexCoord + vec2(-textureStep.x, 0.0));\n    neighborDepths[4] = depthForPoint(depthTexCoord + vec2(-textureStep.x, -textureStep.y));\n    neighborDepths[5] = depthForPoint(depthTexCoord + vec2(textureStep.x,  textureStep.y));\n    neighborDepths[6] = depthForPoint(depthTexCoord + vec2(textureStep.x, -textureStep.y));\n    neighborDepths[7] = depthForPoint(depthTexCoord + vec2(-textureStep.x,  textureStep.y));\n\n    visibility = 1.0;\n    int numDudNeighbors = 0;\n    //search neighbor verts in order to see if we are near an edge\n    //if so, clamp to the surface closest to us\n    if (depth < _Epsilon || (1.0 - depth) < _Epsilon)\n    {\n        // float depthDif = 1.0;\n        float nearestDepth = 1.0;\n        for (int i = 0; i < 8; i++)\n        {\n            float depthNeighbor = neighborDepths[i];\n            if (depthNeighbor >= _Epsilon && (1.0 - depthNeighbor) > _Epsilon)\n            {\n                // float thisDif = abs(nearestDepth - depthNeighbor);\n                if (depthNeighbor < nearestDepth)\n                {\n                    // depthDif = thisDif;\n                    nearestDepth = depthNeighbor;\n                }\n            }\n            else\n            {\n                numDudNeighbors++;\n            }\n        }\n\n        depth = nearestDepth;\n        visibility = 0.8;\n\n        // blob filter\n        if (numDudNeighbors > 6)\n        {\n            visibility = 0.0;\n        }\n    }\n\n    // internal edge filter\n    float maxDisparity = 0.0;\n    for (int i = 0; i < 8; i++)\n    {\n        float depthNeighbor = neighborDepths[i];\n        if (depthNeighbor >= _Epsilon && (1.0 - depthNeighbor) > _Epsilon)\n        {\n            maxDisparity = max(maxDisparity, abs(depth - depthNeighbor));\n        }\n    }\n    visibility *= 1.0 - maxDisparity;\n\n    float z = (depth * (maxdepth - mindepth) + mindepth) * -1.0;\n    vec4 worldPos = extrinsics * vec4((imageCoordinates * imageDimensions - principalPoint) * z / focalLength, z, 1.0);\n    worldPos.w = 1.0;\n    if(isPoints) gl_PointSize = pointSize;\n    gl_Position = projectionMatrix * modelViewMatrix * worldPos;\n}\n"]);
 
         //Video element
         this.video = document.createElement('video');
@@ -1354,7 +1346,439 @@ var DepthKit = function () {
 
 exports.default = DepthKit;
 
-},{"./gui":4,"glslify":11,"three":12}],3:[function(require,module,exports){
+},{"./gui":5,"glslify":15,"three":16}],3:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); // THREE.js
+
+
+// The depth encoding type enum
+
+
+// Fallback depth props in case non were provided
+
+
+// The rendering style enum
+
+
+// dat.GUI wrapper
+
+
+var _three = require('three');
+
+var THREE = _interopRequireWildcard(_three);
+
+var _type2 = require('./type');
+
+var _type3 = _interopRequireDefault(_type2);
+
+var _props2 = require('./props');
+
+var _props3 = _interopRequireDefault(_props2);
+
+var _style2 = require('./style');
+
+var _style3 = _interopRequireDefault(_style2);
+
+var _gui = require('./gui');
+
+var _gui2 = _interopRequireDefault(_gui);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+// GLSLIFY - bundles all the GLSL code along with the JS
+var glsl = require('glslify');
+
+/*
+* TODO add documentation
+*/
+
+//For building the geomtery
+var VERTS_WIDE = 256;
+var VERTS_TALL = 256;
+
+var DepthPlayer = function () {
+    function DepthPlayer() {
+        var _style = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _style3.default.Mesh;
+
+        var _props = arguments[1];
+        var _video = arguments[2];
+        var _selectedQuality = arguments[3];
+        var _type = arguments[4];
+        var showVideo = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
+
+        _classCallCheck(this, DepthPlayer);
+
+        console.log('[DepthPlayer] Creating a depth player with selected quality: ' + _selectedQuality);
+
+        // A couple of sanity checks
+        if (_video == null) {
+            console.warn('[DepthPlayer] No video provided');
+            return;
+        }
+        if (_selectedQuality == null) {
+            console.warn('[DepthPlayer] No selected quality set');
+            return;
+        }
+
+        if (_props == null && _type == _type3.default.DepthKit) {
+            _props = _props3.default.DepthKit;
+        } else if (_props == null && _type == _type3.default.RealSense) {
+            _props = _props3.default.RealSense;
+        }
+        this.gui = new _gui2.default();
+
+        // Load the shaders src
+        var rgbdFrag = glsl(["#define GLSLIFY 1\nuniform sampler2D map;\nuniform float opacity;\n\nuniform float uvdy;\nuniform float uvdx;\n\nvarying float visibility;\nvarying vec2 vUv;\nvarying vec3 vNormal;\nvarying vec3 vPos;\n\nvoid main() {\n\n    if ( visibility < 0.9 ) discard;\n    vec4 color = texture2D(map, vUv);\n\n    color.w = opacity;\n\n    gl_FragColor = color;\n\n}\n"]);
+        var rgbdVert = glsl(["#define GLSLIFY 1\nuniform float mindepth;\nuniform float maxdepth;\n\nuniform float width;\nuniform float height;\n\nuniform bool isPoints;\nuniform float pointSize;\n\nuniform float time;\n\nuniform vec2 focalLength;\nuniform vec2 principalPoint;\nuniform vec2 imageDimensions;\nuniform vec4 crop;\nuniform vec2 meshDensity;\nuniform mat4 extrinsics;\n\nvarying vec3 vNormal;\nvarying vec3 vPos;\n\nuniform sampler2D map;\n\nvarying float visibility;\nvarying vec2 vUv;\n\nconst float _DepthSaturationThreshhold = 0.5; //a given pixel whose saturation is less than half will be culled (old default was .5)\nconst float _DepthBrightnessThreshold = 0.5; //a given pixel whose brightness is less than half will be culled (old default was .9)\nconst float  _Epsilon = .03;\n\nvec3 rgb2hsv(vec3 c)\n{\n    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);\n    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));\n    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));\n\n    float d = q.x - min(q.w, q.y);\n    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + _Epsilon)), d / (q.x + _Epsilon), q.x);\n}\n\nfloat depthForPoint(vec2 texturePoint)\n{\n    vec4 depthsample = texture2D(map, texturePoint);\n    vec3 depthsamplehsv = rgb2hsv(depthsample.rgb);\n    return depthsamplehsv.g > _DepthSaturationThreshhold && depthsamplehsv.b > _DepthBrightnessThreshold ? depthsamplehsv.r : 0.0;\n}\n\nvoid main() {\n    vec4 texSize = vec4(1.0 / width, 1.0 / height, width, height);\n\n    vec2 centerpix = texSize.xy * .5;\n    vec2 textureStep = 1.0 / meshDensity;\n    vec2 basetex = floor(position.xy * textureStep * texSize.zw) * texSize.xy;\n    vec2 imageCoordinates = crop.xy + (basetex * crop.zw);\n    basetex.y = 1.0 - basetex.y;\n\n    vec2 depthTexCoord = basetex * vec2(1.0, 0.5) + centerpix;\n    vec2 colorTexCoord = basetex * vec2(1.0, 0.5) + vec2(0.0, 0.5) + centerpix;\n\n    vUv = colorTexCoord;\n    vPos = (modelMatrix * vec4(position, 1.0 )).xyz;\n    vNormal = normalMatrix * normal;\n\n    //check neighbors\n    //texture coords come in as [0.0 - 1.0] for this whole plane\n    float depth = depthForPoint(depthTexCoord);\n\n    float neighborDepths[8];\n    neighborDepths[0] = depthForPoint(depthTexCoord + vec2(0.0,  textureStep.y));\n    neighborDepths[1] = depthForPoint(depthTexCoord + vec2(textureStep.x, 0.0));\n    neighborDepths[2] = depthForPoint(depthTexCoord + vec2(0.0, -textureStep.y));\n    neighborDepths[3] = depthForPoint(depthTexCoord + vec2(-textureStep.x, 0.0));\n    neighborDepths[4] = depthForPoint(depthTexCoord + vec2(-textureStep.x, -textureStep.y));\n    neighborDepths[5] = depthForPoint(depthTexCoord + vec2(textureStep.x,  textureStep.y));\n    neighborDepths[6] = depthForPoint(depthTexCoord + vec2(textureStep.x, -textureStep.y));\n    neighborDepths[7] = depthForPoint(depthTexCoord + vec2(-textureStep.x,  textureStep.y));\n\n    visibility = 1.0;\n    int numDudNeighbors = 0;\n    //search neighbor verts in order to see if we are near an edge\n    //if so, clamp to the surface closest to us\n    if (depth < _Epsilon || (1.0 - depth) < _Epsilon)\n    {\n        // float depthDif = 1.0;\n        float nearestDepth = 1.0;\n        for (int i = 0; i < 8; i++)\n        {\n            float depthNeighbor = neighborDepths[i];\n            if (depthNeighbor >= _Epsilon && (1.0 - depthNeighbor) > _Epsilon)\n            {\n                // float thisDif = abs(nearestDepth - depthNeighbor);\n                if (depthNeighbor < nearestDepth)\n                {\n                    // depthDif = thisDif;\n                    nearestDepth = depthNeighbor;\n                }\n            }\n            else\n            {\n                numDudNeighbors++;\n            }\n        }\n\n        depth = nearestDepth;\n        visibility = 0.8;\n\n        // blob filter\n        if (numDudNeighbors > 6)\n        {\n            visibility = 0.0;\n        }\n    }\n\n    // internal edge filter\n    float maxDisparity = 0.0;\n    for (int i = 0; i < 8; i++)\n    {\n        float depthNeighbor = neighborDepths[i];\n        if (depthNeighbor >= _Epsilon && (1.0 - depthNeighbor) > _Epsilon)\n        {\n            maxDisparity = max(maxDisparity, abs(depth - depthNeighbor));\n        }\n    }\n    visibility *= 1.0 - maxDisparity;\n\n    float z = (depth * (maxdepth - mindepth) + mindepth) * -1.0;\n    vec4 worldPos = extrinsics * vec4((imageCoordinates * imageDimensions - principalPoint) * z / focalLength, z, 1.0);\n    worldPos.w = 1.0;\n    if(isPoints) gl_PointSize = pointSize;\n    gl_Position = projectionMatrix * modelViewMatrix * worldPos;\n}\n"]);
+
+        //Video element
+        if (_selectedQuality == 'dash') {
+            this.videoElement = document.createElement('video');
+            this.videoElement.id = 'vimeo-depth-player';
+            this.videoElement.crossOrigin = 'anonymous';
+            this.videoElement.setAttribute('crossorigin', 'anonymous');
+            this.videoElement.autoplay = false;
+            this.videoElement.loop = false;
+
+            //Create a DASH.js player
+            this.video = dashjs.MediaPlayer().create();
+
+            //Initialize the player
+            this.video.initialize(this.videoElement, _video, false);
+
+            this.createTexture(this.videoElement);
+        } else {
+            this.video = document.createElement('video');
+            this.video.id = 'vimeo-depth-player';
+            this.video.crossOrigin = 'anonymous';
+            this.video.setAttribute('crossorigin', 'anonymous');
+            this.video.src = _video;
+            this.video.autoplay = false;
+            this.video.loop = false;
+
+            this.createTexture(this.video);
+        }
+
+        //Append the original video from vimeo to the DOM
+        if (showVideo) document.body.append(this.video);
+
+        //Manages loading of assets internally
+        this.manager = new THREE.LoadingManager();
+
+        //JSON props once loaded
+        this.props;
+
+        //Geomtery
+        if (!DepthPlayer.geo) {
+            DepthPlayer.buildGeomtery();
+        }
+
+        //Material
+        this.material = new THREE.ShaderMaterial({
+            uniforms: {
+                "map": {
+                    type: "t",
+                    value: this.videoTexture
+                },
+                "time": {
+                    type: "f",
+                    value: 0.0
+                },
+                "mindepth": {
+                    type: "f",
+                    value: 0.0
+                },
+                "maxdepth": {
+                    type: "f",
+                    value: 0.0
+                },
+                "meshDensity": {
+                    value: new THREE.Vector2(VERTS_WIDE, VERTS_TALL)
+                },
+                "focalLength": {
+                    value: new THREE.Vector2(1, 1)
+                },
+                "principalPoint": {
+                    value: new THREE.Vector2(1, 1)
+                },
+                "imageDimensions": {
+                    value: new THREE.Vector2(512, 828)
+                },
+                "extrinsics": {
+                    value: new THREE.Matrix4()
+                },
+                "crop": {
+                    value: new THREE.Vector4(0, 0, 1, 1)
+                },
+                "width": {
+                    type: "f",
+                    value: 0
+                },
+                "height": {
+                    type: "f",
+                    value: 0
+                },
+                "opacity": {
+                    type: "f",
+                    value: 1.0
+                },
+                "isPoints": {
+                    type: "b",
+                    value: false
+                },
+                "pointSize": {
+                    type: "f",
+                    value: 3.0
+                }
+            },
+            vertexShader: rgbdVert,
+            fragmentShader: rgbdFrag,
+            transparent: true
+        });
+
+        //Make the shader material double sided
+        this.material.side = THREE.DoubleSide;
+
+        //Switch a few things based on selected rendering type and create the volumetric asset
+        switch (_style) {
+            case _style3.default.Wire:
+                this.material.wireframe = true;
+                this.mesh = new THREE.Mesh(DepthPlayer.geo, this.material);
+                break;
+
+            case _style3.default.Points:
+                this.material.uniforms.isPoints.value = true;
+                this.mesh = new THREE.Points(DepthPlayer.geo, this.material);
+                break;
+
+            default:
+                this.mesh = new THREE.Mesh(DepthPlayer.geo, this.material);
+                break;
+        }
+
+        this.loadPropsFromObject(_props);
+
+        //Make sure we don't hide the character - this helps the objects in webVR
+        this.mesh.frustumCulled = false;
+
+        //Apend the object to the Three Object3D that way it's accsesable from the instance
+        this.mesh.player = this;
+        this.mesh.name = 'depth-player';
+
+        //Return the object3D so it could be added to the scene
+        return this.mesh;
+    }
+
+    _createClass(DepthPlayer, [{
+        key: 'createTexture',
+        value: function createTexture(videoElement) {
+            //Create a video texture to be passed to the shader
+            this.videoTexture = new THREE.VideoTexture(videoElement);
+            this.videoTexture.minFilter = THREE.NearestFilter;
+            this.videoTexture.magFilter = THREE.LinearFilter;
+            this.videoTexture.format = THREE.RGBFormat;
+            this.videoTexture.generateMipmaps = false;
+        }
+    }, {
+        key: 'loadPropsFromObject',
+        value: function loadPropsFromObject(object) {
+            //Update the shader based on the properties from the JSON
+            this.material.uniforms.width.value = object.textureWidth;
+            this.material.uniforms.height.value = object.textureHeight;
+            this.material.uniforms.mindepth.value = object.nearClip;
+            this.material.uniforms.maxdepth.value = object.farClip;
+            this.material.uniforms.focalLength.value = object.depthFocalLength;
+            this.material.uniforms.principalPoint.value = object.depthPrincipalPoint;
+            this.material.uniforms.imageDimensions.value = object.depthImageSize;
+            this.material.uniforms.crop.value = object.crop;
+
+            var ex = object.extrinsics;
+            this.material.uniforms.extrinsics.value.set(ex["e00"], ex["e10"], ex["e20"], ex["e30"], ex["e01"], ex["e11"], ex["e21"], ex["e31"], ex["e02"], ex["e12"], ex["e22"], ex["e32"], ex["e03"], ex["e13"], ex["e23"], ex["e33"]);
+
+            //Create the collider
+            var boxGeo = new THREE.BoxGeometry(object.boundsSize.x, object.boundsSize.y, object.boundsSize.z);
+            var boxMat = new THREE.MeshBasicMaterial({
+                color: 0xffff00,
+                wireframe: true
+            });
+
+            this.collider = new THREE.Mesh(boxGeo, boxMat);
+
+            this.collider.visible = false;
+            this.mesh.add(this.collider);
+
+            //Temporary collider positioning fix - // TODO: fix that with this.props.boundsCenter
+            this.collider.position.set(0, 1, 0);
+        }
+    }, {
+        key: 'loadPropsFromFile',
+        value: function loadPropsFromFile(path) {
+            var _this = this;
+
+            //Make sure to read the config file as json (i.e JSON.parse)
+            this.jsonLoader = new THREE.FileLoader(this.manager);
+            this.jsonLoader.setResponseType('json');
+            this.jsonLoader.load(path,
+            // Function when json is loaded
+            function (data) {
+                _this.props = data;
+                // console.log(this.props);
+
+                //Update the shader based on the properties from the JSON
+                _this.material.uniforms.width.value = _this.props.textureWidth;
+                _this.material.uniforms.height.value = _this.props.textureHeight;
+                _this.material.uniforms.mindepth.value = _this.props.nearClip;
+                _this.material.uniforms.maxdepth.value = _this.props.farClip;
+                _this.material.uniforms.focalLength.value = _this.props.depthFocalLength;
+                _this.material.uniforms.principalPoint.value = _this.props.depthPrincipalPoint;
+                _this.material.uniforms.imageDimensions.value = _this.props.depthImageSize;
+                _this.material.uniforms.crop.value = _this.props.crop;
+
+                var ex = _this.props.extrinsics;
+                _this.material.uniforms.extrinsics.value.set(ex["e00"], ex["e10"], ex["e20"], ex["e30"], ex["e01"], ex["e11"], ex["e21"], ex["e31"], ex["e02"], ex["e12"], ex["e22"], ex["e32"], ex["e03"], ex["e13"], ex["e23"], ex["e33"]);
+
+                //Create the collider
+                var boxGeo = new THREE.BoxGeometry(_this.props.boundsSize.x, _this.props.boundsSize.y, _this.props.boundsSize.z);
+                var boxMat = new THREE.MeshBasicMaterial({
+                    color: 0xffff00,
+                    wireframe: true
+                });
+
+                _this.collider = new THREE.Mesh(boxGeo, boxMat);
+
+                _this.collider.visible = false;
+                _this.mesh.add(_this.collider);
+
+                //Temporary collider positioning fix - // TODO: fix that with this.props.boundsCenter
+                THREE.SceneUtils.detach(_this.collider, _this.mesh, _this.mesh.parent);
+                _this.collider.position.set(0, 1, 0);
+            });
+        }
+    }, {
+        key: 'setPointSize',
+
+
+        /*
+        * Render related methods
+        */
+        value: function setPointSize(size) {
+            if (this.material.uniforms.isPoints.value) {
+                this.material.uniforms.pointSize.value = size;
+            } else {
+                console.warn('Can not set point size because the current character is not set to render points');
+            }
+        }
+    }, {
+        key: 'setOpacity',
+        value: function setOpacity(opacity) {
+            this.material.uniforms.opacity.value = opacity;
+        }
+    }, {
+        key: 'setLineWidth',
+        value: function setLineWidth(width) {
+            if (this.material.wireframe) {
+                this.material.wireframeLinewidth = width;
+            } else {
+                console.warn('Can not set the line width because the current character is not set to render wireframe');
+            }
+        }
+
+        /*
+        * Video Player methods
+        */
+
+    }, {
+        key: 'play',
+        value: function play() {
+            if (!this.video.isPlaying) {
+                this.video.play();
+            } else {
+                console.warn('Can not play because the character is already playing');
+            }
+        }
+    }, {
+        key: 'stop',
+        value: function stop() {
+            this.video.currentTime = 0.0;
+            this.video.pause();
+        }
+    }, {
+        key: 'pause',
+        value: function pause() {
+            this.video.pause();
+        }
+    }, {
+        key: 'setLoop',
+        value: function setLoop(isLooping) {
+            this.video.loop = isLooping;
+        }
+    }, {
+        key: 'setVolume',
+        value: function setVolume(volume) {
+            this.video.volume = volume;
+        }
+    }, {
+        key: 'update',
+        value: function update(time) {
+            this.material.uniforms.time.value = time;
+        }
+    }, {
+        key: 'toggleColliderVisiblity',
+        value: function toggleColliderVisiblity() {
+            this.mesh.collider.visible = !this.mesh.collider.visible;
+        }
+    }, {
+        key: 'dispose',
+        value: function dispose() {
+            //Remove the mesh from the scene
+            try {
+                this.mesh.parent.remove(this.mesh);
+            } catch (e) {
+                console.warn(e);
+            } finally {
+                this.mesh.traverse(function (child) {
+                    if (child.geometry !== undefined) {
+                        child.geometry.dispose();
+                        child.material.dispose();
+                    }
+                });
+            }
+        }
+    }], [{
+        key: 'buildGeomtery',
+        value: function buildGeomtery() {
+
+            DepthPlayer.geo = new THREE.Geometry();
+
+            for (var y = 0; y < VERTS_TALL; y++) {
+                for (var x = 0; x < VERTS_WIDE; x++) {
+                    DepthPlayer.geo.vertices.push(new THREE.Vector3(x, y, 0));
+                }
+            }
+            for (var _y = 0; _y < VERTS_TALL - 1; _y++) {
+                for (var _x3 = 0; _x3 < VERTS_WIDE - 1; _x3++) {
+                    DepthPlayer.geo.faces.push(new THREE.Face3(_x3 + _y * VERTS_WIDE, _x3 + (_y + 1) * VERTS_WIDE, _x3 + 1 + _y * VERTS_WIDE));
+                    DepthPlayer.geo.faces.push(new THREE.Face3(_x3 + 1 + _y * VERTS_WIDE, _x3 + (_y + 1) * VERTS_WIDE, _x3 + 1 + (_y + 1) * VERTS_WIDE));
+                }
+            }
+        }
+    }]);
+
+    return DepthPlayer;
+}();
+
+exports.default = DepthPlayer;
+
+},{"./gui":5,"./props":6,"./style":8,"./type":9,"glslify":15,"three":16}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1479,7 +1903,7 @@ var DepthStream = function () {
 
 exports.default = DepthStream;
 
-},{"./gui":4,"./util":6,"glslify":11,"three":12}],4:[function(require,module,exports){
+},{"./gui":5,"./util":10,"glslify":15,"three":16}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1555,7 +1979,133 @@ var GuiManager = function () {
 
 exports.default = GuiManager;
 
-},{"dat.gui":9}],5:[function(require,module,exports){
+},{"dat.gui":13}],6:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var _DepthKit = {
+  "_versionMajor": 0,
+  "_versionMinor": 2,
+  "boundsCenter": {
+    "x": 0,
+    "y": 0,
+    "z": 1.03093326091766
+  },
+  "boundsSize": {
+    "x": 3.14853119850159,
+    "y": 1.76878845691681,
+    "z": 1.08638906478882
+  },
+  "crop": {
+    "w": 1.02883338928223,
+    "x": 0.186250150203705,
+    "y": -0.0672345161437988,
+    "z": 0.522190392017365
+  },
+  "depthFocalLength": {
+    "x": 1919.83203125,
+    "y": 1922.28527832031
+  },
+  "depthImageSize": {
+    "x": 3840.0,
+    "y": 2160.0
+  },
+  "depthPrincipalPoint": {
+    "x": 1875.52282714844,
+    "y": 1030.56298828125
+  },
+  "extrinsics": {
+    "e00": Math.cos(Math.PI / 2),
+    "e01": -Math.sin(Math.PI / 2),
+    "e02": 0,
+    "e03": 0,
+    "e10": Math.sin(Math.PI / 2),
+    "e11": Math.cos(Math.PI / 2),
+    "e12": 0,
+    "e13": 0,
+    "e20": 0,
+    "e21": 0,
+    "e22": 1,
+    "e23": 0,
+    "e30": 0,
+    "e31": 0,
+    "e32": 0,
+    "e33": 1
+  },
+  "farClip": 1.57412779331207,
+  "format": "perpixel",
+  "nearClip": 0.487738698720932,
+  "numAngles": 1,
+  "textureHeight": 4096,
+  "textureWidth": 2048
+};
+var _RealSense = {
+  "_versionMajor": 0,
+  "_versionMinor": 2,
+  "boundsCenter": {
+    "x": 0,
+    "y": 0,
+    "z": 1.03093326091766
+  },
+  "boundsSize": {
+    "x": 3.14853119850159,
+    "y": 1.76878845691681,
+    "z": 1.08638906478882
+  },
+  "crop": {
+    "w": 1.02883338928223,
+    "x": 0.186250150203705,
+    "y": -0.0672345161437988,
+    "z": 0.522190392017365
+  },
+  "depthFocalLength": {
+    "x": 1919,
+    "y": 1923
+  },
+  "depthImageSize": {
+    "x": 3840.0,
+    "y": 2160.0
+  },
+  "depthPrincipalPoint": {
+    "x": 1900.52282714844,
+    "y": 1030.56298828125
+  },
+  "extrinsics": {
+    "e00": Math.cos(Math.PI),
+    "e01": 0,
+    "e02": Math.sin(Math.PI),
+    "e03": 0,
+    "e10": 0,
+    "e11": 1,
+    "e12": 0,
+    "e13": 0,
+    "e20": -Math.sin(Math.PI),
+    "e21": 0,
+    "e22": Math.cos(Math.PI),
+    "e23": 0,
+    "e30": 0,
+    "e31": 0,
+    "e32": 0,
+    "e33": 1
+  },
+  "farClip": 3,
+  "format": "perpixel",
+  "nearClip": 0.1,
+  "numAngles": 1,
+  "textureHeight": 4096,
+  "textureWidth": 2048
+};
+
+var Props = {
+  'DepthKit': _DepthKit,
+  'RealSense': _RealSense
+};
+
+exports.default = Props;
+
+},{}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1672,6 +2222,9 @@ var Scene = function (_EventEmitter) {
     window.addEventListener('resize', function (e) {
       return _this.onWindowResize(e);
     }, false);
+    window.addEventListener('mousemove', function (e) {
+      return _this.onMouseMove(e);
+    }, false);
 
     _this.controls.target = new THREE.Vector3(0.0, 0.5, -0.5);
 
@@ -1716,6 +2269,14 @@ var Scene = function (_EventEmitter) {
       //Set the renderer size
       this.renderer.setSize(this.width, this.height);
     }
+  }, {
+    key: 'onMouseMove',
+    value: function onMouseMove(e) {
+      // this.recenteredX = ((e.clientX / window.innerWidth) * 2) - 1;
+      // this.recenteredY = ((((e.clientY / window.innerHeight) * -1.0) + 1.0) * 2) - 1;
+      // this.camera.position.x = this.recenteredX;
+      // this.camera.position.y = this.recenteredY;
+    }
   }]);
 
   return Scene;
@@ -1723,7 +2284,34 @@ var Scene = function (_EventEmitter) {
 
 exports.default = Scene;
 
-},{"./controls":1,"./util":6,"event-emitter-es6":10,"three":12}],6:[function(require,module,exports){
+},{"./controls":1,"./util":10,"event-emitter-es6":14,"three":16}],8:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var Style = {
+  'Mesh': 0,
+  'Points': 1,
+  'Wire': 2
+};
+
+exports.default = Style;
+
+},{}],9:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var Type = {
+  'DepthKit': 0,
+  'RealSense': 1
+};
+
+exports.default = Type;
+
+},{}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1761,6 +2349,11 @@ var Util = function () {
 			})(navigator.userAgent || navigator.vendor || window.opera);
 			return check;
 		}
+	}, {
+		key: "isJSON",
+		value: function isJSON(json) {
+			return json.description && json.description.match(/^{/);
+		}
 	}]);
 
 	return Util;
@@ -1768,35 +2361,41 @@ var Util = function () {
 
 exports.default = Util;
 
-},{}],7:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     * A promise based wrapper for the vimeo API
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     */
+
+// Utility wrapper with static methods needed for a rainy day 🌧
+
+
+// Depth encoding types
+
+
+var _util = require('./util');
+
+var _util2 = _interopRequireDefault(_util);
+
+var _type = require('./type');
+
+var _type2 = _interopRequireDefault(_type);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-/*
-* A promise based wrapper for the vimeo API
-*/
 var VimeoClient = function () {
   function VimeoClient() {
-    var quality = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'hls';
+    var quality = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'auto';
 
     _classCallCheck(this, VimeoClient);
 
-    if (quality == null) {
-      console.warn('[Vimeo] you have to specifiy the quality parameter');
-    }
-    /*
-    * Set the desired quality.
-    * - 'hd'
-    * - 'sd'
-    * - 'hls'
-    */
     this.selectedQuality = quality;
 
     //Props to be parsed from the API response
@@ -1820,6 +2419,7 @@ var VimeoClient = function () {
 
       //The function returns a promise based on the request made inside
       return new Promise(function (resolve, reject) {
+
         //Use the fetch API (returns a promise) and assemble the complete request path - e.g http://myawesomeapp.com/video/vimeo_video_id
         fetch(window.location.protocol + '//' + window.location.host + '/video/' + vimeoVideoID).then(function (response) {
 
@@ -1829,65 +2429,87 @@ var VimeoClient = function () {
 
               //Save the file list of each request to a member object of the instance
               if (obj.play == null) {
-                reject('[Vimeo] no video found');
+                reject('[Vimeo] No video file found');
               }
 
               _this.files = obj.play;
 
-              if (obj.description && obj.description.match(/^{/)) {
+              //If a JSON was provided in the description then it's a DepthKit take (saved into this.props)
+              if (_util2.default.isJSON(obj)) {
                 _this.props = JSON.parse(obj.description);
+                _this.type = _type2.default.DepthKit;
+              } else {
+                _this.props = null;
+                _this.type = _type2.default.RealSense;
               }
 
               if (_this.selectedQuality == 'auto') {
-                _this.selectedQuality = 'dash';
-                // todo: if mobile safari, play hls
-                // todo: detect if stream even has dash/hls and fall back to highest progressive
-                console.log("[VimeoClient] Selected quality: " + _this.selectedQuality);
+                if (_util2.default.isiOS()) {
+                  _this.selectedQuality = 'hls';
+                } else {
+                  _this.selectedQuality = 'dash';
+                }
+                // TODO: if mobile safari, play hls
+                // TODO: detect if stream even has dash/hls and fall back to highest progressive
+                console.log("[Vimeo] Selected quality: " + _this.selectedQuality);
               }
 
               if (_this.selectedQuality == 'hls') {
-                _this.url = _this.files.hls.link;
-                _this.type = 'application/x-mpegURL';
+                if (_this.files.hls) {
+                  _this.selectedQuality = 'hls';
+                  _this.url = _this.files.hls.link;
+                } else {
+                  console.warn('[Vimeo] Requested an HLS stream but none was found');
+                }
               } else if (_this.selectedQuality == 'dash') {
-                _this.url = _this.files.dash.link;
-                _this.type = 'application/x-mpegURL';
+                if (_this.files.dash) {
+                  _this.selectedQuality = 'dash';
+                  _this.url = _this.files.dash.link;
+                } else {
+                  console.warn('[Vimeo] Requested a DASH stream but none was found');
+                }
               } else {
-                // Iterate over the file list and find the one that matchs our quality setting (e.g 'hd')
-                var _iteratorNormalCompletion = true;
-                var _didIteratorError = false;
-                var _iteratorError = undefined;
+                /*
+                * Progressive currently only supports DepthKit
+                * Future developments will support more native depth playback formats
+                * It is recomended to use adaptive format
+                */
+                if (_this.type === _type2.default.DepthKit) {
+                  // Iterate over the file list and find the one that matchs our quality setting (e.g 'hd')
+                  var _iteratorNormalCompletion = true;
+                  var _didIteratorError = false;
+                  var _iteratorError = undefined;
 
-                try {
-                  for (var _iterator = _this.files.progressive[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var file = _step.value;
-
-                    // console.log(file);
-                    if (file.width === _this.selectedQuality) {
-                      //Save the link
-                      _this.url = file.link;
-
-                      //Save the type
-                      _this.type = file.type;
-
-                      //Save the framerate
-                      _this.fps = file.fps;
-
-                      //Fix the width and height based on the vimeo video sizes
-                      _this.props.textureWidth = file.width;
-                      _this.props.textureHeight = file.height;
-                    }
-                  }
-                } catch (err) {
-                  _didIteratorError = true;
-                  _iteratorError = err;
-                } finally {
                   try {
-                    if (!_iteratorNormalCompletion && _iterator.return) {
-                      _iterator.return();
+                    for (var _iterator = _this.files.progressive[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                      var file = _step.value;
+
+
+                      if (file.width === _this.selectedQuality) {
+
+                        //Save the link
+                        _this.url = file.link;
+
+                        //Save the framerate
+                        _this.fps = file.fps;
+
+                        //If DepthKit in different resolutions then the ones specified in the JSON file
+                        _this.props.textureWidth = file.width;
+                        _this.props.textureHeight = file.height;
+                      }
                     }
+                  } catch (err) {
+                    _didIteratorError = true;
+                    _iteratorError = err;
                   } finally {
-                    if (_didIteratorError) {
-                      throw _iteratorError;
+                    try {
+                      if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                      }
+                    } finally {
+                      if (_didIteratorError) {
+                        throw _iteratorError;
+                      }
                     }
                   }
                 }
@@ -1896,6 +2518,7 @@ var VimeoClient = function () {
               //Resolve the promise and return the url for the video and the props object
               resolve({
                 'url': _this.url,
+                'selectedQuality': _this.selectedQuality,
                 'props': _this.props,
                 'type': _this.type,
                 'fps': _this.fps
@@ -1914,7 +2537,7 @@ var VimeoClient = function () {
 
 exports.default = VimeoClient;
 
-},{}],8:[function(require,module,exports){
+},{"./type":9,"./util":10}],12:[function(require,module,exports){
 'use strict';
 
 var _three = require('three');
@@ -1937,6 +2560,18 @@ var _depthstream = require('./components/depthstream');
 
 var _depthstream2 = _interopRequireDefault(_depthstream);
 
+var _depthplayer = require('./components/depthplayer');
+
+var _depthplayer2 = _interopRequireDefault(_depthplayer);
+
+var _type = require('./components/type');
+
+var _type2 = _interopRequireDefault(_type);
+
+var _style = require('./components/style');
+
+var _style2 = _interopRequireDefault(_style);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
@@ -1949,14 +2584,24 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 * TODO - Package the functionality into a library that could
 * easily be distributed and installed
 */
-window.DepthStream = _depthstream2.default; //Import three.js
 
-window.DepthKit = _depthkit2.default;
+//Import three.js
 window.THREE = THREE;
-window.Scene = _scene2.default;
-window.VimeoClient = _vimeo2.default;
 
-},{"./components/depthkit":2,"./components/depthstream":3,"./components/scene":5,"./components/vimeo":7,"three":12}],9:[function(require,module,exports){
+// Cleaner solution to avoid trashing the window object for now
+var Sandbox = {
+  'DepthStream': _depthstream2.default,
+  'DepthKit': _depthkit2.default,
+  'Scene': _scene2.default,
+  'VimeoClient': _vimeo2.default,
+  'DepthPlayer': _depthplayer2.default,
+  'Style': _style2.default,
+  'Type': _type2.default
+};
+
+window.Sandbox = Sandbox;
+
+},{"./components/depthkit":2,"./components/depthplayer":3,"./components/depthstream":4,"./components/scene":7,"./components/style":8,"./components/type":9,"./components/vimeo":11,"three":16}],13:[function(require,module,exports){
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -4488,7 +5133,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 })));
 
 
-},{}],10:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -4739,7 +5384,7 @@ var EventEmitter = function () {
 
 module.exports = EventEmitter;
 
-},{}],11:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 module.exports = function(strings) {
   if (typeof strings === 'string') strings = [strings]
   var exprs = [].slice.call(arguments,1)
@@ -4751,7 +5396,7 @@ module.exports = function(strings) {
   return parts.join('')
 }
 
-},{}],12:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -50736,4 +51381,4 @@ module.exports = function(strings) {
 
 })));
 
-},{}]},{},[8]);
+},{}]},{},[12]);

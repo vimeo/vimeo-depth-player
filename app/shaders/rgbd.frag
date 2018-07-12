@@ -12,8 +12,8 @@ varying vec3 vPos;
 void main() {
 
     if ( visibility < 0.9 ) discard;
-
     vec4 color = texture2D(map, vUv);
+
     color.w = opacity;
 
     gl_FragColor = color;
