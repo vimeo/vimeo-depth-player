@@ -11,15 +11,15 @@
 
 <script>
   //Create a new scene wrapper (holds the THREE scene under .scene / .camera / .controls ...etc)
-  const glScene = new Scene();
+  const glScene = new Sandbox.Scene();
 
   //Check for webGL support and log
   glScene.on('webgl_support', supported=>{
     console.log(`[Client] is WebGL supported on this browser? ${supported}`);
   });
 
-  //A Vimeo client-to-server wrapper
-  const vimeo = new VimeoClient(2048);
+  // A Vimeo client-to-server wrapper special for volumetric video
+  const vimeo = new Sandbox.VimeoClient(2048);
 
   //We will store all the character instance in here so we can hit play (kind of) together
   let characters = [];
@@ -41,16 +41,16 @@
       response.props.textureWidth = vimeo.files.progressive[res].width;
       response.props.textureHeight = vimeo.files.progressive[res].height;
 
-      //Create the DepthKit character
-      let character;
-      if (res == 5){
-        character = new DepthKit('mesh', response.props, vimeo.files.progressive[res].link, true);
-      } else {
-        character = new DepthKit('mesh', response.props, vimeo.files.progressive[res].link);
-      }
+
+      let character = new Sandbox.DepthPlayer(Sandbox.Style.Mesh,
+                                              response.props,
+                                              vimeo.files.progressive[res].link,
+                                              response.selectedQuality,
+                                              response.type);
 
       let recenteredX = res - 2.5;
 
+      // Create a text that shows the resolution for each take loaded
       const simpleMat = new THREE.MeshPhongMaterial();
       const textResolution = new THREE.TextGeometry( `${vimeo.files.progressive[res].width}x${vimeo.files.progressive[res].height}`, {
         font: glScene.font,
@@ -67,14 +67,12 @@
       textMesh.position.set(recenteredX - 0.3, 1.2, -0.5);
 
       //Position and rotation adjustments
-      character.rotation.z = Math.PI / 2;
-      character.rotation.y = Math.PI;
       character.position.x = recenteredX;
       character.position.z = 0.5;
       character.position.y = 0.5;
 
       //Set to loop and hit play 🎬
-      character.depthkit.setLoop(true);
+      character.player.setLoop(true);
       characters.push(character);
       // character.depthkit.play();
 
@@ -91,7 +89,7 @@
       play.addEventListener('click', (e)=>{
         play.style.display = 'none';
         for(let iter = 0; iter < characters.length; iter++){
-          characters[iter].depthkit.play();
+          characters[iter].player.play();
         }
       }, false);
     }, 500);

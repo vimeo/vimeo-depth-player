@@ -73,6 +73,7 @@ class Scene extends EventEmitter {
 
     //Setup event listeners for events and handle the states
     window.addEventListener('resize', e => this.onWindowResize(e), false);
+    window.addEventListener('mousemove', e => this.onMouseMove(e), false);
 
     this.controls.target = new THREE.Vector3(0.0, 0.5, -0.5);
 
@@ -110,6 +111,13 @@ class Scene extends EventEmitter {
     //Set the renderer size
     this.renderer.setSize(this.width, this.height);
 
+  }
+
+  onMouseMove(e){
+    // this.recenteredX = ((e.clientX / window.innerWidth) * 2) - 1;
+    // this.recenteredY = ((((e.clientY / window.innerHeight) * -1.0) + 1.0) * 2) - 1;
+    // this.camera.position.x = this.recenteredX;
+    // this.camera.position.y = this.recenteredY;
   }
 }
 

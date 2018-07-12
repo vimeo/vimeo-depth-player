@@ -1,17 +1,16 @@
 /*
 * A promise based wrapper for the vimeo API
 */
+
+// Utility wrapper with static methods needed for a rainy day 🌧
+import Util from './util';
+
+// Depth encoding types
+import Type from './type';
+
 class VimeoClient {
-  constructor(quality = 'hls') {
-    if (quality == null) {
-      console.warn('[Vimeo] you have to specifiy the quality parameter');
-    }
-    /*
-    * Set the desired quality.
-    * - 'hd'
-    * - 'sd'
-    * - 'hls'
-    */
+  constructor(quality = 'auto') {
+
     this.selectedQuality = quality;
 
     //Props to be parsed from the API response
@@ -31,6 +30,7 @@ class VimeoClient {
 
     //The function returns a promise based on the request made inside
     return new Promise((resolve, reject)=>{
+
       //Use the fetch API (returns a promise) and assemble the complete request path - e.g http://myawesomeapp.com/video/vimeo_video_id
       fetch(`/video/${vimeoVideoID}`).then(response => {
 
@@ -40,47 +40,68 @@ class VimeoClient {
 
             //Save the file list of each request to a member object of the instance
             if (obj.play == null){
-              reject('[Vimeo] no video found');
+              reject('[Vimeo] No video file found');
             }
 
             this.files = obj.play;
 
-            if (obj.description && obj.description.match(/^{/)) {
+            //If a JSON was provided in the description then it's a DepthKit take (saved into this.props)
+            if (Util.isJSON(obj)) {
               this.props = JSON.parse(obj.description);
+              this.type = Type.DepthKit;
+            } else {
+              this.props = null;
+              this.type = Type.RealSense;
             }
 
             if (this.selectedQuality == 'auto') {
-              this.selectedQuality = 'dash';
-              // todo: if mobile safari, play hls
-              // todo: detect if stream even has dash/hls and fall back to highest progressive
-              console.log("[VimeoClient] Selected quality: " + this.selectedQuality);
+              if(Util.isiOS()){
+                this.selectedQuality = 'hls';
+              } else {
+                this.selectedQuality = 'dash';
+              }
+              // TODO: if mobile safari, play hls
+              // TODO: detect if stream even has dash/hls and fall back to highest progressive
+              console.log("[Vimeo] Selected quality: " + this.selectedQuality);
             }
 
             if (this.selectedQuality == 'hls') {
-              this.url = this.files.hls.link;
-              this.type = 'application/x-mpegURL';
-            } 
-            else if (this.selectedQuality == 'dash') {
-              this.url = this.files.dash.link;
-              this.type = 'application/x-mpegURL';
-            } 
+              if(this.files.hls.link){
+                this.selectedQuality = 'hls';
+                this.url = this.files.hls.link;
+              } else {
+                console.warn('[Vimeo] Requested an HLS stream but none was found');
+              }
+            } else if (this.selectedQuality == 'dash') {
+              if(this.files.dash.link){
+                this.selectedQuality = 'dash';
+                this.url = this.files.dash.link;
+              } else {
+                console.warn('[Vimeo] Requested a DASH stream but none was found');
+              }
+            }
             else {
-              // Iterate over the file list and find the one that matchs our quality setting (e.g 'hd')
-              for (let file of this.files.progressive) {
-                // console.log(file);
-                if (file.width === this.selectedQuality) {
-                  //Save the link
-                  this.url = file.link;
+              /*
+              * Progressive currently only supports DepthKit
+              * Future developments will support more native depth playback formats
+              * It is recomended to use adaptive format
+              */
+              if(this.type === Type.DepthKit){
+                // Iterate over the file list and find the one that matchs our quality setting (e.g 'hd')
+                for (let file of this.files.progressive) {
 
-                  //Save the type
-                  this.type = file.type;
+                  if (file.width === this.selectedQuality) {
 
-                  //Save the framerate
-                  this.fps = file.fps;
+                    //Save the link
+                    this.url = file.link;
 
-                  //Fix the width and height based on the vimeo video sizes
-                  this.props.textureWidth = file.width;
-                  this.props.textureHeight = file.height;
+                    //Save the framerate
+                    this.fps = file.fps;
+
+                    //If DepthKit in different resolutions then the ones specified in the JSON file
+                    this.props.textureWidth = file.width;
+                    this.props.textureHeight = file.height;
+                  }
                 }
               }
             }
@@ -89,6 +110,7 @@ class VimeoClient {
             //Resolve the promise and return the url for the video and the props object
             resolve({
               'url': this.url,
+              'selectedQuality': this.selectedQuality,
               'props': this.props,
               'type': this.type,
               'fps': this.fps
