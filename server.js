@@ -60,11 +60,11 @@ app.get('/:video_id', (request, response) => {
 });
 
 // The route for getting videos from the vimeo API
+// TODO: restrict requests to the server's domain
 app.get('/video/:id', (request, response) => {
-  // Create an API instance using your key
+  // Create an API instance using your VIMEO_TOKEN from your .env file
   let api = new Vimeo(null, null, process.env.VIMEO_TOKEN);
 
-  // Make a requet
   api.request({
     method: 'GET',
     path: `/videos/${request.params.id}`,
@@ -81,6 +81,7 @@ app.get('/video/:id', (request, response) => {
         return;
       }
 
+      // Unfurl the Live links to hack around CORS issues
       if (body.live && body.live.status == "streaming") {
         var sync_req = require('sync-request');
 
