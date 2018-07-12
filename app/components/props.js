@@ -103,9 +103,9 @@ const _RealSense = {
   "e32": 0,
   "e33": 1
   },
-  "farClip": 3,
+  "farClip": 2,
   "format": "perpixel",
-  "nearClip": 0.1,
+  "nearClip": 1,
   "numAngles": 1,
   "textureHeight": 4096,
   "textureWidth": 2048

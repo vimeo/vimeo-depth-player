@@ -52,7 +52,8 @@ export default class DepthPlayer{
       } else if(_props == null && _type == Type.RealSense){
         _props = Props.RealSense;
       }
-      this.gui = new GuiManager();
+      
+      // this.gui = new GuiManager();
 
       // Load the shaders src
       let rgbdFrag = glsl.file('../shaders/rgbd.frag');

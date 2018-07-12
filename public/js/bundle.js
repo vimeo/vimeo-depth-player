@@ -1434,7 +1434,8 @@ var DepthPlayer = function () {
         } else if (_props == null && _type == _type3.default.RealSense) {
             _props = _props3.default.RealSense;
         }
-        this.gui = new _gui2.default();
+
+        // this.gui = new GuiManager();
 
         // Load the shaders src
         var rgbdFrag = glsl(["#define GLSLIFY 1\nuniform sampler2D map;\nuniform float opacity;\n\nuniform float uvdy;\nuniform float uvdx;\n\nvarying float visibility;\nvarying vec2 vUv;\nvarying vec3 vNormal;\nvarying vec3 vPos;\n\nvoid main() {\n\n    if ( visibility < 0.9 ) discard;\n    vec4 color = texture2D(map, vUv);\n\n    color.w = opacity;\n\n    gl_FragColor = color;\n\n}\n"]);
@@ -2090,9 +2091,9 @@ var _RealSense = {
     "e32": 0,
     "e33": 1
   },
-  "farClip": 3,
+  "farClip": 2,
   "format": "perpixel",
-  "nearClip": 0.1,
+  "nearClip": 1,
   "numAngles": 1,
   "textureHeight": 4096,
   "textureWidth": 2048
@@ -2455,14 +2456,14 @@ var VimeoClient = function () {
               }
 
               if (_this.selectedQuality == 'hls') {
-                if (_this.files.hls) {
+                if (_this.files.hls.link) {
                   _this.selectedQuality = 'hls';
                   _this.url = _this.files.hls.link;
                 } else {
                   console.warn('[Vimeo] Requested an HLS stream but none was found');
                 }
               } else if (_this.selectedQuality == 'dash') {
-                if (_this.files.dash) {
+                if (_this.files.dash.link) {
                   _this.selectedQuality = 'dash';
                   _this.url = _this.files.dash.link;
                 } else {

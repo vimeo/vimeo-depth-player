@@ -37,12 +37,13 @@
 
     console.log(response);
 
-    let character = new Sandbox.DepthPlayer(Sandbox.Style.Points,
+    let character = new Sandbox.DepthPlayer(Sandbox.Style.Mesh,
                                             response.props,
                                             response.url,
                                             response.selectedQuality,
                                             response.type);
     // character.player.play();
+    character.rotation.z = -Math.PI / 2;
     glScene.scene.add(character);
 
     //Get rid of the loader

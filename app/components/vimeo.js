@@ -66,14 +66,14 @@ class VimeoClient {
             }
 
             if (this.selectedQuality == 'hls') {
-              if(this.files.hls){
+              if(this.files.hls.link){
                 this.selectedQuality = 'hls';
                 this.url = this.files.hls.link;
               } else {
                 console.warn('[Vimeo] Requested an HLS stream but none was found');
               }
             } else if (this.selectedQuality == 'dash') {
-              if(this.files.dash){
+              if(this.files.dash.link){
                 this.selectedQuality = 'dash';
                 this.url = this.files.dash.link;
               } else {
