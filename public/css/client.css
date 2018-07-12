@@ -5,7 +5,6 @@ body {
   margin: 0;
   overflow: hidden;
   font-family: Arial, Helvetica, sans-serif;
-  text-align: center;
 }
 
 #content {
@@ -53,10 +52,20 @@ body {
 	background-color: #EEF1F2;
 	border-bottom: 1px solid #D0D8DB;
 }
+
 #logo{
 	position: absolute;
 	left: 30px;
 	top: 10px;
+}
+
+#labs {
+	position: absolute;
+	left: 140px;
+	top: 13px;
+	/* font-weight: bold; */
+	font-size: 23px;
+	font-family: "Comic Sans MS", cursive, sans-serif;
 }
 
 /* Animation keyframes - you need to add prefixes */
@@ -126,4 +135,10 @@ body {
     border-style: solid;
     border-width: 9.5px 0 9.5px 17px;
     border-color: transparent transparent transparent rgba(255, 255, 255, 1);
+}
+
+
+.experiments {
+  padding: 20px;
+  font-family: "Comic Sans MS";
 }
