@@ -1,5 +1,3 @@
-<script src="/js/gltfloader.js"></script>
-
 <div id="loader" class="loading">
   <div class="spinner">
     <div class="mask">
@@ -26,7 +24,7 @@
   {
     const loader = document.getElementById('loader');
     const play = document.getElementById('play');
-    
+
     loader.style.display = 'none';
     play.style.display = 'block';
 
@@ -41,7 +39,7 @@
     function checkLoad() {
         if (player.videoElement.readyState === 4) {
           setupPlayButton(player);
-        } 
+        }
         else {
           setTimeout(checkLoad, 100);
         }
