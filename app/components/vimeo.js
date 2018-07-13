@@ -39,7 +39,7 @@ class VimeoClient {
           if (response.status === 200) {
 
             //Save the file list of each request to a member object of the instance
-            if (obj.play == null){
+            if (obj.play == null) {
               reject('[Vimeo] No video file found');
             }
 
@@ -49,15 +49,17 @@ class VimeoClient {
             if (Util.isJSON(obj)) {
               this.props = JSON.parse(obj.description);
               this.type = Type.DepthKit;
-            } else {
+            } 
+            else {
               this.props = null;
               this.type = Type.RealSense;
             }
 
             if (this.selectedQuality == 'auto') {
-              if(Util.isiOS()){
+              if (Util.isiOS()) {
                 this.selectedQuality = 'hls';
-              } else {
+              } 
+              else {
                 this.selectedQuality = 'dash';
               }
               // TODO: if mobile safari, play hls
@@ -66,17 +68,18 @@ class VimeoClient {
             }
 
             if (this.selectedQuality == 'hls') {
-              if(this.files.hls.link){
-                this.selectedQuality = 'hls';
+              if (this.files.hls.link) {
                 this.url = this.files.hls.link;
-              } else {
+              } 
+              else {
                 console.warn('[Vimeo] Requested an HLS stream but none was found');
               }
-            } else if (this.selectedQuality == 'dash') {
-              if(this.files.dash.link){
-                this.selectedQuality = 'dash';
+            } 
+            else if (this.selectedQuality == 'dash') {
+              if (this.files.dash.link) {
                 this.url = this.files.dash.link;
-              } else {
+              } 
+              else {
                 console.warn('[Vimeo] Requested a DASH stream but none was found');
               }
             }
@@ -86,7 +89,7 @@ class VimeoClient {
               * Future developments will support more native depth playback formats
               * It is recomended to use adaptive format
               */
-              if(this.type === Type.DepthKit){
+              if (this.type === Type.DepthKit){
                 // Iterate over the file list and find the one that matchs our quality setting (e.g 'hd')
                 for (let file of this.files.progressive) {
 

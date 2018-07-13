@@ -18,11 +18,12 @@ const VERTS_TALL = 256;
 
 export default class DepthPlayer
 {
-  constructor(_vimeoVideoId = null, _videoQuality = 'auto', _style = Style.Mesh)
+  constructor(_vimeoVideoId = null, _videoQuality = 'auto', _depthType = Type.DepthKit, _depthStyle = Style.Mesh)
   {
     this.vimeoVideoId = _vimeoVideoId;
     this.videoQuality = _videoQuality;
-    this.depthStyle   = _style;
+    this.depthStyle   = _depthStyle;
+    this.depthType    = _depthType;
     this.videoElement = document.createElement('video');    
   }
 
@@ -34,7 +35,7 @@ export default class DepthPlayer
         this.loadVideo(response.props,
                              response.url,
                              response.selectedQuality,
-                             response.type,
+                             response.type || this.depthType,
                              this.depthStyle);
 
         resolve({});
@@ -42,7 +43,8 @@ export default class DepthPlayer
     });
   }
 
-  loadVideo(_props, _videoUrl, _selectedQuality, _type, _style = Style.Mesh, showVideo = false) 
+  // TODO Rename selectedQuality - it is about if it's adaptive or not?
+  loadVideo(_props, _videoUrl, _selectedQuality, _type = Type.DepthKit, _style = Style.Mesh, showVideo = false) 
   {
       console.log(`[DepthPlayer] Creating a depth player with selected quality: ${_selectedQuality}`);
 
@@ -61,7 +63,7 @@ export default class DepthPlayer
       let rgbdFrag = glsl.file('../shaders/rgbd.frag');
       let rgbdVert = glsl.file('../shaders/rgbd.vert');
 
-      this.videoElement.id = 'vimeo-depth-player';
+      this.videoElement.id = 'vimeo-depth-player'; // Must be unique ID
       this.videoElement.crossOrigin = 'anonymous';
       this.videoElement.setAttribute('crossorigin', 'anonymous');
       this.videoElement.autoplay = false;
@@ -168,15 +170,16 @@ export default class DepthPlayer
       //Make the shader material double sided
       this.material.side = THREE.DoubleSide;
 
-      if(_type == Type.DepthKit){
+      if (_type == Type.DepthKit) {
         this.material.defines.DEPTH_ORDER = '1.0';
 
-        if(_props == null){
+        if (_props == null) {
           _props = Props.DepthKit;
         }
-      } else if(_type == Type.RealSense){
+      } 
+      else if ( _type == Type.RealSense) {
         this.material.defines.DEPTH_ORDER = '-1.0';
-        if(_props == null){
+        if (_props == null) {
           _props = Props.RealSense;
         }
       }

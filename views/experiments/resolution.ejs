@@ -1,57 +1,29 @@
-<div id="loader" class="loading">
-  <div class="spinner">
-    <div class="mask">
-      <div class="maskedCircle"></div>
-    </div>
-  </div>
-</div>
-
-<div id="play" class="play-button"></div>
-<div id="gl_canvas_container"></div>
+<% include ../partials/depth-bootup %>
 
 <script>
-  //Create a new scene wrapper (holds the THREE scene under .scene / .camera / .controls ...etc)
-  const glScene = new Sandbox.Scene();
+  const vimeo = new Sandbox.VimeoClient();
 
-  //Check for webGL support and log
-  glScene.on('webgl_support', supported=>{
-    console.log(`[Client] is WebGL supported on this browser? ${supported}`);
-  });
-
-  // A Vimeo client-to-server wrapper special for volumetric video
-  const vimeo = new Sandbox.VimeoClient(2048);
-
-  //We will store all the character instance in here so we can hit play (kind of) together
+  // We will store all the character instance in here so we can hit play (kind of) together
   let characters = [];
 
-  //Request the video and use the values to build the character
-  vimeo.requestVideo('<%= video_id || 279527916 %>').then(response=>{
+  vimeo.requestVideo('<%= video_id || 279527916 %>').then(response => {
+    // Manually loop through all the progressive video files
+    for (let res in vimeo.files.progressive) {
 
-    //Save a reference to the loader so we can get rid of it once everything loads
-    const loader = document.getElementById('loader');
-
-    //Save a reference to the play button so we can get rid of it once everything loads
-    const play = document.getElementById('play');
-
-    //Response has .url with the link to the file and .props for the DepthKit engine
-    // console.log(response.url, response.props);
-    for(let res in vimeo.files.progressive){
-
-      //Correct the texture sizes based on the current resolution
+      // Correct the texture sizes based on the current resolution
       response.props.textureWidth = vimeo.files.progressive[res].width;
       response.props.textureHeight = vimeo.files.progressive[res].height;
 
-      let player = new Sandbox.DepthPlayer();
+      player = new Sandbox.DepthPlayer();
       let character = player.loadVideo(response.props,
-                                vimeo.files.progressive[res].link,
-                                response.selectedQuality,
-                                response.type);
-
+                                       vimeo.files.progressive[res].link,
+                                       'progressive',
+                                       response.type);
       let recenteredX = res - 2.5;
 
       // Create a text that shows the resolution for each take loaded
       const simpleMat = new THREE.MeshPhongMaterial();
-      const textResolution = new THREE.TextGeometry( `${vimeo.files.progressive[res].width}x${vimeo.files.progressive[res].height}`, {
+      const textResolution = new THREE.TextGeometry(`${vimeo.files.progressive[res].width}x${vimeo.files.progressive[res].height}`, {
         font: glScene.font,
         size: 80,
         height: 5,
@@ -61,6 +33,7 @@
         bevelSize: 8,
         bevelSegments: 5
       });
+
       const textMesh = new THREE.Mesh(textResolution, simpleMat);
       textMesh.scale.set(0.001, 0.001, 0.001);
       textMesh.position.set(recenteredX - 0.3, 1.2, -0.5);
@@ -79,20 +52,5 @@
       glScene.scene.add(character);
       glScene.scene.add(textMesh);
     }
-
-    //Get rid of the loader
-    setTimeout(() => {
-      loader.style.display = 'none';
-      play.style.display = 'block';
-
-      //Register the event listener
-      play.addEventListener('click', (e)=>{
-        play.style.display = 'none';
-        for(let iter = 0; iter < characters.length; iter++){
-          characters[iter].player.play();
-        }
-      }, false);
-    }, 500);
-
   });
 </script>
