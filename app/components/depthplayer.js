@@ -1,18 +1,8 @@
-// THREE.js
 import * as THREE from 'three';
-
-// The depth encoding type enum
 import Type from './type';
-
-// Fallback depth props in case non were provided
 import Props from './props';
-
-// The rendering style enum
 import Style from './style';
-
-// dat.GUI wrapper
 import GuiManager from './gui';
-
 import Util from './util';
 
 // GLSLIFY - bundles all the GLSL code along with the JS
@@ -22,29 +12,45 @@ const glsl = require('glslify');
 * TODO add documentation
 */
 
-
 //For building the geomtery
 const VERTS_WIDE = 256;
 const VERTS_TALL = 256;
 
-export default class DepthPlayer{
+export default class DepthPlayer
+{
+  constructor(_vimeoVideoId = null, _videoQuality = 'auto', _style = Style.Mesh)
+  {
+    this.vimeoVideoId = _vimeoVideoId;
+    this.videoQuality = _videoQuality;
+    this.depthStyle   = _style;
+    this.videoElement = document.createElement('video');    
+  }
 
-  constructor(_style = Style.Mesh,
-              _props,
-              _video,
-              _selectedQuality,
-              _type,
-              showVideo = false) {
+  load()
+  {
+    const vimeo = new Sandbox.VimeoClient();
+    return new Promise((resolve, reject) => {
+      vimeo.requestVideo(this.vimeoVideoId).then(response => {
+        this.loadVideo(response.props,
+                             response.url,
+                             response.selectedQuality,
+                             response.type,
+                             this.depthStyle);
 
+        resolve({});
+      });
+    });
+  }
 
+  loadVideo(_props, _videoUrl, _selectedQuality, _type, _style = Style.Mesh, showVideo = false) 
+  {
       console.log(`[DepthPlayer] Creating a depth player with selected quality: ${_selectedQuality}`);
 
-      // A couple of sanity checks
-      if(_video == null){
+      if (_videoUrl == null) {
         console.warn('[DepthPlayer] No video provided');
         return;
       }
-      if(_selectedQuality == null){
+      if (_selectedQuality == null) {
         console.warn('[DepthPlayer] No selected quality set');
         return;
       }
@@ -55,36 +61,29 @@ export default class DepthPlayer{
       let rgbdFrag = glsl.file('../shaders/rgbd.frag');
       let rgbdVert = glsl.file('../shaders/rgbd.vert');
 
-      //Video element
-      if(_selectedQuality == 'dash'){
-        this.videoElement = document.createElement('video');
-        this.videoElement.id = 'vimeo-depth-player';
-        this.videoElement.crossOrigin = 'anonymous';
-        this.videoElement.setAttribute('crossorigin', 'anonymous');
-        this.videoElement.autoplay = false;
-        this.videoElement.loop = false;
+      this.videoElement.id = 'vimeo-depth-player';
+      this.videoElement.crossOrigin = 'anonymous';
+      this.videoElement.setAttribute('crossorigin', 'anonymous');
+      this.videoElement.autoplay = false;
+      this.videoElement.loop = false;
 
-        //Create a DASH.js player
+      // Adaptive DASH playback
+      if (_selectedQuality == 'dash') {
+        // Create a DASH.js player
         this.video = dashjs.MediaPlayer().create();
-
-        //Initialize the player
-        this.video.initialize(this.videoElement, _video, false);
+        this.video.initialize(this.videoElement, _videoUrl, false);
 
         this.createTexture(this.videoElement);
+      } 
+      // Otherwise fallback to progressive
+      else {
+        this.video = this.videoElement;
 
-      } else {
-        this.video = document.createElement('video');
-        this.video.id = 'vimeo-depth-player';
-        this.video.crossOrigin = 'anonymous';
-        this.video.setAttribute('crossorigin', 'anonymous');
-        if(Util.isiOS()){
+        if (Util.isiOS()){
           this.video.setAttribute('webkit-playsinline', 'webkit-playsinline');
           this.video.setAttribute('playsinline', 'playsinline');
         }
-        this.video.src = _video;
-        this.video.autoplay = false;
-        this.video.loop = false;
-
+        this.video.src = _videoUrl;
         this.createTexture(this.video);
       }
 
@@ -208,7 +207,7 @@ export default class DepthPlayer{
       this.mesh.player = this;
       this.mesh.name = 'depth-player';
 
-      //Return the object3D so it could be added to the scene
+      // Return the object3D so it could be added to the scene
       return this.mesh;
   }
 

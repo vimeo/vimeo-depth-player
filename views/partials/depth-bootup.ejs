@@ -1,0 +1,52 @@
+<script src="/js/gltfloader.js"></script>
+
+<div id="loader" class="loading">
+  <div class="spinner">
+    <div class="mask">
+      <div class="maskedCircle"></div>
+    </div>
+  </div>
+</div>
+
+<div id="play" class="play-button"></div>
+<div id="gl_canvas_container"></div>
+
+<script>
+  // Setup the scene and depth player
+  const glScene = new Sandbox.Scene();
+  glScene.camera.position.set(0, 0.5, 0.5);
+
+  glScene.on('webgl_support', supported=>{
+    console.log(`[Client] is WebGL supported on this browser? ${supported}`);
+  });
+
+  let player = new Sandbox.DepthPlayer('<%= video_id || 279527916 %>');
+
+  function setupPlayButton(_player)
+  {
+    const loader = document.getElementById('loader');
+    const play = document.getElementById('play');
+    
+    loader.style.display = 'none';
+    play.style.display = 'block';
+
+    play.addEventListener('click', (e) => {
+      play.style.display = 'none';
+      _player.play();
+    }, false);
+  }
+
+  // Keep on checking to see if the video has loaded.
+  window.addEventListener('load', function() {
+    function checkLoad() {
+        if (player.videoElement.readyState === 4) {
+          setupPlayButton(player);
+        } 
+        else {
+          setTimeout(checkLoad, 100);
+        }
+    }
+    checkLoad();
+  }, false);
+
+</script>

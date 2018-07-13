@@ -976,20 +976,7 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); // THREE.js
-
-
-// The depth encoding type enum
-
-
-// Fallback depth props in case non were provided
-
-
-// The rendering style enum
-
-
-// dat.GUI wrapper
-
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _three = require('three');
 
@@ -1034,190 +1021,207 @@ var VERTS_TALL = 256;
 
 var DepthPlayer = function () {
     function DepthPlayer() {
-        var _style = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _style3.default.Mesh;
+        var _vimeoVideoId = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
-        var _props = arguments[1];
-        var _video = arguments[2];
-        var _selectedQuality = arguments[3];
-        var _type = arguments[4];
-        var showVideo = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
+        var _videoQuality = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'auto';
+
+        var _style = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : _style3.default.Mesh;
 
         _classCallCheck(this, DepthPlayer);
 
-        console.log('[DepthPlayer] Creating a depth player with selected quality: ' + _selectedQuality);
+        this.vimeoVideoId = _vimeoVideoId;
+        this.videoQuality = _videoQuality;
+        this.depthStyle = _style;
+        this.videoElement = document.createElement('video');
+    }
 
-        // A couple of sanity checks
-        if (_video == null) {
-            console.warn('[DepthPlayer] No video provided');
-            return;
+    _createClass(DepthPlayer, [{
+        key: 'load',
+        value: function load() {
+            var _this = this;
+
+            var vimeo = new Sandbox.VimeoClient();
+            return new Promise(function (resolve, reject) {
+                vimeo.requestVideo(_this.vimeoVideoId).then(function (response) {
+                    _this.loadVideo(response.props, response.url, response.selectedQuality, response.type, _this.depthStyle);
+
+                    resolve({});
+                });
+            });
         }
-        if (_selectedQuality == null) {
-            console.warn('[DepthPlayer] No selected quality set');
-            return;
-        }
+    }, {
+        key: 'loadVideo',
+        value: function loadVideo(_props, _videoUrl, _selectedQuality, _type) {
+            var _style = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : _style3.default.Mesh;
 
-        // this.gui = new GuiManager();
+            var showVideo = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
 
-        // Load the shaders src
-        var rgbdFrag = glsl(["#define GLSLIFY 1\nuniform sampler2D map;\nuniform float opacity;\n\nuniform float uvdy;\nuniform float uvdx;\n\nvarying float visibility;\nvarying vec2 vUv;\nvarying vec3 vNormal;\nvarying vec3 vPos;\n\nvoid main() {\n\n    if ( visibility < 0.9 ) discard;\n    vec4 color = texture2D(map, vUv);\n\n    color.w = opacity;\n\n    gl_FragColor = color;\n\n}\n"]);
-        var rgbdVert = glsl(["#define GLSLIFY 1\nuniform float mindepth;\nuniform float maxdepth;\n\nuniform float width;\nuniform float height;\n\nuniform bool isPoints;\nuniform float pointSize;\n\nuniform float time;\n\nuniform vec2 focalLength;\nuniform vec2 principalPoint;\nuniform vec2 imageDimensions;\nuniform vec4 crop;\nuniform vec2 meshDensity;\nuniform mat4 extrinsics;\n\nvarying vec3 vNormal;\nvarying vec3 vPos;\n\nuniform sampler2D map;\n\nvarying float visibility;\nvarying vec2 vUv;\n\nconst float _DepthSaturationThreshhold = 0.5; //a given pixel whose saturation is less than half will be culled (old default was .5)\nconst float _DepthBrightnessThreshold = 0.5; //a given pixel whose brightness is less than half will be culled (old default was .9)\nconst float  _Epsilon = .03;\n\nvec3 rgb2hsv(vec3 c)\n{\n    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);\n    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));\n    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));\n\n    float d = q.x - min(q.w, q.y);\n    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + _Epsilon)), d / (q.x + _Epsilon), q.x);\n}\n\nfloat depthForPoint(vec2 texturePoint)\n{\n    vec4 depthsample = texture2D(map, texturePoint);\n    vec3 depthsamplehsv = rgb2hsv(depthsample.rgb);\n    return depthsamplehsv.g > _DepthSaturationThreshhold && depthsamplehsv.b > _DepthBrightnessThreshold ? depthsamplehsv.r : 0.0;\n}\n\nvoid main() {\n    vec4 texSize = vec4(1.0 / width, 1.0 / height, width, height);\n\n    vec2 centerpix = texSize.xy * .5;\n    vec2 textureStep = 1.0 / meshDensity;\n    vec2 basetex = floor(position.xy * textureStep * texSize.zw) * texSize.xy;\n    vec2 imageCoordinates = crop.xy + (basetex * crop.zw);\n    basetex.y = 1.0 - basetex.y;\n\n    vec2 depthTexCoord = basetex * vec2(1.0, 0.5) + centerpix;\n    vec2 colorTexCoord = basetex * vec2(1.0, 0.5) + vec2(0.0, 0.5) + centerpix;\n\n    vUv = colorTexCoord;\n    vPos = (modelMatrix * vec4(position, 1.0 )).xyz;\n    vNormal = normalMatrix * normal;\n\n    //check neighbors\n    //texture coords come in as [0.0 - 1.0] for this whole plane\n    float depth = depthForPoint(depthTexCoord);\n\n    float neighborDepths[8];\n    neighborDepths[0] = depthForPoint(depthTexCoord + vec2(0.0,  textureStep.y));\n    neighborDepths[1] = depthForPoint(depthTexCoord + vec2(textureStep.x, 0.0));\n    neighborDepths[2] = depthForPoint(depthTexCoord + vec2(0.0, -textureStep.y));\n    neighborDepths[3] = depthForPoint(depthTexCoord + vec2(-textureStep.x, 0.0));\n    neighborDepths[4] = depthForPoint(depthTexCoord + vec2(-textureStep.x, -textureStep.y));\n    neighborDepths[5] = depthForPoint(depthTexCoord + vec2(textureStep.x,  textureStep.y));\n    neighborDepths[6] = depthForPoint(depthTexCoord + vec2(textureStep.x, -textureStep.y));\n    neighborDepths[7] = depthForPoint(depthTexCoord + vec2(-textureStep.x,  textureStep.y));\n\n    visibility = 1.0;\n    int numDudNeighbors = 0;\n    //search neighbor verts in order to see if we are near an edge\n    //if so, clamp to the surface closest to us\n    if (depth < _Epsilon || (1.0 - depth) < _Epsilon)\n    {\n        // float depthDif = 1.0;\n        float nearestDepth = 1.0;\n        for (int i = 0; i < 8; i++)\n        {\n            float depthNeighbor = neighborDepths[i];\n            if (depthNeighbor >= _Epsilon && (1.0 - depthNeighbor) > _Epsilon)\n            {\n                // float thisDif = abs(nearestDepth - depthNeighbor);\n                if (depthNeighbor < nearestDepth)\n                {\n                    // depthDif = thisDif;\n                    nearestDepth = depthNeighbor;\n                }\n            }\n            else\n            {\n                numDudNeighbors++;\n            }\n        }\n\n        depth = nearestDepth;\n        visibility = 0.8;\n\n        // blob filter\n        if (numDudNeighbors > 6)\n        {\n            visibility = 0.0;\n        }\n    }\n\n    // internal edge filter\n    float maxDisparity = 0.0;\n    for (int i = 0; i < 8; i++)\n    {\n        float depthNeighbor = neighborDepths[i];\n        if (depthNeighbor >= _Epsilon && (1.0 - depthNeighbor) > _Epsilon)\n        {\n            maxDisparity = max(maxDisparity, abs(depth - depthNeighbor));\n        }\n    }\n    visibility *= 1.0 - maxDisparity;\n\n    float z = (depth * (maxdepth - mindepth) + mindepth) * DEPTH_ORDER;\n    vec4 worldPos = extrinsics * vec4((imageCoordinates * imageDimensions - principalPoint) * z / focalLength, z, 1.0);\n    worldPos.w = 1.0;\n    if(isPoints) gl_PointSize = pointSize;\n    gl_Position = projectionMatrix * modelViewMatrix * worldPos;\n}\n"]);
+            console.log('[DepthPlayer] Creating a depth player with selected quality: ' + _selectedQuality);
 
-        //Video element
-        if (_selectedQuality == 'dash') {
-            this.videoElement = document.createElement('video');
+            if (_videoUrl == null) {
+                console.warn('[DepthPlayer] No video provided');
+                return;
+            }
+            if (_selectedQuality == null) {
+                console.warn('[DepthPlayer] No selected quality set');
+                return;
+            }
+
+            // this.gui = new GuiManager();
+
+            // Load the shaders src
+            var rgbdFrag = glsl(["#define GLSLIFY 1\nuniform sampler2D map;\nuniform float opacity;\n\nuniform float uvdy;\nuniform float uvdx;\n\nvarying float visibility;\nvarying vec2 vUv;\nvarying vec3 vNormal;\nvarying vec3 vPos;\n\nvoid main() {\n\n    if ( visibility < 0.9 ) discard;\n    vec4 color = texture2D(map, vUv);\n\n    color.w = opacity;\n\n    gl_FragColor = color;\n\n}\n"]);
+            var rgbdVert = glsl(["#define GLSLIFY 1\nuniform float mindepth;\nuniform float maxdepth;\n\nuniform float width;\nuniform float height;\n\nuniform bool isPoints;\nuniform float pointSize;\n\nuniform float time;\n\nuniform vec2 focalLength;\nuniform vec2 principalPoint;\nuniform vec2 imageDimensions;\nuniform vec4 crop;\nuniform vec2 meshDensity;\nuniform mat4 extrinsics;\n\nvarying vec3 vNormal;\nvarying vec3 vPos;\n\nuniform sampler2D map;\n\nvarying float visibility;\nvarying vec2 vUv;\n\nconst float _DepthSaturationThreshhold = 0.5; //a given pixel whose saturation is less than half will be culled (old default was .5)\nconst float _DepthBrightnessThreshold = 0.5; //a given pixel whose brightness is less than half will be culled (old default was .9)\nconst float  _Epsilon = .03;\n\nvec3 rgb2hsv(vec3 c)\n{\n    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);\n    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));\n    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));\n\n    float d = q.x - min(q.w, q.y);\n    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + _Epsilon)), d / (q.x + _Epsilon), q.x);\n}\n\nfloat depthForPoint(vec2 texturePoint)\n{\n    vec4 depthsample = texture2D(map, texturePoint);\n    vec3 depthsamplehsv = rgb2hsv(depthsample.rgb);\n    return depthsamplehsv.g > _DepthSaturationThreshhold && depthsamplehsv.b > _DepthBrightnessThreshold ? depthsamplehsv.r : 0.0;\n}\n\nvoid main() {\n    vec4 texSize = vec4(1.0 / width, 1.0 / height, width, height);\n\n    vec2 centerpix = texSize.xy * .5;\n    vec2 textureStep = 1.0 / meshDensity;\n    vec2 basetex = floor(position.xy * textureStep * texSize.zw) * texSize.xy;\n    vec2 imageCoordinates = crop.xy + (basetex * crop.zw);\n    basetex.y = 1.0 - basetex.y;\n\n    vec2 depthTexCoord = basetex * vec2(1.0, 0.5) + centerpix;\n    vec2 colorTexCoord = basetex * vec2(1.0, 0.5) + vec2(0.0, 0.5) + centerpix;\n\n    vUv = colorTexCoord;\n    vPos = (modelMatrix * vec4(position, 1.0 )).xyz;\n    vNormal = normalMatrix * normal;\n\n    //check neighbors\n    //texture coords come in as [0.0 - 1.0] for this whole plane\n    float depth = depthForPoint(depthTexCoord);\n\n    float neighborDepths[8];\n    neighborDepths[0] = depthForPoint(depthTexCoord + vec2(0.0,  textureStep.y));\n    neighborDepths[1] = depthForPoint(depthTexCoord + vec2(textureStep.x, 0.0));\n    neighborDepths[2] = depthForPoint(depthTexCoord + vec2(0.0, -textureStep.y));\n    neighborDepths[3] = depthForPoint(depthTexCoord + vec2(-textureStep.x, 0.0));\n    neighborDepths[4] = depthForPoint(depthTexCoord + vec2(-textureStep.x, -textureStep.y));\n    neighborDepths[5] = depthForPoint(depthTexCoord + vec2(textureStep.x,  textureStep.y));\n    neighborDepths[6] = depthForPoint(depthTexCoord + vec2(textureStep.x, -textureStep.y));\n    neighborDepths[7] = depthForPoint(depthTexCoord + vec2(-textureStep.x,  textureStep.y));\n\n    visibility = 1.0;\n    int numDudNeighbors = 0;\n    //search neighbor verts in order to see if we are near an edge\n    //if so, clamp to the surface closest to us\n    if (depth < _Epsilon || (1.0 - depth) < _Epsilon)\n    {\n        // float depthDif = 1.0;\n        float nearestDepth = 1.0;\n        for (int i = 0; i < 8; i++)\n        {\n            float depthNeighbor = neighborDepths[i];\n            if (depthNeighbor >= _Epsilon && (1.0 - depthNeighbor) > _Epsilon)\n            {\n                // float thisDif = abs(nearestDepth - depthNeighbor);\n                if (depthNeighbor < nearestDepth)\n                {\n                    // depthDif = thisDif;\n                    nearestDepth = depthNeighbor;\n                }\n            }\n            else\n            {\n                numDudNeighbors++;\n            }\n        }\n\n        depth = nearestDepth;\n        visibility = 0.8;\n\n        // blob filter\n        if (numDudNeighbors > 6)\n        {\n            visibility = 0.0;\n        }\n    }\n\n    // internal edge filter\n    float maxDisparity = 0.0;\n    for (int i = 0; i < 8; i++)\n    {\n        float depthNeighbor = neighborDepths[i];\n        if (depthNeighbor >= _Epsilon && (1.0 - depthNeighbor) > _Epsilon)\n        {\n            maxDisparity = max(maxDisparity, abs(depth - depthNeighbor));\n        }\n    }\n    visibility *= 1.0 - maxDisparity;\n\n    float z = (depth * (maxdepth - mindepth) + mindepth) * DEPTH_ORDER;\n    vec4 worldPos = extrinsics * vec4((imageCoordinates * imageDimensions - principalPoint) * z / focalLength, z, 1.0);\n    worldPos.w = 1.0;\n    if(isPoints) gl_PointSize = pointSize;\n    gl_Position = projectionMatrix * modelViewMatrix * worldPos;\n}\n"]);
+
             this.videoElement.id = 'vimeo-depth-player';
             this.videoElement.crossOrigin = 'anonymous';
             this.videoElement.setAttribute('crossorigin', 'anonymous');
             this.videoElement.autoplay = false;
             this.videoElement.loop = false;
 
-            //Create a DASH.js player
-            this.video = dashjs.MediaPlayer().create();
+            // Adaptive DASH playback
+            if (_selectedQuality == 'dash') {
+                // Create a DASH.js player
+                this.video = dashjs.MediaPlayer().create();
+                this.video.initialize(this.videoElement, _videoUrl, false);
 
-            //Initialize the player
-            this.video.initialize(this.videoElement, _video, false);
-
-            this.createTexture(this.videoElement);
-        } else {
-            this.video = document.createElement('video');
-            this.video.id = 'vimeo-depth-player';
-            this.video.crossOrigin = 'anonymous';
-            this.video.setAttribute('crossorigin', 'anonymous');
-            if (_util2.default.isiOS()) {
-                this.video.setAttribute('webkit-playsinline', 'webkit-playsinline');
-                this.video.setAttribute('playsinline', 'playsinline');
+                this.createTexture(this.videoElement);
             }
-            this.video.src = _video;
-            this.video.autoplay = false;
-            this.video.loop = false;
+            // Otherwise fallback to progressive
+            else {
+                    this.video = this.videoElement;
 
-            this.createTexture(this.video);
-        }
-
-        //Append the original video from vimeo to the DOM
-        if (showVideo) document.body.append(this.video);
-
-        //Manages loading of assets internally
-        this.manager = new THREE.LoadingManager();
-
-        //JSON props once loaded
-        this.props;
-
-        //Geomtery
-        if (!DepthPlayer.geo) {
-            DepthPlayer.buildGeomtery();
-        }
-
-        //Material
-        this.material = new THREE.ShaderMaterial({
-            uniforms: {
-                "map": {
-                    type: "t",
-                    value: this.videoTexture
-                },
-                "time": {
-                    type: "f",
-                    value: 0.0
-                },
-                "mindepth": {
-                    type: "f",
-                    value: 0.0
-                },
-                "maxdepth": {
-                    type: "f",
-                    value: 0.0
-                },
-                "meshDensity": {
-                    value: new THREE.Vector2(VERTS_WIDE, VERTS_TALL)
-                },
-                "focalLength": {
-                    value: new THREE.Vector2(1, 1)
-                },
-                "principalPoint": {
-                    value: new THREE.Vector2(1, 1)
-                },
-                "imageDimensions": {
-                    value: new THREE.Vector2(512, 828)
-                },
-                "extrinsics": {
-                    value: new THREE.Matrix4()
-                },
-                "crop": {
-                    value: new THREE.Vector4(0, 0, 1, 1)
-                },
-                "width": {
-                    type: "f",
-                    value: 0
-                },
-                "height": {
-                    type: "f",
-                    value: 0
-                },
-                "opacity": {
-                    type: "f",
-                    value: 1.0
-                },
-                "isPoints": {
-                    type: "b",
-                    value: false
-                },
-                "pointSize": {
-                    type: "f",
-                    value: 3.0
+                    if (_util2.default.isiOS()) {
+                        this.video.setAttribute('webkit-playsinline', 'webkit-playsinline');
+                        this.video.setAttribute('playsinline', 'playsinline');
+                    }
+                    this.video.src = _videoUrl;
+                    this.createTexture(this.video);
                 }
-            },
-            vertexShader: rgbdVert,
-            fragmentShader: rgbdFrag,
-            transparent: true
-        });
 
-        //Make the shader material double sided
-        this.material.side = THREE.DoubleSide;
+            //Append the original video from vimeo to the DOM
+            if (showVideo) document.body.append(this.video);
 
-        if (_type == _type3.default.DepthKit) {
-            this.material.defines.DEPTH_ORDER = '1.0';
+            //Manages loading of assets internally
+            this.manager = new THREE.LoadingManager();
 
-            if (_props == null) {
-                _props = _props3.default.DepthKit;
+            //JSON props once loaded
+            this.props;
+
+            //Geomtery
+            if (!DepthPlayer.geo) {
+                DepthPlayer.buildGeomtery();
             }
-        } else if (_type == _type3.default.RealSense) {
-            this.material.defines.DEPTH_ORDER = '-1.0';
-            if (_props == null) {
-                _props = _props3.default.RealSense;
+
+            //Material
+            this.material = new THREE.ShaderMaterial({
+                uniforms: {
+                    "map": {
+                        type: "t",
+                        value: this.videoTexture
+                    },
+                    "time": {
+                        type: "f",
+                        value: 0.0
+                    },
+                    "mindepth": {
+                        type: "f",
+                        value: 0.0
+                    },
+                    "maxdepth": {
+                        type: "f",
+                        value: 0.0
+                    },
+                    "meshDensity": {
+                        value: new THREE.Vector2(VERTS_WIDE, VERTS_TALL)
+                    },
+                    "focalLength": {
+                        value: new THREE.Vector2(1, 1)
+                    },
+                    "principalPoint": {
+                        value: new THREE.Vector2(1, 1)
+                    },
+                    "imageDimensions": {
+                        value: new THREE.Vector2(512, 828)
+                    },
+                    "extrinsics": {
+                        value: new THREE.Matrix4()
+                    },
+                    "crop": {
+                        value: new THREE.Vector4(0, 0, 1, 1)
+                    },
+                    "width": {
+                        type: "f",
+                        value: 0
+                    },
+                    "height": {
+                        type: "f",
+                        value: 0
+                    },
+                    "opacity": {
+                        type: "f",
+                        value: 1.0
+                    },
+                    "isPoints": {
+                        type: "b",
+                        value: false
+                    },
+                    "pointSize": {
+                        type: "f",
+                        value: 3.0
+                    }
+                },
+                vertexShader: rgbdVert,
+                fragmentShader: rgbdFrag,
+                transparent: true
+            });
+
+            //Make the shader material double sided
+            this.material.side = THREE.DoubleSide;
+
+            if (_type == _type3.default.DepthKit) {
+                this.material.defines.DEPTH_ORDER = '1.0';
+
+                if (_props == null) {
+                    _props = _props3.default.DepthKit;
+                }
+            } else if (_type == _type3.default.RealSense) {
+                this.material.defines.DEPTH_ORDER = '-1.0';
+                if (_props == null) {
+                    _props = _props3.default.RealSense;
+                }
             }
+
+            //Switch a few things based on selected rendering type and create the volumetric asset
+            switch (_style) {
+                case _style3.default.Wire:
+                    this.material.wireframe = true;
+                    this.mesh = new THREE.Mesh(DepthPlayer.geo, this.material);
+                    break;
+
+                case _style3.default.Points:
+                    this.material.uniforms.isPoints.value = true;
+                    this.mesh = new THREE.Points(DepthPlayer.geo, this.material);
+                    break;
+
+                default:
+                    this.mesh = new THREE.Mesh(DepthPlayer.geo, this.material);
+                    break;
+            }
+
+            this.loadPropsFromObject(_props);
+
+            //Make sure we don't hide the character - this helps the objects in webVR
+            this.mesh.frustumCulled = false;
+
+            //Apend the object to the Three Object3D that way it's accsesable from the instance
+            this.mesh.player = this;
+            this.mesh.name = 'depth-player';
+
+            // Return the object3D so it could be added to the scene
+            return this.mesh;
         }
-
-        //Switch a few things based on selected rendering type and create the volumetric asset
-        switch (_style) {
-            case _style3.default.Wire:
-                this.material.wireframe = true;
-                this.mesh = new THREE.Mesh(DepthPlayer.geo, this.material);
-                break;
-
-            case _style3.default.Points:
-                this.material.uniforms.isPoints.value = true;
-                this.mesh = new THREE.Points(DepthPlayer.geo, this.material);
-                break;
-
-            default:
-                this.mesh = new THREE.Mesh(DepthPlayer.geo, this.material);
-                break;
-        }
-
-        this.loadPropsFromObject(_props);
-
-        //Make sure we don't hide the character - this helps the objects in webVR
-        this.mesh.frustumCulled = false;
-
-        //Apend the object to the Three Object3D that way it's accsesable from the instance
-        this.mesh.player = this;
-        this.mesh.name = 'depth-player';
-
-        //Return the object3D so it could be added to the scene
-        return this.mesh;
-    }
-
-    _createClass(DepthPlayer, [{
+    }, {
         key: 'createTexture',
         value: function createTexture(videoElement) {
             //Create a video texture to be passed to the shader
@@ -1261,7 +1265,7 @@ var DepthPlayer = function () {
     }, {
         key: 'loadPropsFromFile',
         value: function loadPropsFromFile(path) {
-            var _this = this;
+            var _this2 = this;
 
             //Make sure to read the config file as json (i.e JSON.parse)
             this.jsonLoader = new THREE.FileLoader(this.manager);
@@ -1269,37 +1273,37 @@ var DepthPlayer = function () {
             this.jsonLoader.load(path,
             // Function when json is loaded
             function (data) {
-                _this.props = data;
+                _this2.props = data;
                 // console.log(this.props);
 
                 //Update the shader based on the properties from the JSON
-                _this.material.uniforms.width.value = _this.props.textureWidth;
-                _this.material.uniforms.height.value = _this.props.textureHeight;
-                _this.material.uniforms.mindepth.value = _this.props.nearClip;
-                _this.material.uniforms.maxdepth.value = _this.props.farClip;
-                _this.material.uniforms.focalLength.value = _this.props.depthFocalLength;
-                _this.material.uniforms.principalPoint.value = _this.props.depthPrincipalPoint;
-                _this.material.uniforms.imageDimensions.value = _this.props.depthImageSize;
-                _this.material.uniforms.crop.value = _this.props.crop;
+                _this2.material.uniforms.width.value = _this2.props.textureWidth;
+                _this2.material.uniforms.height.value = _this2.props.textureHeight;
+                _this2.material.uniforms.mindepth.value = _this2.props.nearClip;
+                _this2.material.uniforms.maxdepth.value = _this2.props.farClip;
+                _this2.material.uniforms.focalLength.value = _this2.props.depthFocalLength;
+                _this2.material.uniforms.principalPoint.value = _this2.props.depthPrincipalPoint;
+                _this2.material.uniforms.imageDimensions.value = _this2.props.depthImageSize;
+                _this2.material.uniforms.crop.value = _this2.props.crop;
 
-                var ex = _this.props.extrinsics;
-                _this.material.uniforms.extrinsics.value.set(ex["e00"], ex["e10"], ex["e20"], ex["e30"], ex["e01"], ex["e11"], ex["e21"], ex["e31"], ex["e02"], ex["e12"], ex["e22"], ex["e32"], ex["e03"], ex["e13"], ex["e23"], ex["e33"]);
+                var ex = _this2.props.extrinsics;
+                _this2.material.uniforms.extrinsics.value.set(ex["e00"], ex["e10"], ex["e20"], ex["e30"], ex["e01"], ex["e11"], ex["e21"], ex["e31"], ex["e02"], ex["e12"], ex["e22"], ex["e32"], ex["e03"], ex["e13"], ex["e23"], ex["e33"]);
 
                 //Create the collider
-                var boxGeo = new THREE.BoxGeometry(_this.props.boundsSize.x, _this.props.boundsSize.y, _this.props.boundsSize.z);
+                var boxGeo = new THREE.BoxGeometry(_this2.props.boundsSize.x, _this2.props.boundsSize.y, _this2.props.boundsSize.z);
                 var boxMat = new THREE.MeshBasicMaterial({
                     color: 0xffff00,
                     wireframe: true
                 });
 
-                _this.collider = new THREE.Mesh(boxGeo, boxMat);
+                _this2.collider = new THREE.Mesh(boxGeo, boxMat);
 
-                _this.collider.visible = false;
-                _this.mesh.add(_this.collider);
+                _this2.collider.visible = false;
+                _this2.mesh.add(_this2.collider);
 
                 //Temporary collider positioning fix - // TODO: fix that with this.props.boundsCenter
-                THREE.SceneUtils.detach(_this.collider, _this.mesh, _this.mesh.parent);
-                _this.collider.position.set(0, 1, 0);
+                THREE.SceneUtils.detach(_this2.collider, _this2.mesh, _this2.mesh.parent);
+                _this2.collider.position.set(0, 1, 0);
             });
         }
     }, {
@@ -1404,9 +1408,9 @@ var DepthPlayer = function () {
                 }
             }
             for (var _y = 0; _y < VERTS_TALL - 1; _y++) {
-                for (var _x3 = 0; _x3 < VERTS_WIDE - 1; _x3++) {
-                    DepthPlayer.geo.faces.push(new THREE.Face3(_x3 + _y * VERTS_WIDE, _x3 + (_y + 1) * VERTS_WIDE, _x3 + 1 + _y * VERTS_WIDE));
-                    DepthPlayer.geo.faces.push(new THREE.Face3(_x3 + 1 + _y * VERTS_WIDE, _x3 + (_y + 1) * VERTS_WIDE, _x3 + 1 + (_y + 1) * VERTS_WIDE));
+                for (var _x6 = 0; _x6 < VERTS_WIDE - 1; _x6++) {
+                    DepthPlayer.geo.faces.push(new THREE.Face3(_x6 + _y * VERTS_WIDE, _x6 + (_y + 1) * VERTS_WIDE, _x6 + 1 + _y * VERTS_WIDE));
+                    DepthPlayer.geo.faces.push(new THREE.Face3(_x6 + 1 + _y * VERTS_WIDE, _x6 + (_y + 1) * VERTS_WIDE, _x6 + 1 + (_y + 1) * VERTS_WIDE));
                 }
             }
         }

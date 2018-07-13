@@ -41,12 +41,11 @@
       response.props.textureWidth = vimeo.files.progressive[res].width;
       response.props.textureHeight = vimeo.files.progressive[res].height;
 
-
-      let character = new Sandbox.DepthPlayer(Sandbox.Style.Mesh,
-                                              response.props,
-                                              vimeo.files.progressive[res].link,
-                                              response.selectedQuality,
-                                              response.type);
+      let player = new Sandbox.DepthPlayer();
+      let character = player.loadVideo(response.props,
+                                vimeo.files.progressive[res].link,
+                                response.selectedQuality,
+                                response.type);
 
       let recenteredX = res - 2.5;
 
