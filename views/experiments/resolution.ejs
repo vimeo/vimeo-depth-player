@@ -1,6 +1,10 @@
 <% include ../partials/depth-bootup %>
 
 <script>
+
+  //Move the camera slightly backwards
+  glScene.camera.position.z += 1.5;
+
   const vimeo = new Sandbox.VimeoClient();
 
   // We will store all the character instance in here so we can hit play (kind of) together

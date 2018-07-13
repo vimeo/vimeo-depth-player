@@ -1,11 +1,13 @@
+<% include ../partials/depth-bootup %>
+
 <script>
   glScene.camera.position.set(0, 0.5, 0.5);
 
   player.load().then(response => {
-    character.player.setLoop(true);
-    character.position.set(0, 0.7, 0);
-    character.rotation.y = -Math.PI;
-    character.rotation.z = Math.PI / 2;
-    glScene.scene.add(character);
+    player.setLoop(true);
+    player.mesh.position.set(0, 0.7, 0);
+    player.mesh.rotation.y = -Math.PI;
+    player.mesh.rotation.z = Math.PI / 2;
+    glScene.scene.add(player.mesh);
   });
 </script>
