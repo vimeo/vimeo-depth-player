@@ -1,0 +1,11 @@
+<script src="/js/gltfloader.js"></script>
+
+<script>
+  const modelLoader = new THREE.GLTFLoader();
+  modelLoader.load('/assets/brooklyn.glb', obj=>{
+
+    const groupedModelElements = obj.scene.children[0];
+    glScene.scene.add(groupedModelElements);
+
+  });
+</script>
