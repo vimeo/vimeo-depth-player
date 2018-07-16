@@ -33,10 +33,10 @@ export default class DepthPlayer
     return new Promise((resolve, reject) => {
       vimeo.requestVideo(this.vimeoVideoId).then(response => {
         this.loadVideo(response.props,
-                             response.url,
-                             response.selectedQuality,
-                             response.type || this.depthType,
-                             this.depthStyle);
+                       response.url,
+                       response.selectedQuality,
+                       response.type || this.depthType,
+                       this.depthStyle);
 
         resolve({});
       });
@@ -67,7 +67,7 @@ export default class DepthPlayer
       this.videoElement.crossOrigin = 'anonymous';
       this.videoElement.setAttribute('crossorigin', 'anonymous');
       this.videoElement.autoplay = false;
-      this.videoElement.loop = false;
+      this.videoElement.loop =  true;
 
       // Adaptive DASH playback
       if (_selectedQuality == 'dash') {

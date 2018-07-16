@@ -66,6 +66,7 @@ class Scene extends EventEmitter {
 
     //Controls
     this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+    this.isTouching = false;
     // this.controls.autoRotate = true;
 
     let grid = new THREE.GridHelper();
@@ -74,7 +75,9 @@ class Scene extends EventEmitter {
     //Setup event listeners for events and handle the states
     window.addEventListener('resize', e => this.onWindowResize(e), false);
     window.addEventListener('mousemove', e => this.onMouseMove(e), false);
-
+    window.addEventListener('deviceorientation', e => this.onGyroMove(e), false);
+    window.addEventListener('touchstart', e => this.onTouchStart(e), false);
+    window.addEventListener('touchend', e => this.onTouchEnd(e), false);
     this.controls.target = new THREE.Vector3(0.0, 0.5, -0.5);
 
     this.update();
@@ -114,11 +117,31 @@ class Scene extends EventEmitter {
   }
 
   onMouseMove(e){
-    // this.recenteredX = ((e.clientX / window.innerWidth) * 2) - 1;
-    // this.recenteredY = ((((e.clientY / window.innerHeight) * -1.0) + 1.0) * 2) - 1;
-    // this.camera.position.x = this.recenteredX;
-    // this.camera.position.y = this.recenteredY;
+
   }
+
+  onTouchStart(e){
+
+    this.isTouching = true;
+
+  }
+
+  onTouchEnd(e){
+
+    this.isTouching = false;
+
+  }
+
+  onGyroMove(e){
+
+    if(!this.isTouching){
+
+      this.controls.target.x = e.alpha / 150;
+
+    }
+
+  }
+
 }
 
 export default Scene;

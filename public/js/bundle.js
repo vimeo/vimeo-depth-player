@@ -1085,7 +1085,7 @@ var DepthPlayer = function () {
             this.videoElement.crossOrigin = 'anonymous';
             this.videoElement.setAttribute('crossorigin', 'anonymous');
             this.videoElement.autoplay = false;
-            this.videoElement.loop = false;
+            this.videoElement.loop = true;
 
             // Adaptive DASH playback
             if (_selectedQuality == 'dash') {
@@ -1739,6 +1739,7 @@ var Scene = function (_EventEmitter) {
 
     //Controls
     _this.controls = new THREE.OrbitControls(_this.camera, _this.renderer.domElement);
+    _this.isTouching = false;
     // this.controls.autoRotate = true;
 
     var grid = new THREE.GridHelper();
@@ -1751,7 +1752,15 @@ var Scene = function (_EventEmitter) {
     window.addEventListener('mousemove', function (e) {
       return _this.onMouseMove(e);
     }, false);
-
+    window.addEventListener('deviceorientation', function (e) {
+      return _this.onGyroMove(e);
+    }, false);
+    window.addEventListener('touchstart', function (e) {
+      return _this.onTouchStart(e);
+    }, false);
+    window.addEventListener('touchend', function (e) {
+      return _this.onTouchEnd(e);
+    }, false);
     _this.controls.target = new THREE.Vector3(0.0, 0.5, -0.5);
 
     _this.update();
@@ -1797,11 +1806,27 @@ var Scene = function (_EventEmitter) {
     }
   }, {
     key: 'onMouseMove',
-    value: function onMouseMove(e) {
-      // this.recenteredX = ((e.clientX / window.innerWidth) * 2) - 1;
-      // this.recenteredY = ((((e.clientY / window.innerHeight) * -1.0) + 1.0) * 2) - 1;
-      // this.camera.position.x = this.recenteredX;
-      // this.camera.position.y = this.recenteredY;
+    value: function onMouseMove(e) {}
+  }, {
+    key: 'onTouchStart',
+    value: function onTouchStart(e) {
+
+      this.isTouching = true;
+    }
+  }, {
+    key: 'onTouchEnd',
+    value: function onTouchEnd(e) {
+
+      this.isTouching = false;
+    }
+  }, {
+    key: 'onGyroMove',
+    value: function onGyroMove(e) {
+
+      if (!this.isTouching) {
+
+        this.controls.target.x = e.alpha / 150;
+      }
     }
   }]);
 
