@@ -1027,7 +1027,7 @@ var DepthPlayer = function () {
 
         var _depthType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : _type3.default.DepthKit;
 
-        var _depthStyle = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : _style3.default.Mesh;
+        var _depthStyle = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : _style3.default.Points;
 
         _classCallCheck(this, DepthPlayer);
 

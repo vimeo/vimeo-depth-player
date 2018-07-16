@@ -18,13 +18,13 @@ const VERTS_TALL = 256;
 
 export default class DepthPlayer
 {
-  constructor(_vimeoVideoId = null, _videoQuality = 'auto', _depthType = Type.DepthKit, _depthStyle = Style.Mesh)
+  constructor(_vimeoVideoId = null, _videoQuality = 'auto', _depthType = Type.DepthKit, _depthStyle = Style.Points)
   {
     this.vimeoVideoId = _vimeoVideoId;
     this.videoQuality = _videoQuality;
     this.depthStyle   = _depthStyle;
     this.depthType    = _depthType;
-    this.videoElement = document.createElement('video');    
+    this.videoElement = document.createElement('video');
   }
 
   load()
@@ -44,7 +44,7 @@ export default class DepthPlayer
   }
 
   // TODO Rename selectedQuality - it is about if it's adaptive or not?
-  loadVideo(_props, _videoUrl, _selectedQuality, _type = Type.DepthKit, _style = Style.Mesh, showVideo = false) 
+  loadVideo(_props, _videoUrl, _selectedQuality, _type = Type.DepthKit, _style = Style.Mesh, showVideo = false)
   {
       console.log(`[DepthPlayer] Creating a depth player with selected quality: ${_selectedQuality}`);
 
@@ -76,7 +76,7 @@ export default class DepthPlayer
         this.video.initialize(this.videoElement, _videoUrl, false);
 
         this.createTexture(this.videoElement);
-      } 
+      }
       // Otherwise fallback to progressive
       else {
         this.video = this.videoElement;
@@ -176,7 +176,7 @@ export default class DepthPlayer
         if (_props == null) {
           _props = Props.DepthKit;
         }
-      } 
+      }
       else if ( _type == Type.RealSense) {
         this.material.defines.DEPTH_ORDER = '-1.0';
         if (_props == null) {

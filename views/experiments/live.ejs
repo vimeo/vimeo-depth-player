@@ -1,12 +1,14 @@
 <% include ../partials/depth-bootup %>
+<% include ../partials/live-badge %>
 
 <script>
-  glScene.camera.position.y += 0;
+  glScene.camera.position.y -= 1.5;
+  glScene.camera.position.z = 4;
+
   player.depthType = Sandbox.Type.RealSense;
 
   player.load().then(response => {
-    // player.mesh.rotation.y = -Math.PI / 2;
+    player.mesh.rotation.z = -Math.PI / 2;
     glScene.scene.add(player.mesh);
   });
 </script>
-

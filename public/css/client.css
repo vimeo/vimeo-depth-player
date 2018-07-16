@@ -68,6 +68,17 @@ body {
 	font-family: "Comic Sans MS", cursive, sans-serif;
 }
 
+#live-badge{
+  position: absolute;
+  font-size: 12px;
+  padding: 5px;
+  color: white;
+  background-color: red;
+  font-weight: bold;
+  right: 20px;
+  top: 18px;
+}
+
 /* Animation keyframes - you need to add prefixes */
 @keyframes spin {
 	from { transform: rotate(0deg); }
