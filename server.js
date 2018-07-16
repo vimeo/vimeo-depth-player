@@ -35,7 +35,7 @@ if (process.env.NODE_ENV !== 'production') {
 * - /
 * - /experiments    # homepage
 * - /experiments/:project
-* - /experiments/:project/:video_id 
+* - /experiments/:project/:video_id
 * - /:video_id
 */
 
