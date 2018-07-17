@@ -10,6 +10,8 @@
 
   player.load().then(response => {
     player.mesh.rotation.z = -Math.PI / 2;
+    player.mesh.position.y = 1.1;
+    player.mesh.position.z = -1.2;
     glScene.camera.position.y = 2.5;
     glScene.scene.add(player.mesh);
   });
