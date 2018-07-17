@@ -1998,7 +1998,15 @@ var VimeoClient = function () {
 
               if (_this.selectedQuality == 'auto') {
                 if (_util2.default.isiOS()) {
-                  _this.selectedQuality = 'hls';
+
+                  //Iterate over the files and look for a 720p version in progressive format
+                  for (var file in _this.files.progressive) {
+                    if (_this.files.progressive[file].width > 600 && _this.files.progressive[file].width < 1000) {
+                      _this.selectedQuality = _this.files.progressive[file].width;
+                    }
+                  }
+
+                  // this.selectedQuality = 'hls'; // Unfortunetly this will still result in an unsecure opreation on iOS so we can only play progressive files for now
                 } else {
                   _this.selectedQuality = 'dash';
                 }
@@ -2033,20 +2041,20 @@ var VimeoClient = function () {
 
                   try {
                     for (var _iterator = _this.files.progressive[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                      var file = _step.value;
+                      var _file = _step.value;
 
 
-                      if (file.width === _this.selectedQuality) {
+                      if (_file.width === _this.selectedQuality) {
 
                         //Save the link
-                        _this.url = file.link;
+                        _this.url = _file.link;
 
                         //Save the framerate
-                        _this.fps = file.fps;
+                        _this.fps = _file.fps;
 
                         //If DepthKit in different resolutions then the ones specified in the JSON file
-                        _this.props.textureWidth = file.width;
-                        _this.props.textureHeight = file.height;
+                        _this.props.textureWidth = _file.width;
+                        _this.props.textureHeight = _file.height;
                       }
                     }
                   } catch (err) {
