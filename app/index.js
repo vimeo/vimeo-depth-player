@@ -11,6 +11,8 @@ import Type from './components/type';
 
 import Style from './components/style';
 
+import Util from './components/util';
+
 /*
 * Attach all the functionality to the window
 * The specific code related to each page will
@@ -28,7 +30,8 @@ const Sandbox = {
   'VimeoClient': VimeoClient,
   'DepthPlayer': DepthPlayer,
   'Style': Style,
-  'Type': Type
+  'Type': Type,
+  'Util': Util
 }
 
 window.Sandbox = Sandbox;

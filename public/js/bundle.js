@@ -1027,7 +1027,7 @@ var DepthPlayer = function () {
 
         var _depthType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : _type3.default.DepthKit;
 
-        var _depthStyle = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : _style3.default.Points;
+        var _depthStyle = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : _style3.default.Mesh;
 
         _classCallCheck(this, DepthPlayer);
 
@@ -1043,7 +1043,7 @@ var DepthPlayer = function () {
         value: function load() {
             var _this = this;
 
-            var vimeo = new Sandbox.VimeoClient();
+            var vimeo = new Sandbox.VimeoClient(this.videoQuality);
             return new Promise(function (resolve, reject) {
                 vimeo.requestVideo(_this.vimeoVideoId).then(function (response) {
                     _this.loadVideo(response.props, response.url, response.selectedQuality, response.type || _this.depthType, _this.depthStyle);
@@ -1104,6 +1104,8 @@ var DepthPlayer = function () {
                         this.video.setAttribute('playsinline', 'playsinline');
                     }
                     this.video.src = _videoUrl;
+                    this.video.load();
+
                     this.createTexture(this.video);
                 }
 
@@ -1996,7 +1998,15 @@ var VimeoClient = function () {
 
               if (_this.selectedQuality == 'auto') {
                 if (_util2.default.isiOS()) {
-                  _this.selectedQuality = 'hls';
+
+                  //Iterate over the files and look for a 720p version in progressive format
+                  for (var file in _this.files.progressive) {
+                    if (_this.files.progressive[file].width > 600 && _this.files.progressive[file].width < 1000) {
+                      _this.selectedQuality = _this.files.progressive[file].width;
+                    }
+                  }
+
+                  // this.selectedQuality = 'hls'; // Unfortunetly this will still result in an unsecure opreation on iOS so we can only play progressive files for now
                 } else {
                   _this.selectedQuality = 'dash';
                 }
@@ -2031,20 +2041,20 @@ var VimeoClient = function () {
 
                   try {
                     for (var _iterator = _this.files.progressive[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                      var file = _step.value;
+                      var _file = _step.value;
 
 
-                      if (file.width === _this.selectedQuality) {
+                      if (_file.width === _this.selectedQuality) {
 
                         //Save the link
-                        _this.url = file.link;
+                        _this.url = _file.link;
 
                         //Save the framerate
-                        _this.fps = file.fps;
+                        _this.fps = _file.fps;
 
                         //If DepthKit in different resolutions then the ones specified in the JSON file
-                        _this.props.textureWidth = file.width;
-                        _this.props.textureHeight = file.height;
+                        _this.props.textureWidth = _file.width;
+                        _this.props.textureHeight = _file.height;
                       }
                     }
                   } catch (err) {
@@ -2113,6 +2123,10 @@ var _style = require('./components/style');
 
 var _style2 = _interopRequireDefault(_style);
 
+var _util = require('./components/util');
+
+var _util2 = _interopRequireDefault(_util);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
@@ -2126,21 +2140,22 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 * easily be distributed and installed
 */
 
-//Import three.js
 window.THREE = THREE;
 
 // Cleaner solution to avoid trashing the window object for now
+//Import three.js
 var Sandbox = {
   'Scene': _scene2.default,
   'VimeoClient': _vimeo2.default,
   'DepthPlayer': _depthplayer2.default,
   'Style': _style2.default,
-  'Type': _type2.default
+  'Type': _type2.default,
+  'Util': _util2.default
 };
 
 window.Sandbox = Sandbox;
 
-},{"./components/depthplayer":2,"./components/scene":5,"./components/style":6,"./components/type":7,"./components/vimeo":9,"three":14}],11:[function(require,module,exports){
+},{"./components/depthplayer":2,"./components/scene":5,"./components/style":6,"./components/type":7,"./components/util":8,"./components/vimeo":9,"three":14}],11:[function(require,module,exports){
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui

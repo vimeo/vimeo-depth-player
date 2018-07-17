@@ -49,7 +49,7 @@ class VimeoClient {
             if (Util.isJSON(obj)) {
               this.props = JSON.parse(obj.description);
               this.type = Type.DepthKit;
-            } 
+            }
             else {
               this.props = null;
               this.type = Type.RealSense;
@@ -57,8 +57,16 @@ class VimeoClient {
 
             if (this.selectedQuality == 'auto') {
               if (Util.isiOS()) {
-                this.selectedQuality = 'hls';
-              } 
+
+                //Iterate over the files and look for a 720p version in progressive format
+                for (let file in this.files.progressive) {
+                  if(this.files.progressive[file].width > 600 && this.files.progressive[file].width < 1000){
+                    this.selectedQuality = this.files.progressive[file].width;
+                  }
+                }
+
+                // this.selectedQuality = 'hls'; // Unfortunetly this will still result in an unsecure opreation on iOS so we can only play progressive files for now
+              }
               else {
                 this.selectedQuality = 'dash';
               }
@@ -70,15 +78,15 @@ class VimeoClient {
             if (this.selectedQuality == 'hls') {
               if (this.files.hls.link) {
                 this.url = this.files.hls.link;
-              } 
+              }
               else {
                 console.warn('[Vimeo] Requested an HLS stream but none was found');
               }
-            } 
+            }
             else if (this.selectedQuality == 'dash') {
               if (this.files.dash.link) {
                 this.url = this.files.dash.link;
-              } 
+              }
               else {
                 console.warn('[Vimeo] Requested a DASH stream but none was found');
               }

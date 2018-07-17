@@ -18,7 +18,7 @@ const VERTS_TALL = 256;
 
 export default class DepthPlayer
 {
-  constructor(_vimeoVideoId = null, _videoQuality = 'auto', _depthType = Type.DepthKit, _depthStyle = Style.Points)
+  constructor(_vimeoVideoId = null, _videoQuality = 'auto', _depthType = Type.DepthKit, _depthStyle = Style.Mesh)
   {
     this.vimeoVideoId = _vimeoVideoId;
     this.videoQuality = _videoQuality;
@@ -29,7 +29,7 @@ export default class DepthPlayer
 
   load()
   {
-    const vimeo = new Sandbox.VimeoClient();
+    const vimeo = new Sandbox.VimeoClient(this.videoQuality);
     return new Promise((resolve, reject) => {
       vimeo.requestVideo(this.vimeoVideoId).then(response => {
         this.loadVideo(response.props,
@@ -86,6 +86,8 @@ export default class DepthPlayer
           this.video.setAttribute('playsinline', 'playsinline');
         }
         this.video.src = _videoUrl;
+        this.video.load();
+
         this.createTexture(this.video);
       }
 

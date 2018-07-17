@@ -1,7 +1,13 @@
 <% include ../partials/depth-bootup %>
 <% include ../partials/live-badge %>
+<script src="/js/gltfloader.js"></script>
 
 <script>
+  const modelLoader = new THREE.GLTFLoader();
+  modelLoader.load('/assets/stage.glb', obj=>{
+    glScene.scene.add(obj.scene);
+  });
+
   glScene.camera.position.y -= 1.5;
   glScene.camera.position.z = 4;
 
@@ -9,6 +15,9 @@
 
   player.load().then(response => {
     player.mesh.rotation.z = -Math.PI / 2;
+    player.mesh.position.y = 1.1;
+    player.mesh.position.z = -1.2;
+    glScene.camera.position.y = 2.5;
     glScene.scene.add(player.mesh);
   });
 </script>
