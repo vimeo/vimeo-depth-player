@@ -1104,6 +1104,8 @@ var DepthPlayer = function () {
                         this.video.setAttribute('playsinline', 'playsinline');
                     }
                     this.video.src = _videoUrl;
+                    this.video.load();
+
                     this.createTexture(this.video);
                 }
 
