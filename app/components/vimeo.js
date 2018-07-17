@@ -19,8 +19,6 @@ class VimeoClient {
     this.props = {};
     this.url;
     this.files;
-
-    console.log(this.selectedQuality)
   }
   requestVideo(vimeoVideoID) {
 

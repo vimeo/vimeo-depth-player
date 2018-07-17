@@ -1955,8 +1955,6 @@ var VimeoClient = function () {
     this.props = {};
     this.url;
     this.files;
-
-    console.log(this.selectedQuality);
   }
 
   _createClass(VimeoClient, [{

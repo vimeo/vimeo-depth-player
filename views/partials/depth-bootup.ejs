@@ -17,14 +17,8 @@
   glScene.on('webgl_support', supported=>{
     console.log(`[Client] is WebGL supported on this browser? ${supported}`);
   });
-  let player;
-  if(Sandbox.Util.isiOS()){
-    console.log('yay its iOS');
-    player = new Sandbox.DepthPlayer('<%= video_id || 279527916 %>', 1366);
-  } else {
-    console.log('what? no iOS');
-    player = new Sandbox.DepthPlayer('<%= video_id || 279527916 %>');
-  }
+  
+  let player = new Sandbox.DepthPlayer('<%= video_id || 279527916 %>');
 
 
   function setupPlayButton(_player)
