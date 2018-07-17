@@ -19,6 +19,8 @@ class VimeoClient {
     this.props = {};
     this.url;
     this.files;
+
+    console.log(this.selectedQuality)
   }
   requestVideo(vimeoVideoID) {
 
@@ -49,7 +51,7 @@ class VimeoClient {
             if (Util.isJSON(obj)) {
               this.props = JSON.parse(obj.description);
               this.type = Type.DepthKit;
-            } 
+            }
             else {
               this.props = null;
               this.type = Type.RealSense;
@@ -58,7 +60,7 @@ class VimeoClient {
             if (this.selectedQuality == 'auto') {
               if (Util.isiOS()) {
                 this.selectedQuality = 'hls';
-              } 
+              }
               else {
                 this.selectedQuality = 'dash';
               }
@@ -70,15 +72,15 @@ class VimeoClient {
             if (this.selectedQuality == 'hls') {
               if (this.files.hls.link) {
                 this.url = this.files.hls.link;
-              } 
+              }
               else {
                 console.warn('[Vimeo] Requested an HLS stream but none was found');
               }
-            } 
+            }
             else if (this.selectedQuality == 'dash') {
               if (this.files.dash.link) {
                 this.url = this.files.dash.link;
-              } 
+              }
               else {
                 console.warn('[Vimeo] Requested a DASH stream but none was found');
               }
