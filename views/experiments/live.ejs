@@ -1,5 +1,6 @@
 <% include ../partials/depth-bootup %>
 <% include ../partials/live-badge %>
+<% include ../partials/live-stage %>
 
 <script>
   glScene.camera.position.y -= 1.5;
@@ -9,6 +10,7 @@
 
   player.load().then(response => {
     player.mesh.rotation.z = -Math.PI / 2;
+    glScene.camera.position.y = 2.5;
     glScene.scene.add(player.mesh);
   });
 </script>
