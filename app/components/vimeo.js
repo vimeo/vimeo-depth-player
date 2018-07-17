@@ -59,7 +59,7 @@ class VimeoClient {
               if (Util.isiOS()) {
 
                 //Iterate over the files and look for a 720p version in progressive format
-                for(let file in this.files.progressive){
+                for (let file in this.files.progressive) {
                   if(this.files.progressive[file].width > 600 && this.files.progressive[file].width < 1000){
                     this.selectedQuality = this.files.progressive[file].width;
                   }

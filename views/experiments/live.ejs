@@ -1,8 +1,13 @@
 <% include ../partials/depth-bootup %>
 <% include ../partials/live-badge %>
-<% include ../partials/live-stage %>
+<script src="/js/gltfloader.js"></script>
 
 <script>
+  const modelLoader = new THREE.GLTFLoader();
+  modelLoader.load('/assets/stage.glb', obj=>{
+    glScene.scene.add(obj.scene);
+  });
+
   glScene.camera.position.y -= 1.5;
   glScene.camera.position.z = 4;
 
