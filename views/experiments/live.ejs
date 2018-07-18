@@ -6,6 +6,12 @@
 </div>
 <div class="short-link">bit.ly/vfdemo2</div>
 
+<div class="warning" data-is-ios style="display:none;">
+  Unfortunately livestreaming on iOS does not work and is an 
+  <a href="https://github.com/mrdoob/three.js/issues/9754" target="_blank">known Apple bug</a>. 
+  View in any desktop browser or an Android phone.
+</div>
+
 <script src="/js/gltfloader.js"></script>
 <script>
   const modelLoader = new THREE.GLTFLoader();
@@ -21,6 +27,9 @@
   player.depthType = Sandbox.Type.RealSense;
 
   player.load().then(response => {
+    if (!player.videoUrl) {
+      alert('Video is not live yet!');
+    }
     player.mesh.rotation.z = -Math.PI / 2;
     player.mesh.scale.set(0.85, 0.85, 0.85);
     player.mesh.position.x = -0.4;
@@ -30,4 +39,11 @@
     player.mesh.material.defines.PIXEL_EDGE_CLIP = '1';
     glScene.scene.add(player.mesh);
   });
+
+  var iosEls = document.querySelectorAll('[data-is-ios]');
+  if (Sandbox.Util.isiOS()) {
+    for (let i = 0; i < iosEls.length; i++) {
+      iosEls[i].style.display = 'block';
+    } 
+  }
 </script>

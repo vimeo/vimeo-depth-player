@@ -172,3 +172,18 @@ body {
   font-family: Helvetica, Arial, sans-serif;
   font-size: 40px;
 }
+
+.warning {
+  position: absolute;
+  top: 60px;
+  padding: 10px;
+  margin: 20px;
+  font-size: 14px;
+  font-family: Helvetica, Arial, sans-serif;
+  background: red;
+  color: #fff;
+  border-radius: 5px;
+}
+.warning a {
+  color: #fff;
+}

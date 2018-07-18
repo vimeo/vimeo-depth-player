@@ -84,7 +84,7 @@ class VimeoClient {
               }
             }
             else if (this.selectedQuality == 'dash') {
-              if (this.files.dash.link) {
+              if (this.files.dash && this.files.dash.link) {
                 this.url = this.files.dash.link;
               }
               else {
@@ -127,7 +127,8 @@ class VimeoClient {
               'fps': this.fps
             });
 
-          } else {
+          } 
+          else {
             reject(response.status);
           }
         })

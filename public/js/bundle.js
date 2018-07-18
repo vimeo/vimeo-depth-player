@@ -1057,6 +1057,7 @@ var DepthPlayer = function (_EventEmitter) {
             var vimeo = new Sandbox.VimeoClient(this.videoQuality);
             return new Promise(function (resolve, reject) {
                 vimeo.requestVideo(_this2.vimeoVideoId).then(function (response) {
+                    _this2.videoUrl = response.url;
                     _this2.loadVideo(response.props, response.url, response.selectedQuality, response.type || _this2.depthType, _this2.depthStyle);
 
                     resolve({});
@@ -2034,7 +2035,7 @@ var VimeoClient = function () {
                   console.warn('[Vimeo] Requested an HLS stream but none was found');
                 }
               } else if (_this.selectedQuality == 'dash') {
-                if (_this.files.dash.link) {
+                if (_this.files.dash && _this.files.dash.link) {
                   _this.url = _this.files.dash.link;
                 } else {
                   console.warn('[Vimeo] Requested a DASH stream but none was found');

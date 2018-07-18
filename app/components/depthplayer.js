@@ -36,6 +36,7 @@ export default class DepthPlayer extends EventEmitter
     const vimeo = new Sandbox.VimeoClient(this.videoQuality);
     return new Promise((resolve, reject) => {
       vimeo.requestVideo(this.vimeoVideoId).then(response => {
+        this.videoUrl = response.url;
         this.loadVideo(response.props,
                        response.url,
                        response.selectedQuality,
