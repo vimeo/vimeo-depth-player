@@ -4,6 +4,7 @@
 <script>
   glScene.camera.position.set(0, 0.5, 0.5);
 
+  player.depthStyle = 0;
   player.load().then(response => {
     player.setLoop(true);
     player.mesh.position.set(0, 0.7, 0);
