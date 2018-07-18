@@ -134,11 +134,7 @@ class Scene extends EventEmitter {
 
   onGyroMove(e){
 
-    if(!this.isTouching){
-
-      this.controls.target.x = e.alpha / 150;
-
-    }
+    if(!this.isTouching){}
 
   }
 

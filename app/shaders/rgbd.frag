@@ -14,6 +14,11 @@ void main() {
     if ( visibility < 0.9 ) discard;
     vec4 color = texture2D(map, vUv);
 
+    //For live streaming only to clip the black per pixel
+    if(PIXEL_EDGE_CLIP == 1){
+      if( color.r < 0.05 ) discard;
+    }
+
     color.w = opacity;
 
     gl_FragColor = color;

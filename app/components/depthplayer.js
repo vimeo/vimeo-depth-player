@@ -18,7 +18,7 @@ const VERTS_TALL = 256;
 
 export default class DepthPlayer
 {
-  constructor(_vimeoVideoId = null, _videoQuality = 'auto', _depthType = Type.DepthKit, _depthStyle = Style.Mesh)
+  constructor(_vimeoVideoId = null, _videoQuality = 'auto', _depthType = Type.DepthKit, _depthStyle = Style.Points)
   {
     this.vimeoVideoId = _vimeoVideoId;
     this.videoQuality = _videoQuality;
@@ -172,6 +172,8 @@ export default class DepthPlayer
       //Make the shader material double sided
       this.material.side = THREE.DoubleSide;
 
+
+
       if (_type == Type.DepthKit) {
         this.material.defines.DEPTH_ORDER = '1.0';
 
@@ -185,7 +187,7 @@ export default class DepthPlayer
           _props = Props.RealSense;
         }
       }
-
+      this.material.defines.PIXEL_EDGE_CLIP = '0';
       //Switch a few things based on selected rendering type and create the volumetric asset
       switch (_style) {
           case Style.Wire:
@@ -312,7 +314,7 @@ export default class DepthPlayer
     );
   }
 
-   static buildGeomtery() {
+  static buildGeomtery() {
 
       DepthPlayer.geo = new THREE.Geometry();
 
