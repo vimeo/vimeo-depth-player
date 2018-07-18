@@ -4,6 +4,7 @@
   <span class="dot"></span>
   LIVE
 </div>
+<div class="short-link">bit.ly/vfdemo2</div>
 
 <script src="/js/gltfloader.js"></script>
 <script>
@@ -14,6 +15,8 @@
 
   glScene.camera.position.y -= 1.5;
   glScene.camera.position.z = 4;
+
+  player.vimeoVideoId = '<%= video_id || 280554928 %>';
 
   player.depthType = Sandbox.Type.RealSense;
 
