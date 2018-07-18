@@ -175,7 +175,7 @@ body {
 
 .warning {
   position: absolute;
-  top: 60px;
+  bottom: 0px;
   padding: 10px;
   margin: 20px;
   font-size: 14px;

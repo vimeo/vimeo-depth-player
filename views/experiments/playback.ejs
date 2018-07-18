@@ -1,7 +1,7 @@
 <% include ../partials/depth-bootup %>
 <% include ../partials/brooklyn-office %>
 
-<div class="short-link">bit.ly/vfdemo1</div>
+<div class="short-link" style="display:none;" data-is-desktop>bit.ly/vfdemo1</div>
 
 <script>
   glScene.camera.position.set(0, 0.5, 0.5);
@@ -14,4 +14,6 @@
     player.mesh.rotation.z = Math.PI / 2;
     glScene.scene.add(player.mesh);
   });
+
+  Sandbox.Util.runDisplayHelpers();
 </script>

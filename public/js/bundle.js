@@ -1878,7 +1878,7 @@ var Type = {
 exports.default = Type;
 
 },{}],8:[function(require,module,exports){
-"use strict";
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
 	value: true
@@ -1894,20 +1894,20 @@ var Util = function () {
 	}
 
 	_createClass(Util, null, [{
-		key: "checkWebGL",
+		key: 'checkWebGL',
 		value: function checkWebGL() {
 			var hasWebGL = void 0;
 			window.WebGLRenderingContext ? hasWebGL = true : hasWebGL = false;
 			return hasWebGL;
 		}
 	}, {
-		key: "isiOS",
+		key: 'isiOS',
 		value: function isiOS() {
 			return (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
 			);
 		}
 	}, {
-		key: "isMobile",
+		key: 'isMobile',
 		value: function isMobile() {
 			var check = false;
 			(function (a) {
@@ -1916,9 +1916,26 @@ var Util = function () {
 			return check;
 		}
 	}, {
-		key: "isJSON",
+		key: 'isJSON',
 		value: function isJSON(json) {
 			return json.description && json.description.match(/^{/);
+		}
+	}, {
+		key: 'runDisplayHelpers',
+		value: function runDisplayHelpers() {
+			if (Sandbox.Util.isiOS()) {
+				var iosEls = document.querySelectorAll('[data-is-ios]');
+				for (var i = 0; i < iosEls.length; i++) {
+					iosEls[i].style.display = 'block';
+				}
+			}
+
+			if (!Sandbox.Util.isMobile()) {
+				var els = document.querySelectorAll('[data-is-desktop]');
+				for (var _i = 0; _i < els.length; _i++) {
+					els[_i].style.display = 'block';
+				}
+			}
 		}
 	}]);
 
@@ -2035,7 +2052,7 @@ var VimeoClient = function () {
                   console.warn('[Vimeo] Requested an HLS stream but none was found');
                 }
               } else if (_this.selectedQuality == 'dash') {
-                if (_this.files.dash && _this.files.dash.link) {
+                if (_this.files.dash.link) {
                   _this.url = _this.files.dash.link;
                 } else {
                   console.warn('[Vimeo] Requested a DASH stream but none was found');

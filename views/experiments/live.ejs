@@ -4,7 +4,7 @@
   <span class="dot"></span>
   LIVE
 </div>
-<div class="short-link">bit.ly/vfdemo2</div>
+<div class="short-link" style="display:none;" data-is-desktop>bit.ly/vfdemo2</div>
 
 <div class="warning" data-is-ios style="display:none;">
   Unfortunately livestreaming on iOS does not work and is an 
@@ -40,10 +40,5 @@
     glScene.scene.add(player.mesh);
   });
 
-  var iosEls = document.querySelectorAll('[data-is-ios]');
-  if (Sandbox.Util.isiOS()) {
-    for (let i = 0; i < iosEls.length; i++) {
-      iosEls[i].style.display = 'block';
-    } 
-  }
+  Sandbox.Util.runDisplayHelpers();
 </script>
