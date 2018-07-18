@@ -75,7 +75,7 @@ export default class DepthPlayer extends EventEmitter
       this.videoElement.loop =  true;
 
       this.videoElement.addEventListener('loadeddata', function() {
-        if (this.videoElement.readyState == 4) {
+        if (this.videoElement.readyState >= 3) {
           this.emit('load');
         }
       }.bind(this));
