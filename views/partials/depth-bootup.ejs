@@ -31,6 +31,7 @@
 
   play_btn.addEventListener('click', (e) => {
     play_btn.style.display = 'none';
+    glScene.controls.autoRotate = true;
     player.play();
   }, false);
 

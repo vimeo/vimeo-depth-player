@@ -1,7 +1,7 @@
 <% include ../partials/depth-bootup %>
 
 <div id="live-badge">
-  <span class="dot"></span> 
+  <span class="dot"></span>
   LIVE
 </div>
 
@@ -19,8 +19,10 @@
 
   player.load().then(response => {
     player.mesh.rotation.z = -Math.PI / 2;
-    player.mesh.position.y = 1.1;
-    player.mesh.position.z = -2.0;
+    player.mesh.scale.set(0.85, 0.85, 0.85);
+    player.mesh.position.x = -0.4;
+    player.mesh.position.y = 1.5;
+    player.mesh.position.z = -1.8;
     glScene.camera.position.y = 2.5;
     player.mesh.material.defines.PIXEL_EDGE_CLIP = '1';
     glScene.scene.add(player.mesh);
