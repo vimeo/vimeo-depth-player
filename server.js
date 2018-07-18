@@ -7,12 +7,14 @@ const expressLayouts = require('express-ejs-layouts');
 const cors = require('cors')
 const app = express();
 
-
 // Render engine setup
 var path = require('path');
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
 app.use(expressLayouts);
+
+// Event emitter 
+app.use(require('event-emitter-es6/router'));
 
 //Setup cors
 app.use(cors());
