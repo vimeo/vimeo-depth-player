@@ -81,12 +81,18 @@ app.get('/video/:id', (request, response) => {
         return;
       }
 
+      // Sort the resolutions from highest to lowest
+      body["play"]["progressive"] = body["play"]["progressive"].sort(function(a, b) {
+        if (parseInt(a['height']) > parseInt(b['height'])) return -1;
+        return 1;
+      });
+
       // Unfurl the Live links to hack around CORS issues
       if (body.live && body.live.status == "streaming") {
         var sync_req = require('sync-request');
 
         body.play.dash.link = sync_req('GET', body.play.dash.link).url;
-        body.play.hls.link = sync_req('GET', body.play.hls.link).url;
+        body.play.hls.link  = sync_req('GET', body.play.hls.link).url;
       }
 
       response.status(200).send(body);
