@@ -8,7 +8,7 @@
   const vimeo = new Sandbox.VimeoClient();
 
   // We will store all the character instance in here so we can hit play (kind of) together
-  let characters = [];
+  let players = [];
 
   vimeo.requestVideo('<%= video_id || 279527916 %>').then(response => {
     // Manually loop through all the progressive video files
@@ -19,10 +19,13 @@
       response.props.textureHeight = vimeo.files.progressive[res].height;
 
       player = new Sandbox.DepthPlayer();
+      player.on('load', setupPlayButton);
+
       let character = player.loadVideo(response.props,
                                        vimeo.files.progressive[res].link,
                                        'progressive',
-                                       response.type);
+                                       response.type,
+                                       Sandbox.Style.Mesh);
       let recenteredX = res - 2.5;
 
       // Create a text that shows the resolution for each take loaded
@@ -51,10 +54,17 @@
 
       //Set to loop and hit play 🎬
       character.player.setLoop(true);
-      characters.push(character);
+      players.push(player);
 
       glScene.scene.add(character);
       glScene.scene.add(textMesh);
     }
+  });
+
+  play_btn.addEventListener('click', (e) => {
+      play_btn.style.display = 'none';
+      for (let i = 0; i < players.length; i++) {
+        players[i].play();
+      }
   });
 </script>

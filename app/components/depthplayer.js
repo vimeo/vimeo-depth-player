@@ -8,6 +8,8 @@ import Util from './util';
 // GLSLIFY - bundles all the GLSL code along with the JS
 const glsl = require('glslify');
 
+const EventEmitter = require('event-emitter-es6');
+
 /*
 * TODO add documentation
 */
@@ -16,10 +18,12 @@ const glsl = require('glslify');
 const VERTS_WIDE = 256;
 const VERTS_TALL = 256;
 
-export default class DepthPlayer
+export default class DepthPlayer extends EventEmitter
 {
   constructor(_vimeoVideoId = null, _videoQuality = 'auto', _depthType = Type.DepthKit, _depthStyle = Style.Points)
   {
+    super();
+
     this.vimeoVideoId = _vimeoVideoId;
     this.videoQuality = _videoQuality;
     this.depthStyle   = _depthStyle;
@@ -44,7 +48,7 @@ export default class DepthPlayer
   }
 
   // TODO Rename selectedQuality - it is about if it's adaptive or not?
-  loadVideo(_props, _videoUrl, _selectedQuality, _type = Type.DepthKit, _style = Style.Mesh, showVideo = false)
+  loadVideo(_props, _videoUrl, _selectedQuality, _type = Type.DepthKit, _style = Style.Points, showVideo = false)
   {
       console.log(`[DepthPlayer] Creating a depth player with selected quality: ${_selectedQuality}`);
 
@@ -63,13 +67,19 @@ export default class DepthPlayer
       let rgbdFrag = glsl.file('../shaders/rgbd.frag');
       let rgbdVert = glsl.file('../shaders/rgbd.vert');
 
-      this.videoElement.id = 'vimeo-depth-player'; // Must be unique ID
+      this.videoElement.id = 'vimeo-depth-player'; // TODO Must be unique ID
       this.videoElement.crossOrigin = 'anonymous';
       this.videoElement.setAttribute('crossorigin', 'anonymous');
       this.videoElement.autoplay = false;
       this.videoElement.loop =  true;
 
-      // Adaptive DASH playback
+      this.videoElement.addEventListener('loadeddata', function() {
+        if (this.videoElement.readyState == 4) {
+          this.emit('load');
+        }
+      }.bind(this));
+
+      // Adaptive DASH playback uses DepthJS
       if (_selectedQuality == 'dash') {
         // Create a DASH.js player
         this.video = dashjs.MediaPlayer().create();
@@ -77,7 +87,7 @@ export default class DepthPlayer
 
         this.createTexture(this.videoElement);
       }
-      // Otherwise fallback to progressive
+      // Otherwise fallback to standard video element 
       else {
         this.video = this.videoElement;
 
@@ -91,22 +101,19 @@ export default class DepthPlayer
         this.createTexture(this.video);
       }
 
-
       //Append the original video from vimeo to the DOM
       if(showVideo) document.body.append(this.video);
 
-      //Manages loading of assets internally
+      //Manages loading of assets internally  
       this.manager = new THREE.LoadingManager();
 
       //JSON props once loaded
       this.props;
 
-      //Geomtery
       if (!DepthPlayer.geo) {
           DepthPlayer.buildGeomtery();
       }
 
-      //Material
       this.material = new THREE.ShaderMaterial({
           uniforms: {
               "map": {
@@ -218,7 +225,8 @@ export default class DepthPlayer
       return this.mesh;
   }
 
-  createTexture(videoElement){
+  createTexture(videoElement)
+  {
     //Create a video texture to be passed to the shader
     this.videoTexture = new THREE.VideoTexture(videoElement);
     this.videoTexture.minFilter = THREE.NearestFilter;
