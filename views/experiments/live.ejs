@@ -1,7 +1,11 @@
 <% include ../partials/depth-bootup %>
-<% include ../partials/live-badge %>
-<script src="/js/gltfloader.js"></script>
 
+<div id="live-badge">
+  <span class="dot"></span> 
+  LIVE
+</div>
+
+<script src="/js/gltfloader.js"></script>
 <script>
   const modelLoader = new THREE.GLTFLoader();
   modelLoader.load('/assets/stage.glb', obj=>{

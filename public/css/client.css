@@ -68,7 +68,7 @@ body {
 	font-family: "Comic Sans MS", cursive, sans-serif;
 }
 
-#live-badge{
+#live-badge {
   position: absolute;
   font-size: 12px;
   padding: 5px;
@@ -76,7 +76,16 @@ body {
   background-color: red;
   font-weight: bold;
   right: 20px;
-  top: 18px;
+	top: 75px;
+	border-radius: 3px;
+}
+#live-badge .dot {
+	height: 7px;
+  width: 7px;
+  background-color: #fff;
+  border-radius: 50%;
+	display: inline-block;
+	margin-right: 3px;
 }
 
 /* Animation keyframes - you need to add prefixes */
