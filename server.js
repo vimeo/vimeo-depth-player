@@ -84,10 +84,12 @@ app.get('/video/:id', (request, response) => {
       }
 
       // Sort the resolutions from highest to lowest
-      body["play"]["progressive"] = body["play"]["progressive"].sort(function(a, b) {
-        if (parseInt(a['height']) > parseInt(b['height'])) return -1;
-        return 1;
-      });
+      if (body["play"]["progressive"]) {
+        body["play"]["progressive"] = body["play"]["progressive"].sort(function(a, b) {
+          if (parseInt(a['height']) > parseInt(b['height'])) return -1;
+          return 1;
+        });
+      }
 
       // Unfurl the Live links to hack around CORS issues
       if (body.live && body.live.status == "streaming") {
