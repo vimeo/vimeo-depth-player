@@ -178,7 +178,10 @@
 
     function onPlay() {
 
-      depthPlayer.play();
+      for (var i = 0; i < depthPlayers.length; i++) {
+        depthPlayers[i].play();
+      }
+      
       document.getElementById('play').style.display = 'none';
 
     }

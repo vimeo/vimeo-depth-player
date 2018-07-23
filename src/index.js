@@ -1,7 +1,7 @@
 import API from './components/vimeo';
 import DepthPlayer from './components/depth-player';
 import DepthType from './components/depth-type';
-import RenderStyle from './components/render-';
+import RenderStyle from './components/render-style';
 import Util from './components/util';
 
 /*
