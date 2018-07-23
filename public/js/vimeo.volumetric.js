@@ -2052,7 +2052,7 @@ var VimeoClient = function () {
                   console.warn('[Vimeo] Requested an HLS stream but none was found');
                 }
               } else if (_this.selectedQuality == 'dash') {
-                if (_this.files.dash.link) {
+                if (_this.files.dash && _this.files.dash.link) {
                   _this.url = _this.files.dash.link;
                 } else {
                   console.warn('[Vimeo] Requested a DASH stream but none was found');

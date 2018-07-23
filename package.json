@@ -1,15 +1,15 @@
 {
-  "name": "vimeo_depthkit",
+  "name": "vimeo_volumetric_video",
   "version": "0.0.1",
-  "description": "A volumetric video implementation that uses materials hosted on Vimeo",
+  "description": "A volumetric video player for playing back color-depth videos hosted on Vimeo",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "concurrently \"nodemon server.js\" \"watchify app/index.js -o public/js/bundle.js -v\"",
-    "build": "browserify app/index.js | uglifyjs --source-map --output public/js/bundle.min.js",
+    "dev": "concurrently \"nodemon server.js\" \"watchify app/index.js -o public/js/vimeo.volumetric.js -v\"",
+    "build": "browserify app/index.js | uglifyjs --source-map --output public/js/vimeo.volumetric.min.js",
     "test": "npm run build"
   },
-  "author": "Or Fleisher <contact@orfleisher.com>",
+  "author": "Or Fleisher <or@vimeo.com>",
   "license": "MIT",
   "dependencies": {
     "cors": "^2.8.4",
