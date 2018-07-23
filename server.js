@@ -13,7 +13,7 @@ app.use(express.static('assets'));
 app.use(express.static('dist'));
 app.engine('.html', ejs.__express);
 app.set('view-engine', 'html');
-app.set("views", __dirname + '/examples');
+app.set('views', __dirname + '/examples');
 
 // CORS headers
 app.use(function(req, res, next) {
@@ -39,15 +39,6 @@ if (process.env.NODE_ENV !== 'production') {
 
 }
 
-/*
-* Public Routes
-* - /
-* - /experiments    # homepage
-* - /experiments/:project
-* - /experiments/:project/:video_id
-* - /:video_id
-*/
-
 app.get('/playback', (request, response) => {
   response.render('playback.html');
 });
@@ -56,16 +47,8 @@ app.get('/resolution', (request, response) => {
   response.render('resolution.html');
 });
 
-app.get('/experiments/:project', (request, response) => {
-  response.render('experiments/' + request.params.project, { video_id: null });
-});
-
-app.get('/experiments/:project/:video_id', (request, response) => {
-  response.render('experiments/' + request.params.project, { video_id: request.params.video_id });
-});
-
-app.get('/:video_id', (request, response) => {
-  response.render('video', { video_id: request.params.video_id });
+app.get('/live', (request, response) => {
+  response.render('live.html');
 });
 
 // The route for getting videos from the vimeo API

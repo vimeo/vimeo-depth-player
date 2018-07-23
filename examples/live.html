@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  <title>Vimeo | Volumetric Video Playback</title>
+  <title>Vimeo | Volumetric Video Livestreaming</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
@@ -82,21 +82,27 @@
       scene.add(light);
 
       // Create a new Vimeo Depth Player instance with the video ID as the first parameter (string)
-      depthPlayer = new Vimeo.DepthPlayer('274161280');
+      depthPlayer = new Vimeo.DepthPlayer('280565863');
 
       // Register on load event to hide the loader and show the play button
       depthPlayer.on('load', showPlayButton);
 
       // Set the rendering style to be a mesh ( cause he is a 3D mesh )
-      depthPlayer.depthStyle = Vimeo.RenderStyle.Mesh;
+      depthPlayer.depthType = Vimeo.DepthType.RealSense;
 
       // Load the video and add the mesh to the scene
-      depthPlayer.load().then(function() {
+      depthPlayer.load().then(function(response) {
 
-        depthPlayer.setLoop(true);
-        depthPlayer.mesh.position.set(0, 0.7, 0);
-        depthPlayer.mesh.rotation.y = -Math.PI;
-        depthPlayer.mesh.rotation.z = Math.PI / 2;
+        if (!depthPlayer.videoUrl) {
+          alert('Video is not live yet!');
+        }
+
+        depthPlayer.mesh.rotation.z = -Math.PI / 2;
+        depthPlayer.mesh.scale.set(0.85, 0.85, 0.85);
+        depthPlayer.mesh.position.x = -0.4;
+        depthPlayer.mesh.position.y = 1.5;
+        depthPlayer.mesh.position.z = -1.8;
+        depthPlayer.mesh.material.defines.PIXEL_EDGE_CLIP = '1';
 
         scene.add(depthPlayer.mesh);
 
@@ -104,11 +110,9 @@
 
       // Load the 3D enviorment model
       var modelLoader = new THREE.GLTFLoader();
-      modelLoader.load('./media/brooklyn.glb', function(obj) {
+      modelLoader.load('./media/stage.glb', function(obj) {
 
-        var enviormentMesh = obj.scene.children[0];
-        enviormentMesh.position.y -= 0.3;
-        scene.add(enviormentMesh);
+        scene.add(obj.scene);
 
       });
 
