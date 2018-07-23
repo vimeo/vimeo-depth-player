@@ -6,9 +6,9 @@
 import Util from './util';
 
 // Depth encoding types
-import Type from './type';
+import DepthType from './depth-type';
 
-class VimeoClient {
+class API {
   constructor(quality = 'auto') {
 
     this.selectedQuality = quality;
@@ -48,11 +48,11 @@ class VimeoClient {
             //If a JSON was provided in the description then it's a DepthKit take (saved into this.props)
             if (Util.isJSON(obj)) {
               this.props = JSON.parse(obj.description);
-              this.type = Type.DepthKit;
+              this.type = DepthType.DepthKit;
             }
             else {
               this.props = null;
-              this.type = Type.RealSense;
+              this.type = DepthType.RealSense;
             }
 
             if (this.selectedQuality == 'auto') {
@@ -97,7 +97,7 @@ class VimeoClient {
               * Future developments will support more native depth playback formats
               * It is recomended to use adaptive format
               */
-              if (this.type === Type.DepthKit){
+              if (this.type === DepthType.DepthKit){
                 // Iterate over the file list and find the one that matchs our quality setting (e.g 'hd')
                 for (let file of this.files.progressive) {
 
@@ -127,7 +127,7 @@ class VimeoClient {
               'fps': this.fps
             });
 
-          } 
+          }
           else {
             reject(response.status);
           }
@@ -138,4 +138,4 @@ class VimeoClient {
   }
 }
 
-export default VimeoClient;
+export default API;

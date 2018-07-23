@@ -5,8 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "concurrently \"nodemon server.js\" \"watchify app/index.js -o public/js/vimeo.volumetric.js -v\"",
-    "build": "browserify app/index.js | uglifyjs --source-map --output public/js/vimeo.volumetric.min.js",
+    "dev": "concurrently \"nodemon server.js\" \"watchify src/index.js -o dist/vimeo.depth-player.js -v\"",
+    "build": "browserify src/index.js | uglifyjs --source-map --output dist/vimeo.depth-player.min.js",
     "test": "npm run build"
   },
   "author": "Or Fleisher <or@vimeo.com>",

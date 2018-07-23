@@ -1,24 +1,21 @@
-//Import the vimeo.js library
+// Vimeo.js
 const Vimeo = require('vimeo').Vimeo;
 
-// Import the express library and create an express app
+// Express.js
 const express = require('express');
-const expressLayouts = require('express-ejs-layouts');
-const cors = require('cors')
 const app = express();
 
-// Render engine setup
-var path = require('path');
-app.use(express.static('public'));
-app.set('view engine', 'ejs');
-app.use(expressLayouts);
+// ejs
+const ejs = require('ejs');
 
-// Event emitter 
-app.use(require('event-emitter-es6/router'));
+// Render engine for the express server
+app.use(express.static('assets'));
+app.use(express.static('dist'));
+app.engine('.html', ejs.__express);
+app.set('view-engine', 'html');
+app.set("views", __dirname + '/examples');
 
-//Setup cors
-app.use(cors());
-
+// CORS headers
 app.use(function(req, res, next) {
   console.log(`[Server] A ${req.method} request was made to ${req.url}`);
   res.header("Access-Control-Allow-Origin", "*");
@@ -26,10 +23,20 @@ app.use(function(req, res, next) {
   next();
 });
 
-// If working locally load the enviorment variables which are inside the .env file
+/*
+* Vimeo token for local development is saved in a .env file
+* For deployment make sure to store it in an enviorment
+* variable called VIMEO_TOKEN=4trwegfudsbg4783724343
+*/
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').load();
-  console.log('[Server] enviorment variables loaded from .env file 💪🏻');
+  if(process.env.VIMEO_TOKEN){
+      console.log('[Server] enviorment variables loaded from .env file 💪🏻');
+  } else {
+    console.log('[Server] could not load the Vimeo token, make sure you have a .env file or enviorment variable with the token');
+    return;
+  }
+
 }
 
 /*
@@ -41,12 +48,12 @@ if (process.env.NODE_ENV !== 'production') {
 * - /:video_id
 */
 
-app.get('/', (request, response) => {
-  response.render('index', { layout: false });
+app.get('/playback', (request, response) => {
+  response.render('playback.html');
 });
 
-app.get('/experiments', (request, response) => {
-  response.render('experiments');
+app.get('/resolution', (request, response) => {
+  response.render('resolution.html');
 });
 
 app.get('/experiments/:project', (request, response) => {

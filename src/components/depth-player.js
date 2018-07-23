@@ -1,7 +1,6 @@
-import * as THREE from 'three';
-import Type from './type';
+import DepthType from './depth-type';
 import Props from './props';
-import Style from './style';
+import RenderStyle from './render-style';
 import GuiManager from './gui';
 import Util from './util';
 
@@ -20,7 +19,7 @@ const VERTS_TALL = 256;
 
 export default class DepthPlayer extends EventEmitter
 {
-  constructor(_vimeoVideoId = null, _videoQuality = 'auto', _depthType = Type.DepthKit, _depthStyle = Style.Points)
+  constructor(_vimeoVideoId = null, _videoQuality = 'auto', _depthType = DepthType.DepthKit, _depthStyle = RenderStyle.Points)
   {
     super();
 
@@ -33,7 +32,7 @@ export default class DepthPlayer extends EventEmitter
 
   load()
   {
-    const vimeo = new Sandbox.VimeoClient(this.videoQuality);
+    const vimeo = new Vimeo.API(this.videoQuality);
     return new Promise((resolve, reject) => {
       vimeo.requestVideo(this.vimeoVideoId).then(response => {
         this.videoUrl = response.url;
@@ -49,7 +48,7 @@ export default class DepthPlayer extends EventEmitter
   }
 
   // TODO Rename selectedQuality - it is about if it's adaptive or not?
-  loadVideo(_props, _videoUrl, _selectedQuality, _type = Type.DepthKit, _style = Style.Points, showVideo = false)
+  loadVideo(_props, _videoUrl, _selectedQuality, _type = DepthType.DepthKit, _style = RenderStyle.Points, showVideo = false)
   {
       console.log(`[DepthPlayer] Creating a depth player with selected quality: ${_selectedQuality}`);
 
@@ -88,7 +87,7 @@ export default class DepthPlayer extends EventEmitter
 
         this.createTexture(this.videoElement);
       }
-      // Otherwise fallback to standard video element 
+      // Otherwise fallback to standard video element
       else {
         this.video = this.videoElement;
 
@@ -105,7 +104,7 @@ export default class DepthPlayer extends EventEmitter
       //Append the original video from vimeo to the DOM
       if(showVideo) document.body.append(this.video);
 
-      //Manages loading of assets internally  
+      //Manages loading of assets internally
       this.manager = new THREE.LoadingManager();
 
       //JSON props once loaded
@@ -182,14 +181,14 @@ export default class DepthPlayer extends EventEmitter
 
 
 
-      if (_type == Type.DepthKit) {
+      if (_type == DepthType.DepthKit) {
         this.material.defines.DEPTH_ORDER = '1.0';
 
         if (_props == null) {
           _props = Props.DepthKit;
         }
       }
-      else if ( _type == Type.RealSense) {
+      else if ( _type == DepthType.RealSense) {
         this.material.defines.DEPTH_ORDER = '-1.0';
         if (_props == null) {
           _props = Props.RealSense;
@@ -198,12 +197,12 @@ export default class DepthPlayer extends EventEmitter
       this.material.defines.PIXEL_EDGE_CLIP = '0';
       //Switch a few things based on selected rendering type and create the volumetric asset
       switch (_style) {
-          case Style.Wire:
+          case RenderStyle.Wire:
               this.material.wireframe = true;
               this.mesh = new THREE.Mesh(DepthPlayer.geo, this.material);
               break;
 
-          case Style.Points:
+          case RenderStyle.Points:
               this.material.uniforms.isPoints.value = true;
               this.mesh = new THREE.Points(DepthPlayer.geo, this.material);
               break;
