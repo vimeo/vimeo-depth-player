@@ -12,11 +12,8 @@
   "author": "Or Fleisher <or@vimeo.com>",
   "license": "MIT",
   "dependencies": {
-    "cors": "^2.8.4",
     "ejs": "^2.6.1",
     "express": "^4.16.2",
-    "express-ejs-layouts": "^2.4.0",
-    "path": "^0.12.7",
     "sync-request": "^6.0.0",
     "three": "^0.89.0",
     "vimeo": "^2.0.2"

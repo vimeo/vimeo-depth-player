@@ -1,6 +1,6 @@
 /*
-* A promise based wrapper for the vimeo API
-*/
+ * A promise based wrapper for the vimeo API
+ */
 
 // Utility wrapper with static methods needed for a rainy day 🌧
 import Util from './util';
@@ -23,13 +23,13 @@ class API {
   requestVideo(vimeoVideoID) {
 
     //Safeguard the request
-    if (!vimeoVideoID){
+    if (!vimeoVideoID) {
       console.warn('[Client] Can not request a video without providing a video ID');
       return;
     }
 
     //The function returns a promise based on the request made inside
-    return new Promise((resolve, reject)=>{
+    return new Promise((resolve, reject) => {
 
       //Use the fetch API (returns a promise) and assemble the complete request path - e.g http://myawesomeapp.com/video/vimeo_video_id
       fetch(`/video/${vimeoVideoID}`).then(response => {
@@ -49,8 +49,7 @@ class API {
             if (Util.isJSON(obj)) {
               this.props = JSON.parse(obj.description);
               this.type = DepthType.DepthKit;
-            }
-            else {
+            } else {
               this.props = null;
               this.type = DepthType.RealSense;
             }
@@ -60,14 +59,13 @@ class API {
 
                 //Iterate over the files and look for a 720p version in progressive format
                 for (let file in this.files.progressive) {
-                  if(this.files.progressive[file].width > 600 && this.files.progressive[file].width < 1000){
+                  if (this.files.progressive[file].width > 600 && this.files.progressive[file].width < 1000) {
                     this.selectedQuality = this.files.progressive[file].width;
                   }
                 }
 
                 // this.selectedQuality = 'hls'; // Unfortunetly this will still result in an unsecure opreation on iOS so we can only play progressive files for now
-              }
-              else {
+              } else {
                 this.selectedQuality = 'dash';
               }
               // TODO: if mobile safari, play hls
@@ -78,26 +76,22 @@ class API {
             if (this.selectedQuality == 'hls') {
               if (this.files.hls.link) {
                 this.url = this.files.hls.link;
-              }
-              else {
+              } else {
                 console.warn('[Vimeo] Requested an HLS stream but none was found');
               }
-            }
-            else if (this.selectedQuality == 'dash') {
+            } else if (this.selectedQuality == 'dash') {
               if (this.files.dash && this.files.dash.link) {
                 this.url = this.files.dash.link;
-              }
-              else {
+              } else {
                 console.warn('[Vimeo] Requested a DASH stream but none was found');
               }
-            }
-            else {
+            } else {
               /*
-              * Progressive currently only supports DepthKit
-              * Future developments will support more native depth playback formats
-              * It is recomended to use adaptive format
-              */
-              if (this.type === DepthType.DepthKit){
+               * Progressive currently only supports DepthKit
+               * Future developments will support more native depth playback formats
+               * It is recomended to use adaptive format
+               */
+              if (this.type === DepthType.DepthKit) {
                 // Iterate over the file list and find the one that matchs our quality setting (e.g 'hd')
                 for (let file of this.files.progressive) {
 
@@ -127,8 +121,7 @@ class API {
               'fps': this.fps
             });
 
-          }
-          else {
+          } else {
             reject(response.status);
           }
         })
