@@ -24,7 +24,7 @@ VIMEO_TOKEN=asfa733240239qwerfhuasf
 depthPlayer = new Vimeo.DepthPlayer('YOUR_VIDEO_ID');
 ```
 
-## Features
+# Features
 ### Adaptive Playback
 ![playback](https://github.com/vimeo/vimeo-depth-player/blob/library-refactoring/docs/playback.gif)  
 The `Vimeo.DepthPlayer()` supports adaptive playback of volumetric video hosted on Vimeo. Currently, it supports volumetric captures made with [DepthKit](https://depthkit.tv) using the Combined-Per-Pixel export option. It recomended to store the `take.txt` contents in the video description for more accurate 3D reconstruction.
@@ -34,11 +34,11 @@ The `Vimeo.DepthPlayer()` supports adaptive playback of volumetric video hosted 
 The `Vimeo.DepthPlayer()` also supports adaptive playback of live streamed volumetric video using [Vimeo Live](https://vimeo.com/live) and an Intel RealSense camera (D415/D435). In order to livestream volumetric video you can use our [Depth Viewer](http://github.com/vimeo/depth-viewer) that enables you to use Livestream Studio/OBS to stream an aligned color-depth video. 
 
 
-## Requirements
+# Requirements
 * Requires a Pro [Vimeo account](https://vimeo.com) or higher. 
 * [Node.js](https://nodejs.org)
 
-## API
+# API
 
 
 # Questions, help, and support
