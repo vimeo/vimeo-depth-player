@@ -4,30 +4,24 @@
 
 ![cover](https://github.com/vimeo/volumetric-player/blob/library-refactoring/docs/webvr_small.gif)  
 A webVR volumetric video player that uses color-depth videos hosted on Vimeo. 
-- Quick-start
-- Features
-- Requirements
+- [Getting started](#getting-started)
+- [Features](#features)
+- [Requirements](#requirements)
+- [Development](#development)
 
-* **[Record video](#recording)** (including 4K, 360, stereo 360) and upload to your Vimeo account. 
-  * [Features](#features)
-  * [Requirements](#requirements)
-  * [Quickstart](#getting-started)
-
-* **[Stream video](#streaming)** (4K, 360, stereo 360) from your own Vimeo account into Unity.
-  * [Features](#streaming-features)
-  * [Requirements](#streaming-requirements)
-  * [Quickstart](#setting-up)
-
-* **[Vimeo & AVPro](#vimeo--avpro)**
-  * [Streaming with AVPro Video and Vimeo](#streaming-with-avpro-video-and-vimeo)
-  * [Recording with AVPro Movie Capture and Vimeo](#recording-with-avpro-movie-capture-and-vimeo)
-
-# Installation
-Download the most recent `.unitypackage` from the [latest releases](https://github.com/vimeo/vimeo-unity-sdk/releases) and open it up.
-
-# Recording
-
-<img src="https://i.imgur.com/tnP8Rl7.gif" height="250" /> <img src="https://i.imgur.com/blyIiks.gif" height="250" />
+# Getting started
+To quickly get started you can download our demo assets [from here](https://labs.vimeo.com/cdn/volumetric/demo-assets.zip) and upload them into your Vimeo account, follow the instructions provided with the videos. Make sure you check out the [requirements section](#requirements).
+1. Download or clone the repository, `git clone https://github.com/vimeo/vimeo-depth-player.git`
+2. Generate a token for your Vimeo account here and save the token into a `.env` file in the root folder of the repository.
+```sh
+VIMEO_TOKEN=asfa733240239qwerfhuasf
+```
+3. Install all dependencies by running `npm install` inside the repository folder
+4. Run the server, `npm run start`
+5. In the examples folder swap your volumetric Vimeo video id with the one provided
+```js
+depthPlayer = new Vimeo.DepthPlayer('YOUR_VIDEO_ID');
+```
 
 ## Features
 The Vimeo Recorder is built on top of Unity's native `MediaEncoder` to make it simple to capture your Unity scene and share to Vimeo. Features include:
