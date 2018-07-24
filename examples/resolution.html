@@ -14,13 +14,16 @@
   <script type="text/javascript" src="js/dash.all.min.js"></script>
 
   <!--Three.js-->
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/89/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/94/three.min.js"></script>
 
   <!-- GLTF loader -->
   <script type="text/javascript" src="js/gltfloader.js"></script>
 
   <!-- Orbit Controls -->
   <script type="text/javascript" src="js/orbitcontrols.js"></script>
+
+  <!-- WebVR -->
+  <script type="text/javascript" src="js/webvr.js"></script>
 
   <!--vimeo.volumetric.js-->
   <script type="text/javascript" src="vimeo.depth-player.js"></script>
@@ -62,12 +65,6 @@
 
     function init() {
 
-      //Setup renderer
-      renderer = new THREE.WebGLRenderer();
-      renderer.setPixelRatio(window.devicePixelRatio);
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      document.body.appendChild(renderer.domElement);
-
       // Setup scene
       scene = new THREE.Scene();
 
@@ -75,15 +72,26 @@
       camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, .01, 100);
       camera.position.set(0, 1, 3);
 
-      // Setup controls
-      controls = new THREE.OrbitControls(camera);
-      controls.target.set(0, 0.5, -1.0);
-      controls.update();
-
       // Setup light
       var light = new THREE.PointLight();
       light.position.set(0, 2.5, 0);
       scene.add(light);
+
+      //Setup renderer
+      renderer = new THREE.WebGLRenderer();
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      if(WEBVR.hasWebVR()){
+        renderer.vr.enabled = true;
+        document.body.appendChild(WEBVR.createButton(renderer));
+      } else {
+        controls = new THREE.OrbitControls(camera);
+        controls.target.set(0, 0.9, -1.0);
+        controls.update();
+      }
+
+      document.body.appendChild(renderer.domElement);
 
       // Setup 3D font
       let fontLoader = new THREE.FontLoader();
@@ -127,12 +135,10 @@
 
           var textMesh = new THREE.Mesh(textGeo, textMat);
           textMesh.scale.set(0.001, 0.001, 0.001);
-          textMesh.position.set(xOffset - 0.3, 1.2, -0.5);
+          textMesh.position.set(xOffset - 0.3, 2.0, -1.5);
 
           //Position and rotation adjustments
-          player.mesh.position.x = xOffset;
-          player.mesh.position.z = 0.5;
-          player.mesh.position.y = 0.5;
+          player.mesh.position.set(xOffset, 1.2, -0.5);
           player.mesh.rotation.y = -Math.PI;
           player.mesh.rotation.z = Math.PI / 2;
 
@@ -149,13 +155,17 @@
       document.getElementById('play').addEventListener('click', onPlay, false);
       window.addEventListener('resize', onWindowResize, false);
 
-      render();
+      animate();
+
+    }
+
+    function animate() {
+
+      renderer.setAnimationLoop(render);
 
     }
 
     function render() {
-
-      requestAnimationFrame(render);
 
       renderer.render(scene, camera);
 
@@ -181,7 +191,7 @@
       for (var i = 0; i < depthPlayers.length; i++) {
         depthPlayers[i].play();
       }
-      
+
       document.getElementById('play').style.display = 'none';
 
     }

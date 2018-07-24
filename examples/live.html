@@ -11,10 +11,13 @@
   <script type="text/javascript" src="js/dash.all.min.js"></script>
 
   <!--Three.js-->
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/89/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/94/three.min.js"></script>
 
   <!-- GLTF loader -->
   <script type="text/javascript" src="js/gltfloader.js"></script>
+
+  <!--Three.js-->
+  <script type="text/javascript" src="js/webvr.js"></script>
 
   <!-- Orbit Controls -->
   <script type="text/javascript" src="js/orbitcontrols.js"></script>
@@ -58,28 +61,33 @@
 
     function init() {
 
-      //Setup renderer
-      renderer = new THREE.WebGLRenderer();
-      renderer.setPixelRatio(window.devicePixelRatio);
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      document.body.appendChild(renderer.domElement);
-
       // Setup scene
       scene = new THREE.Scene();
 
       // Setup camera
       camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, .01, 100);
-      camera.position.set(0, 1, 1);
-
-      // Setup controls
-      controls = new THREE.OrbitControls(camera);
-      controls.target.set(0, 0.5, -1.0);
-      controls.update();
+      camera.position.set(0, 1.5, 3);
 
       // Setup light
       var light = new THREE.PointLight();
       light.position.set(0, 2.5, 0);
       scene.add(light);
+
+      //Setup renderer
+      renderer = new THREE.WebGLRenderer();
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      if(WEBVR.hasWebVR()){
+        renderer.vr.enabled = true;
+        document.body.appendChild(WEBVR.createButton(renderer));
+      } else {
+        controls = new THREE.OrbitControls(camera);
+        controls.target.set(0, 0.9, -1.0);
+        controls.update();
+      }
+
+      document.body.appendChild(renderer.domElement);
 
       // Create a new Vimeo Depth Player instance with the video ID as the first parameter (string)
       depthPlayer = new Vimeo.DepthPlayer('280565863');
@@ -99,9 +107,7 @@
 
         depthPlayer.mesh.rotation.z = -Math.PI / 2;
         depthPlayer.mesh.scale.set(0.85, 0.85, 0.85);
-        depthPlayer.mesh.position.x = -0.4;
-        depthPlayer.mesh.position.y = 1.5;
-        depthPlayer.mesh.position.z = -1.8;
+        depthPlayer.mesh.position.set(0, 1.2, -0.5);
         depthPlayer.mesh.material.defines.PIXEL_EDGE_CLIP = '1';
 
         scene.add(depthPlayer.mesh);
@@ -112,6 +118,7 @@
       var modelLoader = new THREE.GLTFLoader();
       modelLoader.load('./media/stage.glb', function(obj) {
 
+        obj.scene.position.set(0.4, -0.38, 1.4);
         scene.add(obj.scene);
 
       });
@@ -119,13 +126,17 @@
       document.getElementById('play').addEventListener('click', onPlay, false);
       window.addEventListener('resize', onWindowResize, false);
 
-      render();
+      animate();
+
+    }
+
+    function animate() {
+
+      renderer.setAnimationLoop(render);
 
     }
 
     function render() {
-
-      requestAnimationFrame(render);
 
       renderer.render(scene, camera);
 
