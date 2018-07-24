@@ -1,6 +1,8 @@
-<h1 align="center">Vimeo Depth Player</h1>
+<h1>Vimeo Depth Player</h1>
 
-![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)
+![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)  
+A webVR volumetric video player that uses color-depth videos hosted on Vimeo. 
+![cover](https://github.com/vimeo/volumetric-player/blob/library-refactoring/docs/webvr_small.gif)
 
 This plugin has two major features:
 
