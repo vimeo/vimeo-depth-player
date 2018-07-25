@@ -11,7 +11,14 @@ A webVR volumetric video player that uses color-depth videos hosted on Vimeo.
 - [Development](#development)
 
 # Getting started
-To quickly get started you can download our demo assets [from here](https://labs.vimeo.com/cdn/volumetric/demo-assets.zip) and upload them into your Vimeo account, copy video descriptions as well. Make sure you check out the [requirements section](#requirements).
+Live demo links are acsseable through:
+- Playback
+- Livestreaming (archived stream)
+
+To quickly get started you can download our demo assets [from here (playback)](https://vimeo.com/279527916) or [here (archived livestream)](https://vimeo.com/280565863) and upload them into your Vimeo account, copy video descriptions as well. Make sure you check out the [requirements section](#requirements).
+
+> Note: In order to stream Vimeo videos, you will need direct video file access via the Vimeo API. Accessing video files via API is limited to Vimeo Pro and Business customers.
+
 1. Download or clone the repository, `git clone https://github.com/vimeo/vimeo-depth-player.git`
 2. Generate a token for your Vimeo account here and save the token into a `.env` file in the root folder of the repository.
 ```sh
@@ -39,6 +46,16 @@ The `Vimeo.DepthPlayer()` also supports adaptive playback of live streamed volum
 * [Node.js](https://nodejs.org)
 
 # API
+All the functionality is acsseable after instancing a Vimeo `DepthPlayer` in the following way
+```js
+var depthPlayer = new Vimeo.DepthPlayer('YOUR_VIDEO_ID');
+```
+Here is a list of all the parameter you can provide to the `Vimeo.DepthPlayer()` constructor:
+1. `_vimeoVideoId` - The first parameter must be provided and describes the Vimeo video ID
+2. `_videoQuality` - Default is `auto` which will try to establish an adaptive stream (i.e Dash stream), you can specifiy a fixed width by providing a number instead.
+3. `_depthType` - An enum desciring the depth encoding type. Currently you can choose between `Vimeo.DepthType.DepthKit` or `Vimeo.DepthType.RealSense`.
+4. `_depthStyle` - An enum desciring the depth rendering style. Default is `Vimeo.RenderStyle.Points`. Optionally you can use `Vimeo.RenderStyle.Mesh` or `Vimeo.RenderStyle.Wire`.
+### Methods:
 
 
 # Questions, help, and support
