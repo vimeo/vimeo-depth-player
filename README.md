@@ -75,4 +75,4 @@ Make pull requests, file bug reports, and make feature requests via a [GitHub is
 Working on a cool video project? [Let's talk!](mailto:labs@vimeo.com)
 
 # Thanks
-Special thanks to [DepthKit](https://depthkit.tv) and [DepthKit.js](https://github.com/juniorxsound/DepthKit.js)
+Special thanks to [three.js](https://github.com/mrdoob/three.js), [DepthKit](https://depthkit.tv) and [DepthKit.js](https://github.com/juniorxsound/DepthKit.js)
