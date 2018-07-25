@@ -11,9 +11,9 @@ A webVR volumetric video player that uses color-depth videos hosted on Vimeo.
 - [Development](#development)
 
 # Getting started
-Live demo links are acsseable through:
-- Playback
-- Livestreaming (archived stream)
+Check out / remix our Glitch demos:
+- [Playback](https://vimeo-depth-player-playback.glitch.me/)
+- [Livestreaming (archived stream)](https://vimeo-volumetric-video-livestreaming.glitch.me)
 
 To quickly get started you can download our demo assets [from here (playback)](https://vimeo.com/279527916) or [here (archived livestream)](https://vimeo.com/280565863) and upload them into your Vimeo account, copy video descriptions as well. Make sure you check out the [requirements section](#requirements).
 
@@ -26,7 +26,7 @@ VIMEO_TOKEN=asfa733240239qwerfhuasf
 ```
 3. Install all dependencies by running `npm install` inside the repository folder
 4. Run the server, `npm run start`
-5. In the examples folder swap your volumetric Vimeo video id with the one provided
+5. In the examples folder swap your volumetric Vimeo video id with the one provided in the `examples/playback.html`
 ```js
 depthPlayer = new Vimeo.DepthPlayer('YOUR_VIDEO_ID');
 ```
@@ -56,7 +56,7 @@ Here is a list of all the parameter you can provide to the `Vimeo.DepthPlayer()`
 3. `_depthType` - An enum desciring the depth encoding type. Currently you can choose between `Vimeo.DepthType.DepthKit` or `Vimeo.DepthType.RealSense`.
 4. `_depthStyle` - An enum desciring the depth rendering style. Default is `Vimeo.RenderStyle.Points`. Optionally you can use `Vimeo.RenderStyle.Mesh` or `Vimeo.RenderStyle.Wire`.
 ### Methods:
-
+Add full list of methods
 
 # Questions, help, and support
 For questions and support, [ask on StackOverflow](https://stackoverflow.com/questions/ask/?tags=vimeo). If you found a bug, please file a [GitHub issue](https://github.com/vimeo/unity-vimeo-player/issues).
