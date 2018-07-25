@@ -56,14 +56,23 @@ Here is a list of all the parameter you can provide to the `Vimeo.DepthPlayer()`
 3. `_depthType` - An enum desciring the depth encoding type. Currently you can choose between `Vimeo.DepthType.DepthKit` or `Vimeo.DepthType.RealSense`.
 4. `_depthStyle` - An enum desciring the depth rendering style. Default is `Vimeo.RenderStyle.Points`. Optionally you can use `Vimeo.RenderStyle.Mesh` or `Vimeo.RenderStyle.Wire`.
 ### Methods:
-Add full list of methods
+`depthPlayer.play()` - Play the volumetric video
+`depthPlayer.stop()` - Pause playback and set the video time to 0
+`depthPlayer.pause()` - Pause playback
+`depthPlayer.setVolume(volume)` - Set the volume of the audio
+`depthPlayer.setLoop(state)` - Controls the loop state
+`depthPlayer.setPointSize(size)` - If rendering `Vimeo.RenderStyle.Points` controls the size of the points
+`depthPlayer.setOpacity(opacity)` - Control the opacity of the 3D object
+`depthPlayer.setLineWidth(width)` - If rendering `Vimeo.RenderStyle.Wire` controls the width of the wireframe
+`depthPlayer.dispose()` - Get rid of the `depthPlayer` instance and clean up all resources
 
 # Questions, help, and support
-For questions and support, [ask on StackOverflow](https://stackoverflow.com/questions/ask/?tags=vimeo). If you found a bug, please file a [GitHub issue](https://github.com/vimeo/unity-vimeo-player/issues).
+For questions and support, [ask on StackOverflow](https://stackoverflow.com/questions/ask/?tags=vimeo). If you found a bug, please file a [GitHub issue](https://github.com/vimeo/vimeo-depth-player/issues).
 
-Make pull requests, file bug reports, and make feature requests via a [GitHub issue](https://github.com/vimeo/unity-vimeo-player/issues).
+Make pull requests, file bug reports, and make feature requests via a [GitHub issue](https://github.com/vimeo/vimeo-depth-player/issues).
 
 # Let's collaborate
 Working on a cool video project? [Let's talk!](mailto:labs@vimeo.com)
 
 # Thanks
+Special thanks to [DepthKit](https://depthkit.tv) and [DepthKit.js](https://github.com/juniorxsound/DepthKit.js)
