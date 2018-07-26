@@ -7,9 +7,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License">
-  <a href="https://codecov.io/gh/aframevr/aframe">
-    <img src="https://codecov.io/gh/aframevr/aframe/branch/master/graph/badge.svg" alt="Coverage Status">
-  </a>
+  <img src="https://app.codeship.com/projects/9ce7c020-7326-0136-9217-52081b953558/status?branch=master" alt="Codeship Status" />
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="PRs Welcome">
   <a href="https://glitch.com/edit/#!/remix/vimeo-depth-player-playback">
     <img src="https://cdn.glitch.com/2bdfb3f8-05ef-4035-a06e-2043962a3a13%2Fremix%402x.png?1513093958726" alt="remix button" aria-label="remix" height="23" alt="Glitch">
