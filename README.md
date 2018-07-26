@@ -43,6 +43,18 @@ To quickly get started you can download our demo assets from [here](https://vime
 
 > Note: In order to stream Vimeo videos, you will need direct video file access via the Vimeo API. Accessing video files via API is limited to Vimeo Pro and Business customers.
 
+### Glitch setup:
+1. Hit the remix button, or click one of the GIFs shown above
+2. We will need to use the Vimeo API so that we can grab the video files directly for WebGL to use. To make your life easy, we [made this handy link which will generate the token for you](https://vimeo-authy.herokuapp.com/auth/vimeo/webgl). Once you have authorized the app, it will give you a token so you can paste into the `.env` file. If you're running this locally, create a `.env` file in your root folder. Your `.env` file should now look something like this:
+```
+VIMEO_TOKEN=406cea4d4xxxxxxxxxxe437756d036f5
+```
+3. In the examples folder swap your volumetric Vimeo video id with the one provided in the `examples/playback.html`
+```js
+depthPlayer = new Vimeo.DepthPlayer('YOUR_VIDEO_ID');
+```
+
+### Node.js setup:
 1. Download or clone the repository, `git clone https://github.com/vimeo/vimeo-depth-player.git`
 2. Generate a token for your Vimeo account here and save the token into a `.env` file in the root folder of the repository.
 ```sh
