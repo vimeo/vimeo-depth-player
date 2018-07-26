@@ -37,11 +37,18 @@ If you're unfamiliar with setting up Node, the easiest way to get started is to 
   <img alt="Livestreaming demo" target="_blank" src="https://i.imgur.com/IO21VAX.gif" height="270" width="49%">
 </a>
 
-To quickly get started you can download our demo assets from [here](https://vimeo.com/279527916) (using a [Depthkit](https://depthkit.tv) produced asset)  or [here](https://vimeo.com/280565863) (our archived livestream using a IntelReal Sense camera) and upload them into your Vimeo account. Copy descriptions of the videos on Vimeo as well - it's our hacky way of storing config information. Make sure you check out the [requirements section](#requirements).
+### Upload a depth video
+Make sure you check out the [requirements](#requirements) before starting.
+
+First you'll need a video to test with on your Vimeo account. You can download one of the following demo videos:
+* [DepthKit produced asset](https://vimeo.com/279527916) 
+* [Archived livestream using a IntelReal Sense camera](https://vimeo.com/280565863) 
+
+[Upload](https://vimeo.com/upload) them into your Vimeo account. Copy the description of the video on Vimeo as well - it's our hacky way of storing JSON config information. 
 
 > Note: In order to stream Vimeo videos, you will need direct video file access via the Vimeo API. Accessing video files via API is limited to Vimeo Pro and Business customers.
 
-### Glitch setup:
+### Glitch setup
 1. Hit the remix button, or click one of the GIFs shown above
 2. We will need to use the Vimeo API so that we can grab the video files directly for WebGL to use. To make your life easy, we [made this handy link which will generate the token for you](https://vimeo-authy.herokuapp.com/auth/vimeo/webgl). Once you have authorized the app, it will give you a token so you can paste into the `.env` file. If you're running this locally, create a `.env` file in your root folder. Your `.env` file should now look something like this:
 ```
@@ -52,7 +59,7 @@ VIMEO_TOKEN=406cea4d4xxxxxxxxxxe437756d036f5
 depthPlayer = new Vimeo.DepthPlayer('YOUR_VIDEO_ID');
 ```
 
-### Node.js setup:
+### Node.js setup
 1. Download or clone the repository, `git clone https://github.com/vimeo/vimeo-depth-player.git`
 2. Generate a token for your Vimeo account here and save the token into a `.env` file in the root folder of the repository.
 ```sh
@@ -60,7 +67,7 @@ VIMEO_TOKEN=asfa733240239qwerfhuasf
 ```
 3. Install all dependencies by running `npm install` inside the repository folder
 4. Run the server, `npm run start`
-5. In the examples folder swap your volumetric Vimeo video id with the one provided in the `examples/playback.html`
+5. In the examples folder swap your volumetric Vimeo video id with the one provided in the `examples/demo.html`
 ```js
 depthPlayer = new Vimeo.DepthPlayer('YOUR_VIDEO_ID');
 ```
@@ -68,7 +75,7 @@ depthPlayer = new Vimeo.DepthPlayer('YOUR_VIDEO_ID');
 # Features
 
 - [x] Supports DepthKit volumetric video hosted on Vimeo.
-- [x] Supports adaptive video for fast video delivery and rendering (on supported devices).
+- [x] Supports adaptive video for fast video delivery and rendering (on supported browsers and mobile devices).
 - [x] Renders volumetric (color-depth) live streams using Vimeo Live
 - [x] Supports streams captured with an Intel RealSense D415/D435
 - [x] Utilizes adaptive streaming for for smooth video delivery and rendering
@@ -82,10 +89,10 @@ var depthPlayer = new Vimeo.DepthPlayer('YOUR_VIDEO_ID');
 Here is a list of all the parameters you can provide to the `Vimeo.DepthPlayer()` constructor:
 ```js
 Vimeo.DepthPlayer(
-  `_vimeoVideoId`, // (required) - The first parameter must be provided and describes the Vimeo video ID
-  `_videoQuality`, // Default is `auto` which will try to establish an adaptive stream, you can specifiy a fixed width by providing a number instead.
-  `_depthType`, // An enum desciring the depth encoding type. Currently you can choose between `Vimeo.DepthType.DepthKit` or `Vimeo.DepthType.RealSense`.
-  `_depthStyle`,  // An enum desciring the depth rendering style. Default is `Vimeo.RenderStyle.Points`. Optionally you can use `Vimeo.RenderStyle.Mesh` or `Vimeo.RenderStyle.Wire`.
+  _vimeoVideoId, // (required) - The first parameter must be provided and describes the Vimeo video ID
+  _videoQuality, // Default is `auto` which will try to establish an adaptive stream, you can specifiy a fixed width by providing a number instead.
+  _depthType, // An enum desciring the depth encoding type. Currently you can choose between `Vimeo.DepthType.DepthKit` or `Vimeo.DepthType.RealSense`.
+  _depthStyle,  // An enum desciring the depth rendering style. Default is `Vimeo.RenderStyle.Points`. Optionally you can use `Vimeo.RenderStyle.Mesh` or `Vimeo.RenderStyle.Wire`.
 );
 ```
 
