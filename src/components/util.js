@@ -23,12 +23,14 @@ class Util {
   }
 
   static runDisplayHelpers() {
+    if (Vimeo.Util.isiOS()) {
       var iosEls = document.querySelectorAll('[data-is-ios]');
       for (let i = 0; i < iosEls.length; i++) {
         iosEls[i].style.display = 'block';
       }
     }
 
+    if (!Vimeo.Util.isMobile()) {
       var els = document.querySelectorAll('[data-is-desktop]');
       for (let i = 0; i < els.length; i++) {
         els[i].style.display = 'block';
