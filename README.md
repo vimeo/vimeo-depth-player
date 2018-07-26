@@ -1,16 +1,12 @@
-<h1 style="text-align:center">Vimeo Depth Player</h1>
+<h1 align="center">Vimeo Depth Player</h1>
 
-<div style="text-align:center;">
+<img align="center" src="https://raw.githubusercontent.com/vimeo/vimeo-depth-player/library-refactoring/docs/webvr_small.gif?token=AAJhwWgAm6TGq5tvMZS_8puOgjbKedDeks5bYxduwA%3D%3D" alt="A GIF of a volumetric WebVR demo" height="330" />
 
-<img src="https://raw.githubusercontent.com/vimeo/vimeo-depth-player/library-refactoring/docs/webvr_small.gif?token=AAJhwWgAm6TGq5tvMZS_8puOgjbKedDeks5bYxduwA%3D%3D" alt="A GIF of a volumetric WebVR demo" height="330" />
-
-<span style="font-weight:bold;">A WebVR volumetric video player that uses color-depth based videos hosted on Vimeo.</span>
+**A WebVR volumetric video player that uses color-depth based videos hosted on Vimeo.**
 
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square) <a href="https://glitch.com/edit/#!/remix/vimeo-depth-player-playback" target="_blank">
   <img src="https://cdn.glitch.com/2bdfb3f8-05ef-4035-a06e-2043962a3a13%2Fremix%402x.png?1513093958726" alt="remix button" aria-label="remix" height="23">
 </a>
-
-</div>
 
 # Overview
 - [Requirements](#requirements)
