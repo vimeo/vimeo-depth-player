@@ -69,6 +69,7 @@ export default class DepthPlayer extends EventEmitter {
     this.videoElement.autoplay = false;
     this.videoElement.loop = true;
 
+    // When the video is done loading, trigger the load event
     this.videoElement.addEventListener('loadeddata', function() {
       if (this.videoElement.readyState >= 3) {
         this.emit('load');
@@ -97,13 +98,13 @@ export default class DepthPlayer extends EventEmitter {
       this.createTexture(this.video);
     }
 
-    //Append the original video from vimeo to the DOM
+    // Append the original video from vimeo to the DOM
     if (showVideo) document.body.append(this.video);
 
-    //Manages loading of assets internally
+    // Manages loading of assets internally
     this.manager = new THREE.LoadingManager();
 
-    //JSON props once loaded
+    // JSON props once loaded
     this.props;
 
     if (!DepthPlayer.geo) {
@@ -172,7 +173,7 @@ export default class DepthPlayer extends EventEmitter {
       transparent: true
     });
 
-    //Make the shader material double sided
+   // Make the shader material double sided
     this.material.side = THREE.DoubleSide;
 
 
@@ -190,7 +191,7 @@ export default class DepthPlayer extends EventEmitter {
       }
     }
     this.material.defines.PIXEL_EDGE_CLIP = '0';
-    //Switch a few things based on selected rendering type and create the volumetric asset
+   // Switch a few things based on selected rendering type and create the volumetric asset
     switch (_style) {
       case RenderStyle.Wire:
         this.material.wireframe = true;
@@ -209,10 +210,10 @@ export default class DepthPlayer extends EventEmitter {
 
     this.loadPropsFromObject(_props);
 
-    //Make sure we don't hide the character - this helps the objects in webVR
+   // Make sure we don't hide the character - this helps the objects in webVR
     this.mesh.frustumCulled = false;
 
-    //Apend the object to the Three Object3D that way it's accsesable from the instance
+   // Apend the object to the Three Object3D that way it's accsesable from the instance
     this.mesh.player = this;
     this.mesh.name = 'depth-player';
 
@@ -220,8 +221,8 @@ export default class DepthPlayer extends EventEmitter {
     return this.mesh;
   }
 
+  // Create a video texture to be passed to the shader
   createTexture(videoElement) {
-    //Create a video texture to be passed to the shader
     this.videoTexture = new THREE.VideoTexture(videoElement);
     this.videoTexture.minFilter = THREE.NearestFilter;
     this.videoTexture.magFilter = THREE.LinearFilter;
@@ -230,7 +231,7 @@ export default class DepthPlayer extends EventEmitter {
   }
 
   loadPropsFromObject(object) {
-    //Update the shader based on the properties from the JSON
+    // Update the shader based on the properties from the JSON
     this.material.uniforms.width.value = object.textureWidth;
     this.material.uniforms.height.value = object.textureHeight;
     this.material.uniforms.mindepth.value = object.nearClip;
@@ -248,7 +249,7 @@ export default class DepthPlayer extends EventEmitter {
       ex["e03"], ex["e13"], ex["e23"], ex["e33"],
     );
 
-    //Create the collider
+   // Create the collider
     let boxGeo = new THREE.BoxGeometry(object.boundsSize.x, object.boundsSize.y, object.boundsSize.z);
     let boxMat = new THREE.MeshBasicMaterial({
       color: 0xffff00,
@@ -261,11 +262,12 @@ export default class DepthPlayer extends EventEmitter {
     this.collider.visible = false;
     this.mesh.add(this.collider);
 
-    //Temporary collider positioning fix - // TODO: fix that with this.props.boundsCenter
+   // Temporary collider positioning fix - // TODO: fix that with this.props.boundsCenter
     this.collider.position.set(0, 1, 0);
   }
+
   loadPropsFromFile(path) {
-    //Make sure to read the config file as json (i.e JSON.parse)
+    // Make sure to read the config file as json (i.e JSON.parse)
     this.jsonLoader = new THREE.FileLoader(this.manager);
     this.jsonLoader.setResponseType('json');
     this.jsonLoader.load(path,
@@ -274,7 +276,7 @@ export default class DepthPlayer extends EventEmitter {
         this.props = data;
         // console.log(this.props);
 
-        //Update the shader based on the properties from the JSON
+       // Update the shader based on the properties from the JSON
         this.material.uniforms.width.value = this.props.textureWidth;
         this.material.uniforms.height.value = this.props.textureHeight;
         this.material.uniforms.mindepth.value = this.props.nearClip;
@@ -292,7 +294,7 @@ export default class DepthPlayer extends EventEmitter {
           ex["e03"], ex["e13"], ex["e23"], ex["e33"],
         );
 
-        //Create the collider
+        // Create the collider
         let boxGeo = new THREE.BoxGeometry(this.props.boundsSize.x, this.props.boundsSize.y, this.props.boundsSize.z);
         let boxMat = new THREE.MeshBasicMaterial({
           color: 0xffff00,
@@ -305,7 +307,7 @@ export default class DepthPlayer extends EventEmitter {
         this.collider.visible = false;
         this.mesh.add(this.collider);
 
-        //Temporary collider positioning fix - // TODO: fix that with this.props.boundsCenter
+        // Temporary collider positioning fix - // TODO: fix that with this.props.boundsCenter
         THREE.SceneUtils.detach(this.collider, this.mesh, this.mesh.parent);
         this.collider.position.set(0, 1, 0);
       }
@@ -345,7 +347,8 @@ export default class DepthPlayer extends EventEmitter {
   setPointSize(size) {
     if (this.material.uniforms.isPoints.value) {
       this.material.uniforms.pointSize.value = size;
-    } else {
+    }
+    else {
       console.warn('Can not set point size because the current character is not set to render points');
     }
   }
@@ -357,7 +360,8 @@ export default class DepthPlayer extends EventEmitter {
   setLineWidth(width) {
     if (this.material.wireframe) {
       this.material.wireframeLinewidth = width;
-    } else {
+    }
+    else {
       console.warn('Can not set the line width because the current character is not set to render wireframe');
     }
   }
@@ -368,7 +372,8 @@ export default class DepthPlayer extends EventEmitter {
   play() {
     if (!this.video.isPlaying) {
       this.video.play();
-    } else {
+    }
+    else {
       console.warn('Can not play because the character is already playing');
     }
   }
@@ -399,7 +404,7 @@ export default class DepthPlayer extends EventEmitter {
   }
 
   dispose() {
-    //Remove the mesh from the scene
+   // Remove the mesh from the scene
     try {
       this.mesh.parent.remove(this.mesh);
     } catch (e) {

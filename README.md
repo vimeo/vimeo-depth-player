@@ -1,21 +1,35 @@
-<h1>Vimeo Depth Player</h1>
+<h1 style="text-align:center">Vimeo Depth Player</h1>
 
-![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)  
+<div style="text-align:center;">
 
-![cover](https://github.com/vimeo/volumetric-player/blob/library-refactoring/docs/webvr_small.gif)  
-A webVR volumetric video player that uses color-depth videos hosted on Vimeo. 
+<img src="https://raw.githubusercontent.com/vimeo/vimeo-depth-player/library-refactoring/docs/webvr_small.gif?token=AAJhwWgAm6TGq5tvMZS_8puOgjbKedDeks5bYxduwA%3D%3D" alt="A GIF of a volumetric WebVR demo" height="330" />
+
+<span style="font-weight:bold;">A WebVR volumetric video player that uses color-depth based videos hosted on Vimeo.</span>
+
+![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square) <a href="https://glitch.com/edit/#!/remix/vimeo-depth-player-playback" target="_blank">
+  <img src="https://cdn.glitch.com/2bdfb3f8-05ef-4035-a06e-2043962a3a13%2Fremix%402x.png?1513093958726" alt="remix button" aria-label="remix" height="23">
+</a>
+
+</div>
+
+# Overview
+- [Requirements](#requirements)
 - [Getting started](#getting-started)
 - [Features](#features)
-- [Requirements](#requirements)
 - [API](#api)
 - [Development](#development)
 
-# Getting started
-Check out / remix our Glitch demos:
-- [Playback](https://vimeo-depth-player-playback.glitch.me/)
-- [Livestreaming (archived stream)](https://vimeo-volumetric-video-livestreaming.glitch.me)
+# Requirements
+* Requires a [Vimeo Pro account](https://vimeo.com) or higher. 
+* [Node.js](https://nodejs.org)
 
-To quickly get started you can download our demo assets [from here (playback)](https://vimeo.com/279527916) or [here (archived livestream)](https://vimeo.com/280565863) and upload them into your Vimeo account, copy video descriptions as well. Make sure you check out the [requirements section](#requirements).
+
+# Getting started
+If you're unfamiliar with setting up Node, the easiest way to get started is to just remix our demos on Glitch.
+- [Demo](https://vimeo-depth-player-playback.glitch.me/)
+- [Livestreaming Demo (which is now archived)](https://vimeo-volumetric-video-livestreaming.glitch.me)
+
+To quickly get started you can download our demo assets from [here](https://vimeo.com/279527916) (using a [Depthkit](https://depthkit.tv) produced asset)  or [here](https://vimeo.com/280565863) (our archived livestream using a IntelReal Sense camera) and upload them into your Vimeo account. Copy descriptions of the videos on Vimeo as well - it's our hacky way of storing config information. Make sure you check out the [requirements section](#requirements).
 
 > Note: In order to stream Vimeo videos, you will need direct video file access via the Vimeo API. Accessing video files via API is limited to Vimeo Pro and Business customers.
 
@@ -41,30 +55,28 @@ The `Vimeo.DepthPlayer()` supports adaptive playback of volumetric video hosted 
 The `Vimeo.DepthPlayer()` also supports adaptive playback of live streamed volumetric video using [Vimeo Live](https://vimeo.com/live) and an Intel RealSense camera (D415/D435). In order to livestream volumetric video you can use our [Depth Viewer](http://github.com/vimeo/depth-viewer) that enables you to use Livestream Studio/OBS to stream an aligned color-depth video. 
 
 
-# Requirements
-* Requires a Pro [Vimeo account](https://vimeo.com) or higher. 
-* [Node.js](https://nodejs.org)
-
 # API
 All the functionality is acsseable after instancing a Vimeo `DepthPlayer` in the following way
 ```js
 var depthPlayer = new Vimeo.DepthPlayer('YOUR_VIDEO_ID');
 ```
-Here is a list of all the parameter you can provide to the `Vimeo.DepthPlayer()` constructor:
-1. `_vimeoVideoId` - The first parameter must be provided and describes the Vimeo video ID
+Here is a list of all the parameters you can provide to the `Vimeo.DepthPlayer()` constructor:
+1. `_vimeoVideoId` (required) - The first parameter must be provided and describes the Vimeo video ID
 2. `_videoQuality` - Default is `auto` which will try to establish an adaptive stream (i.e Dash stream), you can specifiy a fixed width by providing a number instead.
 3. `_depthType` - An enum desciring the depth encoding type. Currently you can choose between `Vimeo.DepthType.DepthKit` or `Vimeo.DepthType.RealSense`.
 4. `_depthStyle` - An enum desciring the depth rendering style. Default is `Vimeo.RenderStyle.Points`. Optionally you can use `Vimeo.RenderStyle.Mesh` or `Vimeo.RenderStyle.Wire`.
-### Methods:
-`depthPlayer.play()` - Play the volumetric video
-`depthPlayer.stop()` - Pause playback and set the video time to 0
-`depthPlayer.pause()` - Pause playback
-`depthPlayer.setVolume(volume)` - Set the volume of the audio
-`depthPlayer.setLoop(state)` - Controls the loop state
-`depthPlayer.setPointSize(size)` - If rendering `Vimeo.RenderStyle.Points` controls the size of the points
-`depthPlayer.setOpacity(opacity)` - Control the opacity of the 3D object
-`depthPlayer.setLineWidth(width)` - If rendering `Vimeo.RenderStyle.Wire` controls the width of the wireframe
-`depthPlayer.dispose()` - Get rid of the `depthPlayer` instance and clean up all resources
+
+### Depth player methods
+
+- `play()` - Play the volumetric video
+- `stop()` - Pause playback and set the video time to 0
+- `pause()` - Pause playback
+- `setVolume(volume)` - Set the volume of the audio
+- `setLoop(state)` - Controls the loop state
+- `setPointSize(size)` - If rendering `Vimeo.RenderStyle.Points` controls the size of the points
+- `setOpacity(opacity)` - Control the opacity of the 3D object
+- `setLineWidth(width)` - If rendering `Vimeo.RenderStyle.Wire` controls the width of the wireframe
+- `dispose()` - Get rid of the `depthPlayer` instance and clean up all resources
 
 # Questions, help, and support
 For questions and support, [ask on StackOverflow](https://stackoverflow.com/questions/ask/?tags=vimeo). If you found a bug, please file a [GitHub issue](https://github.com/vimeo/vimeo-depth-player/issues).

@@ -11,13 +11,14 @@ import Util from './components/util';
 const Vimeo = {
   'API': API,
   'DepthPlayer': DepthPlayer,
-  'RenderStyle': RenderStyle, //problem!
-  'DepthType': DepthType, //problem!
+  'RenderStyle': RenderStyle,
+  'DepthType': DepthType,
   'Util': Util
 }
 
 if (window.THREE) {
   window.Vimeo = Vimeo;
-} else {
+}
+else {
   console.warn('[Depth Player] three.js was not found, did you forget to include it?');
 }

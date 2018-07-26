@@ -30,9 +30,10 @@ app.use(function(req, res, next) {
 */
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').load();
-  if(process.env.VIMEO_TOKEN){
+  if (process.env.VIMEO_TOKEN) {
       console.log('[Server] enviorment variables loaded from .env file 💪🏻');
-  } else {
+  }
+  else {
     console.log('[Server] could not load the Vimeo token, make sure you have a .env file or enviorment variable with the token');
     return;
   }

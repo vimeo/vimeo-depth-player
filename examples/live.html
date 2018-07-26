@@ -2,27 +2,20 @@
 <html lang="en">
 
 <head>
-  <title>Vimeo | Volumetric Video Livestreaming</title>
+  <title>Volumetric Video Livestreaming - Vimeo</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
   <link rel="icon" href="media/favicon.ico">
   <link rel="stylesheet" type="text/css" href="css/client.css" />
-  <script type="text/javascript" src="js/dash.all.min.js"></script>
 
-  <!--Three.js-->
+  <script type="text/javascript" src="/js/dash.all.min.js"></script> <!-- Dash.js for playing back adaptive video -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/94/three.min.js"></script>
-
-  <!-- GLTF loader -->
   <script type="text/javascript" src="js/gltfloader.js"></script>
-
-  <!--Three.js-->
   <script type="text/javascript" src="js/webvr.js"></script>
-
-  <!-- Orbit Controls -->
   <script type="text/javascript" src="js/orbitcontrols.js"></script>
 
-  <!--vimeo.volumetric.js-->
+  <!-- vimeo.depth-player.js -->
   <script type="text/javascript" src="vimeo.depth-player.js"></script>
 </head>
 
@@ -57,10 +50,11 @@
     //Vimeo Depth Player instance
     var depthPlayer;
 
-    init();
+    // Set Vimeo video id we want to play
+    var vimeoVideoId = 274161280;
 
-    function init() {
-
+    function init() 
+    {
       // Setup scene
       scene = new THREE.Scene();
 
@@ -73,15 +67,16 @@
       light.position.set(0, 2.5, 0);
       scene.add(light);
 
-      //Setup renderer
+      // Setup renderer
       renderer = new THREE.WebGLRenderer();
       renderer.setPixelRatio(window.devicePixelRatio);
       renderer.setSize(window.innerWidth, window.innerHeight);
 
-      if(WEBVR.hasWebVR()){
+      if (WEBVR.hasWebVR()){
         renderer.vr.enabled = true;
         document.body.appendChild(WEBVR.createButton(renderer));
-      } else {
+      } 
+      else {
         controls = new THREE.OrbitControls(camera);
         controls.target.set(0, 0.9, -1.0);
         controls.update();
@@ -90,7 +85,7 @@
       document.body.appendChild(renderer.domElement);
 
       // Create a new Vimeo Depth Player instance with the video ID as the first parameter (string)
-      depthPlayer = new Vimeo.DepthPlayer('280565863');
+      depthPlayer = new Vimeo.DepthPlayer(vimeoVideoId);
 
       // Register on load event to hide the loader and show the play button
       depthPlayer.on('load', showPlayButton);
@@ -123,46 +118,46 @@
 
       });
 
-      document.getElementById('play').addEventListener('click', onPlay, false);
-      window.addEventListener('resize', onWindowResize, false);
-
+      setupEvents();
       animate();
-
     }
 
-    function animate() {
-
+    function animate() 
+    {
       renderer.setAnimationLoop(render);
-
     }
 
-    function render() {
-
+    function render() 
+    {
       renderer.render(scene, camera);
-
     }
 
-    function onWindowResize() {
-
+    function onWindowResize() 
+    {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
-
     }
 
-    function showPlayButton() {
-
+    function showPlayButton() 
+    {
       document.getElementById('loader').style.display = 'none';
       document.getElementById('play').style.display = 'block';
-
     }
 
-    function onPlay() {
+    function setupEvents()
+    {
+      document.getElementById('play').addEventListener('click', onPlay, false);
+      window.addEventListener('resize', onWindowResize, false);
+    }
 
+    function onPlay() 
+    {
       depthPlayer.play();
       document.getElementById('play').style.display = 'none';
-
     }
+
+    init();
   </script>
 </body>
 

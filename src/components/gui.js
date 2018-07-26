@@ -2,7 +2,7 @@ import * as dat from 'dat.gui';
 
 export default class GuiManager {
   constructor() {
-    //Create the gui
+   // Create the gui
     this.gui = new dat.GUI();
 
     this.guiFunctions = {};
@@ -11,7 +11,8 @@ export default class GuiManager {
   add(object, param, rangeMin, rangeMax) {
     if (rangeMin) {
       this.gui.add(object, param, rangeMin, rangeMax);
-    } else {
+    }
+    else {
       this.gui.add(object, param);
     }
   }
@@ -25,7 +26,8 @@ export default class GuiManager {
       if (child == 'x' || child == 'y' || child == 'z') {
         if (folder) {
           this.folder.add(vector, child);
-        } else {
+        }
+        else {
           this.gui.add(vector, child);
         }
       }

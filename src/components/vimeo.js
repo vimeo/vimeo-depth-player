@@ -13,7 +13,7 @@ class API {
 
     this.selectedQuality = quality;
 
-    //Props to be parsed from the API response
+   // Props to be parsed from the API response
     this.type;
     this.fps;
     this.props = {};
@@ -22,34 +22,35 @@ class API {
   }
   requestVideo(vimeoVideoID) {
 
-    //Safeguard the request
+   // Safeguard the request
     if (!vimeoVideoID) {
       console.warn('[Client] Can not request a video without providing a video ID');
       return;
     }
 
-    //The function returns a promise based on the request made inside
+   // The function returns a promise based on the request made inside
     return new Promise((resolve, reject) => {
 
-      //Use the fetch API (returns a promise) and assemble the complete request path - e.g http://myawesomeapp.com/video/vimeo_video_id
+     // Use the fetch API (returns a promise) and assemble the complete request path - e.g http://myawesomeapp.com/video/vimeo_video_id
       fetch(`/video/${vimeoVideoID}`).then(response => {
 
-        //Unpack the response and get the object back using .json() method from the fetch API
+       // Unpack the response and get the object back using .json() method from the fetch API
         response.json().then(obj => {
           if (response.status === 200) {
 
-            //Save the file list of each request to a member object of the instance
+           // Save the file list of each request to a member object of the instance
             if (obj.play == null) {
               reject('[Vimeo] No video file found');
             }
 
             this.files = obj.play;
 
-            //If a JSON was provided in the description then it's a DepthKit take (saved into this.props)
+           // If a JSON was provided in the description then it's a DepthKit take (saved into this.props)
             if (Util.isJSON(obj)) {
               this.props = JSON.parse(obj.description);
               this.type = DepthType.DepthKit;
-            } else {
+            }
+            else {
               this.props = null;
               this.type = DepthType.RealSense;
             }
@@ -57,7 +58,7 @@ class API {
             if (this.selectedQuality == 'auto') {
               if (Util.isiOS()) {
 
-                //Iterate over the files and look for a 720p version in progressive format
+               // Iterate over the files and look for a 720p version in progressive format
                 for (let file in this.files.progressive) {
                   if (this.files.progressive[file].width > 600 && this.files.progressive[file].width < 1000) {
                     this.selectedQuality = this.files.progressive[file].width;
@@ -65,7 +66,8 @@ class API {
                 }
 
                 // this.selectedQuality = 'hls'; // Unfortunetly this will still result in an unsecure opreation on iOS so we can only play progressive files for now
-              } else {
+              }
+              else {
                 this.selectedQuality = 'dash';
               }
               // TODO: if mobile safari, play hls
@@ -76,16 +78,20 @@ class API {
             if (this.selectedQuality == 'hls') {
               if (this.files.hls.link) {
                 this.url = this.files.hls.link;
-              } else {
+              }
+              else {
                 console.warn('[Vimeo] Requested an HLS stream but none was found');
               }
-            } else if (this.selectedQuality == 'dash') {
+            } 
+            else if (this.selectedQuality == 'dash') {
               if (this.files.dash && this.files.dash.link) {
                 this.url = this.files.dash.link;
-              } else {
+              }
+              else {
                 console.warn('[Vimeo] Requested a DASH stream but none was found');
               }
-            } else {
+            } 
+            else {
               /*
                * Progressive currently only supports DepthKit
                * Future developments will support more native depth playback formats
@@ -97,13 +103,13 @@ class API {
 
                   if (file.width === this.selectedQuality) {
 
-                    //Save the link
+                   // Save the link
                     this.url = file.link;
 
-                    //Save the framerate
+                   // Save the framerate
                     this.fps = file.fps;
 
-                    //If DepthKit in different resolutions then the ones specified in the JSON file
+                   // If DepthKit in different resolutions then the ones specified in the JSON file
                     this.props.textureWidth = file.width;
                     this.props.textureHeight = file.height;
                   }
@@ -112,7 +118,7 @@ class API {
             }
 
 
-            //Resolve the promise and return the url for the video and the props object
+           // Resolve the promise and return the url for the video and the props object
             resolve({
               'url': this.url,
               'selectedQuality': this.selectedQuality,
@@ -121,7 +127,8 @@ class API {
               'fps': this.fps
             });
 
-          } else {
+          }
+          else {
             reject(response.status);
           }
         })
