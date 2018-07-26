@@ -6,9 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "concurrently \"nodemon server.js\" \"watchify src/index.js -o dist/vimeo.depth-player.js -v\"",
-    "build": "npm run lint -- --fix; browserify src/index.js | uglifyjs --source-map --output dist/vimeo.depth-player.min.js",
-    "lint": "eslint .",
-    "test": "npm run lint"
+    "build": "npm run test -- --fix; browserify src/index.js | uglifyjs --source-map --output dist/vimeo.depth-player.min.js",
+    "test": "eslint ."
   },
   "author": "Or Fleisher <or@vimeo.com>",
   "license": "MIT",
