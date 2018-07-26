@@ -40,8 +40,8 @@ if (process.env.NODE_ENV !== 'production') {
 
 }
 
-app.get('/playback', (request, response) => {
-  response.render('playback.html');
+app.get('/demo', (request, response) => {
+  response.render('demo.html');
 });
 
 app.get('/resolution', (request, response) => {
