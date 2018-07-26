@@ -48,12 +48,17 @@ depthPlayer = new Vimeo.DepthPlayer('YOUR_VIDEO_ID');
 # Features
 ### Adaptive Playback
 ![playback](https://github.com/vimeo/vimeo-depth-player/blob/library-refactoring/docs/playback.gif)  
-The `Vimeo.DepthPlayer()` supports adaptive playback of volumetric video hosted on Vimeo. Currently, it supports volumetric captures made with [DepthKit](https://depthkit.tv) using the Combined-Per-Pixel export option. It recomended to store the `take.txt` contents in the video description for more accurate 3D reconstruction.
+The `Vimeo.DepthPlayer()` supports adaptive playback of volumetric video hosted on Vimeo.
+- [x] Supports DepthKit volumetric video hosted on Vimeo.
+- [x] Supports adaptive video for fast video delivery and rendering (on supported devices).
 
 ### Livestreaming
 ![livestreaming](https://github.com/vimeo/vimeo-depth-player/blob/library-refactoring/docs/livestreaming.gif)  
-The `Vimeo.DepthPlayer()` also supports adaptive playback of live streamed volumetric video using [Vimeo Live](https://vimeo.com/live) and an Intel RealSense camera (D415/D435). In order to livestream volumetric video you can use our [Depth Viewer](http://github.com/vimeo/depth-viewer) that enables you to use Livestream Studio/OBS to stream an aligned color-depth video. 
-
+The `Vimeo.DepthPlayer()` also supports adaptive playback of live streamed volumetric video using [Vimeo Live](https://vimeo.com/live) and an Intel RealSense camera (D415/D435). 
+- [x] Renders volumetric (color-depth) live streams using Vimeo Live
+- [x] Supports streams captured with an Intel RealSense D415/D435
+- [x] Utilizes adaptive streaming for for smooth video delivery and rendering
+- [x] Tested with [Depth Viewer](http://github.com/vimeo/depth-viewer)
 
 # API
 All the functionality is acsseable after instancing a Vimeo `DepthPlayer` in the following way
