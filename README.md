@@ -6,7 +6,7 @@
 <h4 align="center">A WebVR volumetric video player that uses color-depth based videos hosted on Vimeo.</h4>
 
 <p align="center">
-  <a href="https://travis-ci.org/aframevr/aframe"><img src="https://img.shields.io/travis/aframevr/aframe.svg?style=flat-square" alt="Build Status"></a>
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License">
   <a href="https://codecov.io/gh/aframevr/aframe">
     <img src="https://codecov.io/gh/aframevr/aframe/branch/master/graph/badge.svg" alt="Coverage Status">
   </a>
