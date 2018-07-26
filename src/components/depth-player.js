@@ -1,7 +1,6 @@
 import DepthType from './depth-type';
 import Props from './props';
 import RenderStyle from './render-style';
-import GuiManager from './gui';
 import Util from './util';
 
 // GLSLIFY - bundles all the GLSL code along with the JS
@@ -13,7 +12,7 @@ const EventEmitter = require('event-emitter-es6');
  * TODO add documentation
  */
 
-//For building the geomtery
+// For building the geomtery
 const VERTS_WIDE = 256;
 const VERTS_TALL = 256;
 
@@ -57,8 +56,6 @@ export default class DepthPlayer extends EventEmitter {
       return;
     }
 
-    // this.gui = new GuiManager();
-
     // Load the shaders src
     let rgbdFrag = glsl.file('../shaders/rgbd.frag');
     let rgbdVert = glsl.file('../shaders/rgbd.vert');
@@ -77,7 +74,7 @@ export default class DepthPlayer extends EventEmitter {
     }.bind(this));
 
     // Adaptive DASH playback uses DepthJS
-    if (_selectedQuality == 'dash') {
+    if (_selectedQuality === 'dash') {
       // Create a DASH.js player
       this.video = dashjs.MediaPlayer().create();
       this.video.initialize(this.videoElement, _videoUrl, false);
@@ -178,13 +175,13 @@ export default class DepthPlayer extends EventEmitter {
 
 
 
-    if (_type == DepthType.DepthKit) {
+    if (_type === DepthType.DepthKit) {
       this.material.defines.DEPTH_ORDER = '1.0';
 
       if (_props == null) {
         _props = Props.DepthKit;
       }
-    } else if (_type == DepthType.RealSense) {
+    } else if (_type === DepthType.RealSense) {
       this.material.defines.DEPTH_ORDER = '-1.0';
       if (_props == null) {
         _props = Props.RealSense;
@@ -246,7 +243,7 @@ export default class DepthPlayer extends EventEmitter {
       ex["e00"], ex["e10"], ex["e20"], ex["e30"],
       ex["e01"], ex["e11"], ex["e21"], ex["e31"],
       ex["e02"], ex["e12"], ex["e22"], ex["e32"],
-      ex["e03"], ex["e13"], ex["e23"], ex["e33"],
+      ex["e03"], ex["e13"], ex["e23"], ex["e33"]
     );
 
    // Create the collider
@@ -291,7 +288,7 @@ export default class DepthPlayer extends EventEmitter {
           ex["e00"], ex["e10"], ex["e20"], ex["e30"],
           ex["e01"], ex["e11"], ex["e21"], ex["e31"],
           ex["e02"], ex["e12"], ex["e22"], ex["e32"],
-          ex["e03"], ex["e13"], ex["e23"], ex["e33"],
+          ex["e03"], ex["e13"], ex["e23"], ex["e33"]
         );
 
         // Create the collider
@@ -330,13 +327,14 @@ export default class DepthPlayer extends EventEmitter {
             x + y * VERTS_WIDE,
             x + (y + 1) * VERTS_WIDE,
             (x + 1) + y * (VERTS_WIDE)
-          ));
+        ));
+        
         DepthPlayer.geo.faces.push(
           new THREE.Face3(
             x + 1 + y * VERTS_WIDE,
             x + (y + 1) * VERTS_WIDE,
             (x + 1) + (y + 1) * (VERTS_WIDE)
-          ));
+        ));
       }
     }
   }
