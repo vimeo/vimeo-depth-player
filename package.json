@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "description": "A WebVR volumetric video player that uses color-depth based videos hosted on Vimeo.",
   "main": "server.js",
+  "engines" : { 
+    "node" : ">=0.12"
+  },
   "scripts": {
     "start": "node server.js",
     "dev": "concurrently \"nodemon server.js\" \"watchify src/index.js -o dist/vimeo.depth-player.js -v\"",
