@@ -2,11 +2,20 @@
 <p align="center">
 <img src="https://raw.githubusercontent.com/vimeo/vimeo-depth-player/library-refactoring/docs/webvr_small.gif?token=AAJhwWgAm6TGq5tvMZS_8puOgjbKedDeks5bYxduwA%3D%3D" alt="A GIF of a volumetric WebVR demo" height="330" />
 </p>
-**A WebVR volumetric video player that uses color-depth based videos hosted on Vimeo.**
 
-![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square) <a href="https://glitch.com/edit/#!/remix/vimeo-depth-player-playback" target="_blank">
-  <img src="https://cdn.glitch.com/2bdfb3f8-05ef-4035-a06e-2043962a3a13%2Fremix%402x.png?1513093958726" alt="remix button" aria-label="remix" height="23">
-</a>
+<h4 align="center">A WebVR volumetric video player that uses color-depth based videos hosted on Vimeo.</h4>
+
+<p align="center">
+  <a href="https://travis-ci.org/aframevr/aframe"><img src="https://img.shields.io/travis/aframevr/aframe.svg?style=flat-square" alt="Build Status"></a>
+  <a href="https://codecov.io/gh/aframevr/aframe">
+    <img src="https://codecov.io/gh/aframevr/aframe/branch/master/graph/badge.svg" alt="Coverage Status">
+  </a>
+  <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="PRs Welcome">
+  <a href="https://glitch.com/edit/#!/remix/vimeo-depth-player-playback">
+    <img src="https://cdn.glitch.com/2bdfb3f8-05ef-4035-a06e-2043962a3a13%2Fremix%402x.png?1513093958726" alt="remix button" aria-label="remix" height="23" alt="Glitch">
+  </a>
+</p>
+
 
 # Overview
 - [Requirements](#requirements)
