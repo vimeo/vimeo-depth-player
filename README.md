@@ -28,10 +28,10 @@
 If you're unfamiliar with setting up Node, the easiest way to get started is to just remix our demos on Glitch (click the GIFs).
 
 <a href="https://vimeo-depth-player-playback.glitch.me/">
-  <img alt="Demo" target="_blank" src="https://i.imgur.com/KB9D16o.gif" height="260" width="49%">
+  <img alt="Demo" target="_blank" src="https://i.imgur.com/KB9D16o.gif" height="270" width="49%">
 </a>
 <a href="https://vimeo-volumetric-video-livestreaming.glitch.me">
-  <img alt="Livestreaming demo" target="_blank" src="https://i.imgur.com/IO21VAX.gif" height="260" width="49%">
+  <img alt="Livestreaming demo" target="_blank" src="https://i.imgur.com/IO21VAX.gif" height="270" width="49%">
 </a>
 
 To quickly get started you can download our demo assets from [here](https://vimeo.com/279527916) (using a [Depthkit](https://depthkit.tv) produced asset)  or [here](https://vimeo.com/280565863) (our archived livestream using a IntelReal Sense camera) and upload them into your Vimeo account. Copy descriptions of the videos on Vimeo as well - it's our hacky way of storing config information. Make sure you check out the [requirements section](#requirements).
