@@ -1,13 +1,14 @@
 {
-  "name": "vimeo_volumetric_video",
+  "name": "vimeo_depth_player",
   "version": "0.0.1",
-  "description": "A volumetric video player for playing back color-depth videos hosted on Vimeo",
+  "description": "A WebVR volumetric video player that uses color-depth based videos hosted on Vimeo.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "concurrently \"nodemon server.js\" \"watchify src/index.js -o dist/vimeo.depth-player.js -v\"",
-    "build": "browserify src/index.js | uglifyjs --source-map --output dist/vimeo.depth-player.min.js",
-    "test": "npm run build"
+    "build": "npm run lint -- --fix; browserify src/index.js | uglifyjs --source-map --output dist/vimeo.depth-player.min.js",
+    "lint": "eslint .",
+    "test": "npm run lint"
   },
   "author": "Or Fleisher <or@vimeo.com>",
   "license": "MIT",
@@ -26,9 +27,13 @@
     "concurrently": "^3.5.1",
     "dat.gui": "^0.7.2",
     "dotenv": "^6.0.0",
+    "eslint": "^5.2.0",
+    "eslint-config-prettier": "^2.9.0",
+    "eslint-config-strongloop": "^2.1.0",
     "event-emitter-es6": "^1.1.5",
     "glslify": "^6.1.0",
     "nodemon": "^1.14.12",
+    "prettier": "1.13.7",
     "uglify-js": "^3.3.9",
     "watchify": "^3.10.0"
   },

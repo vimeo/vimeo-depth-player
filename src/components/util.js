@@ -23,14 +23,12 @@ class Util {
   }
 
   static runDisplayHelpers() {
-    if (Sandbox.Util.isiOS()) {
       var iosEls = document.querySelectorAll('[data-is-ios]');
       for (let i = 0; i < iosEls.length; i++) {
         iosEls[i].style.display = 'block';
       }
     }
 
-    if (!Sandbox.Util.isMobile()) {
       var els = document.querySelectorAll('[data-is-desktop]');
       for (let i = 0; i < els.length; i++) {
         els[i].style.display = 'block';

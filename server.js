@@ -18,8 +18,8 @@ app.set('views', __dirname + '/examples');
 // CORS headers
 app.use(function(req, res, next) {
   console.log(`[Server] A ${req.method} request was made to ${req.url}`);
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
 });
 
@@ -31,13 +31,10 @@ app.use(function(req, res, next) {
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').load();
   if (process.env.VIMEO_TOKEN) {
-      console.log('[Server] enviorment variables loaded from .env file 💪🏻');
+    console.log('[Server] Enviorment variables loaded from .env 💪🏻');
+  } else {
+    console.log('[Server] Could not find a VIMEO_TOKEN. Make sure you have a .env file or enviorment variable with the token');
   }
-  else {
-    console.log('[Server] could not load the Vimeo token, make sure you have a .env file or enviorment variable with the token');
-    return;
-  }
-
 }
 
 app.get('/demo', (request, response) => {
@@ -61,33 +58,32 @@ app.get('/video/:id', (request, response) => {
   api.request({
     method: 'GET',
     path: `/videos/${request.params.id}`,
-    headers: { 'Accept': 'application/vnd.vimeo.*+json;version=3.4' },
+    headers: { Accept: 'application/vnd.vimeo.*+json;version=3.4' },
   },
   function(error, body, status_code, headers) {
     if (error) {
       response.status(500).send(error);
       console.log('[Server] ' + error);
-    }
-    else {
-      if (body["play"] == null) {
+    } else {
+      if (body['play'] == null) {
         response.status(401).send({ error: "You don't have access to this video's files." });
         return;
       }
 
       // Sort the resolutions from highest to lowest
-      if (body["play"]["progressive"]) {
-        body["play"]["progressive"] = body["play"]["progressive"].sort(function(a, b) {
-          if (parseInt(a['height']) > parseInt(b['height'])) return -1;
+      if (body['play']['progressive']) {
+        body['play']['progressive'] = body['play']['progressive'].sort(function(a, b) {
+          if (parseInt(a['height'], 10) > parseInt(b['height'], 10)) return -1;
           return 1;
         });
       }
 
       // Unfurl the Live links to hack around CORS issues
-      if (body.live && body.live.status == "streaming") {
+      if (body.live && body.live.status === 'streaming') {
         var sync_req = require('sync-request');
 
         body.play.dash.link = sync_req('GET', body.play.dash.link).url;
-        body.play.hls.link  = sync_req('GET', body.play.hls.link).url;
+        body.play.hls.link = sync_req('GET', body.play.hls.link).url;
       }
 
       response.status(200).send(body);
