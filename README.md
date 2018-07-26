@@ -70,10 +70,14 @@ All the functionality is acsseable after instancing a Vimeo `DepthPlayer` in the
 var depthPlayer = new Vimeo.DepthPlayer('YOUR_VIDEO_ID');
 ```
 Here is a list of all the parameters you can provide to the `Vimeo.DepthPlayer()` constructor:
-1. `_vimeoVideoId` (required) - The first parameter must be provided and describes the Vimeo video ID
-2. `_videoQuality` - Default is `auto` which will try to establish an adaptive stream (i.e Dash stream), you can specifiy a fixed width by providing a number instead.
-3. `_depthType` - An enum desciring the depth encoding type. Currently you can choose between `Vimeo.DepthType.DepthKit` or `Vimeo.DepthType.RealSense`.
-4. `_depthStyle` - An enum desciring the depth rendering style. Default is `Vimeo.RenderStyle.Points`. Optionally you can use `Vimeo.RenderStyle.Mesh` or `Vimeo.RenderStyle.Wire`.
+```js
+Vimeo.DepthPlayer(
+  `_vimeoVideoId`, // (required) - The first parameter must be provided and describes the Vimeo video ID
+  `_videoQuality`, // Default is `auto` which will try to establish an adaptive stream, you can specifiy a fixed width by providing a number instead.
+  `_depthType`, // An enum desciring the depth encoding type. Currently you can choose between `Vimeo.DepthType.DepthKit` or `Vimeo.DepthType.RealSense`.
+  `_depthStyle`,  // An enum desciring the depth rendering style. Default is `Vimeo.RenderStyle.Points`. Optionally you can use `Vimeo.RenderStyle.Mesh` or `Vimeo.RenderStyle.Wire`.
+);
+```
 
 ### Depth player methods
 
