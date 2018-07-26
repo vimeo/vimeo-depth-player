@@ -1,64 +1,52 @@
-//Import the vimeo.js library
+// Vimeo.js
 const Vimeo = require('vimeo').Vimeo;
 
-// Import the express library and create an express app
+// Express.js
 const express = require('express');
-const expressLayouts = require('express-ejs-layouts');
-const cors = require('cors')
 const app = express();
 
-// Render engine setup
-var path = require('path');
-app.use(express.static('public'));
-app.set('view engine', 'ejs');
-app.use(expressLayouts);
+// ejs
+const ejs = require('ejs');
 
-// Event emitter 
-app.use(require('event-emitter-es6/router'));
+// Render engine for the express server
+app.use(express.static('assets'));
+app.use(express.static('dist'));
+app.engine('.html', ejs.__express);
+app.set('view-engine', 'html');
+app.set('views', __dirname + '/examples');
 
-//Setup cors
-app.use(cors());
-
+// CORS headers
 app.use(function(req, res, next) {
   console.log(`[Server] A ${req.method} request was made to ${req.url}`);
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
 });
 
-// If working locally load the enviorment variables which are inside the .env file
+/*
+* Vimeo token for local development is saved in a .env file
+* For deployment make sure to store it in an enviorment
+* variable called VIMEO_TOKEN=4trwegfudsbg4783724343
+*/
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').load();
-  console.log('[Server] enviorment variables loaded from .env file 💪🏻');
+  if (process.env.VIMEO_TOKEN) {
+    console.log('[Server] Enviorment variables loaded from .env 💪🏻');
+  } else {
+    console.log('[Server] Could not find a VIMEO_TOKEN. Make sure you have a .env file or enviorment variable with the token');
+  }
 }
 
-/*
-* Public Routes
-* - /
-* - /experiments    # homepage
-* - /experiments/:project
-* - /experiments/:project/:video_id
-* - /:video_id
-*/
-
-app.get('/', (request, response) => {
-  response.render('index', { layout: false });
+app.get('/demo', (request, response) => {
+  response.render('demo.html');
 });
 
-app.get('/experiments', (request, response) => {
-  response.render('experiments');
+app.get('/resolution', (request, response) => {
+  response.render('resolution.html');
 });
 
-app.get('/experiments/:project', (request, response) => {
-  response.render('experiments/' + request.params.project, { video_id: null });
-});
-
-app.get('/experiments/:project/:video_id', (request, response) => {
-  response.render('experiments/' + request.params.project, { video_id: request.params.video_id });
-});
-
-app.get('/:video_id', (request, response) => {
-  response.render('video', { video_id: request.params.video_id });
+app.get('/live', (request, response) => {
+  response.render('live.html');
 });
 
 // The route for getting videos from the vimeo API
@@ -70,33 +58,32 @@ app.get('/video/:id', (request, response) => {
   api.request({
     method: 'GET',
     path: `/videos/${request.params.id}`,
-    headers: { 'Accept': 'application/vnd.vimeo.*+json;version=3.4' },
+    headers: { Accept: 'application/vnd.vimeo.*+json;version=3.4' },
   },
   function(error, body, status_code, headers) {
     if (error) {
       response.status(500).send(error);
       console.log('[Server] ' + error);
-    }
-    else {
-      if (body["play"] == null) {
+    } else {
+      if (body['play'] == null) {
         response.status(401).send({ error: "You don't have access to this video's files." });
         return;
       }
 
       // Sort the resolutions from highest to lowest
-      if (body["play"]["progressive"]) {
-        body["play"]["progressive"] = body["play"]["progressive"].sort(function(a, b) {
-          if (parseInt(a['height']) > parseInt(b['height'])) return -1;
+      if (body['play']['progressive']) {
+        body['play']['progressive'] = body['play']['progressive'].sort(function(a, b) {
+          if (parseInt(a['height'], 10) > parseInt(b['height'], 10)) return -1;
           return 1;
         });
       }
 
       // Unfurl the Live links to hack around CORS issues
-      if (body.live && body.live.status == "streaming") {
+      if (body.live && body.live.status === 'streaming') {
         var sync_req = require('sync-request');
 
         body.play.dash.link = sync_req('GET', body.play.dash.link).url;
-        body.play.hls.link  = sync_req('GET', body.play.hls.link).url;
+        body.play.hls.link = sync_req('GET', body.play.hls.link).url;
       }
 
       response.status(200).send(body);
