@@ -51,9 +51,6 @@
     // Vimeo Depth Player instance
     var depthPlayers = [];
 
-    // Set Vimeo video id we want to play
-    var vimeoVideoId = 274161280;
-
     function init() 
     {
       // Setup scene
@@ -94,7 +91,7 @@
       // Create the vimeo api instance directly so we can use all the videos in the response instead of just one
       var vimeoAPI = new Vimeo.API();
 
-      vimeoAPI.requestVideo(vimeoVideoId).then(function(response) {
+      vimeoAPI.requestVideo('274161280').then(function(response) {
         for (var i = 0; i < vimeoAPI.files.progressive.length; i++) {
 
           // Correct the texture sizes based on the current resolution

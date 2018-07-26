@@ -50,9 +50,6 @@
     // Vimeo Depth Player instance
     var depthPlayer;
 
-    // Set Vimeo video id we want to play
-    var vimeoVideoId = 274161280;
-
     function init() 
     {
       // Setup scene
@@ -85,7 +82,7 @@
       document.body.appendChild(renderer.domElement);
 
       // Create a new Vimeo Depth Player instance with the video ID as the first parameter (string)
-      depthPlayer = new Vimeo.DepthPlayer(vimeoVideoId);
+      depthPlayer = new Vimeo.DepthPlayer('274161280');
 
       // Register on load event to hide the loader and show the play button
       depthPlayer.on('load', showPlayButton);

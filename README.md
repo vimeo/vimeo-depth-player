@@ -47,7 +47,7 @@ To quickly get started you can download our demo assets from [here](https://vime
 ```
 VIMEO_TOKEN=406cea4d4xxxxxxxxxxe437756d036f5
 ```
-3. In the examples folder swap your volumetric Vimeo video id with the one provided in the `examples/playback.html`
+3. In the examples folder swap your volumetric Vimeo video id with the one provided in the `examples/demo.html`
 ```js
 depthPlayer = new Vimeo.DepthPlayer('YOUR_VIDEO_ID');
 ```
