@@ -1,7 +1,7 @@
 <h1 align="center">Vimeo Depth Player</h1>
-
-<img align="center" src="https://raw.githubusercontent.com/vimeo/vimeo-depth-player/library-refactoring/docs/webvr_small.gif?token=AAJhwWgAm6TGq5tvMZS_8puOgjbKedDeks5bYxduwA%3D%3D" alt="A GIF of a volumetric WebVR demo" height="330" />
-
+<p align="center">
+<img src="https://raw.githubusercontent.com/vimeo/vimeo-depth-player/library-refactoring/docs/webvr_small.gif?token=AAJhwWgAm6TGq5tvMZS_8puOgjbKedDeks5bYxduwA%3D%3D" alt="A GIF of a volumetric WebVR demo" height="330" />
+</p>
 **A WebVR volumetric video player that uses color-depth based videos hosted on Vimeo.**
 
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square) <a href="https://glitch.com/edit/#!/remix/vimeo-depth-player-playback" target="_blank">
