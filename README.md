@@ -1,6 +1,6 @@
 <h1 align="center">Vimeo Depth Player</h1>
 <p align="center">
-<img src="https://raw.githubusercontent.com/vimeo/vimeo-depth-player/library-refactoring/docs/webvr_small.gif?token=AAJhwWgAm6TGq5tvMZS_8puOgjbKedDeks5bYxduwA%3D%3D" alt="A GIF of a volumetric WebVR demo" height="330" />
+<img src="https://i.imgur.com/xuXsLJC.gif" alt="A GIF of a volumetric WebVR demo" height="330" />
 </p>
 
 <h4 align="center">A WebVR volumetric video player that uses color-depth based videos hosted on Vimeo.</h4>
@@ -28,8 +28,6 @@
 
 
 # Getting started
-If you're unfamiliar with setting up Node, the easiest way to get started is to just remix our demos on Glitch (click the GIFs).
-
 <a href="https://vimeo-depth-player-playback.glitch.me/">
   <img alt="Demo" target="_blank" src="https://i.imgur.com/KB9D16o.gif" height="270" width="49%">
 </a>
@@ -49,7 +47,9 @@ First you'll need a video to test with on your Vimeo account. You can download o
 > Note: In order to stream Vimeo videos, you will need direct video file access via the Vimeo API. Accessing video files via API is limited to Vimeo Pro and Business customers.
 
 ### Glitch setup
-1. Hit the remix button, or click one of the GIFs shown above
+If you're unfamiliar with setting up Node, the easiest way to get started is to just remix our demos on Glitch (click the GIFs above).
+
+1. [Click here](https://glitch.com/edit/#!/remix/vimeo-depth-player-playback) to Remix the demo on Glitch
 2. We will need to use the Vimeo API so that we can grab the video files directly for WebGL to use. To make your life easy, we [made this handy link which will generate the token for you](https://vimeo-authy.herokuapp.com/auth/vimeo/webgl). Once you have authorized the app, it will give you a token so you can paste into the `.env` file. If you're running this locally, create a `.env` file in your root folder. Your `.env` file should now look something like this:
 ```
 VIMEO_TOKEN=406cea4d4xxxxxxxxxxe437756d036f5
@@ -72,14 +72,17 @@ VIMEO_TOKEN=asfa733240239qwerfhuasf
 depthPlayer = new Vimeo.DepthPlayer('YOUR_VIDEO_ID');
 ```
 
+### Example demos
+* `examples/demo.html` - A simple volumetric demo that also includes a background 3D model.
+* `examples/live.html` - Almost identical to `demo.html` just different assets. We included this just to show what we used in our [livestreaming volumetric demo](https://vimeo.com/280815263#t=8395s).
+* `examples/resolution.html` - This shows you how to select different video resolutions for playback.
+
 # Features
 
 - [x] Supports DepthKit volumetric video hosted on Vimeo.
-- [x] Supports adaptive video for fast video delivery and rendering (on supported browsers and mobile devices).
-- [x] Renders volumetric (color-depth) live streams using Vimeo Live
+- [x] Supports adaptive video (HLS/DASH) for fast video delivery and rendering (on supported browsers and mobile devices).
+- [x] Leverage our [Depth Viewer](http://github.com/vimeo/depth-viewer) to livestream volumetric video (color-depth) using Vimeo Live
 - [x] Supports streams captured with an Intel RealSense D415/D435
-- [x] Utilizes adaptive streaming for for smooth video delivery and rendering
-- [x] Tested with [Depth Viewer](http://github.com/vimeo/depth-viewer)
 
 # API
 All the functionality is acsseable after instancing a Vimeo `DepthPlayer` in the following way
