@@ -20,7 +20,6 @@
 - [Getting started](#getting-started)
 - [Features](#features)
 - [API](#api)
-- [Development](#development)
 
 # Requirements
 * Requires a [Vimeo Pro account](https://vimeo.com) or higher. 
