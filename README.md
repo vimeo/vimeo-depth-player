@@ -4,7 +4,7 @@
 </p>
 
 <h4 align="center">A WebVR volumetric video player that uses color-depth based videos hosted on Vimeo.</h4>
-<p align="center">This repository consists of tools and demos presetned at the Volumetric Filmmaking meetup at NYC.<br> Watch the <a href="https://vimeo.com/280815263#t=7836s">live-stream from the meetup</a>, or checkout the <a href="https://github.com/vimeo/vimeo-depth-viewer">Depth Viewer repository</a>.</p>
+<p align="center">This repository consists of tools and demos presetned at the Volumetric Filmmaking meetup at NYC.<br> Watch the <a href="https://vimeo.com/280815263#t=7836s">livestream from the meetup</a> or check out the <a href="https://github.com/vimeo/vimeo-depth-viewer">depth viewer repository</a>.</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License">
