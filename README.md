@@ -28,12 +28,8 @@
 
 
 # Getting started
-<a href="https://vimeo-depth-player-playback.glitch.me/">
-  <img alt="Demo" target="_blank" src="https://i.imgur.com/KB9D16o.gif" height="270" width="49%">
-</a>
-<a href="https://vimeo-volumetric-video-livestreaming.glitch.me">
-  <img alt="Livestreaming demo" target="_blank" src="https://i.imgur.com/IO21VAX.gif" height="270" width="49%">
-</a>
+<a href="https://vimeo-depth-player-playback.glitch.me/"><img alt="Demo" target="_blank" src="https://i.imgur.com/KB9D16o.gif" height="270" width="49%"></a>
+<a href="https://vimeo-volumetric-video-livestreaming.glitch.me"><img alt="Livestreaming demo" target="_blank" src="https://i.imgur.com/IO21VAX.gif" height="270" width="49%"></a>
 <i>Check out our <a href="https://vimeo-depth-player-playback.glitch.me/">volumetric playback</a> and <a href="https://vimeo-volumetric-video-livestreaming.glitch.me">volumetric live-streaming</a> demos.</i>
 
 ### Upload a depth video
