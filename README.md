@@ -58,25 +58,26 @@ depthPlayer = new Vimeo.DepthPlayer('YOUR_VIDEO_ID');
 
 ### Node.js setup
 1. Download or clone the repository, `git clone https://github.com/vimeo/vimeo-depth-player.git`
-2. Generate a token for your Vimeo account here and save the token into a `.env` file in the root folder of the repository.
+2. [Generate a token](https://vimeo-authy.herokuapp.com/auth/vimeo/webgl) for your Vimeo account here and save the token into a `.env` file in the root folder of the repository. It should look something like this:
 ```sh
 VIMEO_TOKEN=asfa733240239qwerfhuasf
+PORT=5000
 ```
 3. Install all dependencies by running `npm install` inside the repository folder
-4. Run the server, `npm run start`
+4. Run the server, `npm run dev`
 5. In the examples folder swap your volumetric Vimeo video id with the one provided in the `examples/demo.html`
 ```js
 depthPlayer = new Vimeo.DepthPlayer('YOUR_VIDEO_ID');
 ```
 
 ### Example demos
-* `examples/demo.html` - A simple volumetric demo that also includes a background 3D model.
-* `examples/live.html` - Almost identical to `demo.html` just different assets. We included this just to show what we used in our [livestreaming volumetric demo](https://vimeo.com/280815263#t=8395s).
-* `examples/resolution.html` - This shows you how to select different video resolutions for playback.
+* `localhost:5000/demo` - A simple volumetric demo that also includes a background 3D model.
+* `localhost:5000/live` - Almost identical to `demo.html` just different assets. We included this just to show what we used in our [livestreaming volumetric demo](https://vimeo.com/280815263#t=8395s).
+* `localhost:5000/resolution` - This shows you how to select different video resolutions for playback.
 
 # Features
 
-- [x] Supports DepthKit volumetric video hosted on Vimeo.
+- [x] Supports Depthkit volumetric video hosted on Vimeo.
 - [x] Supports adaptive video (HLS/DASH) for fast video delivery and rendering (on supported browsers and mobile devices).
 - [x] Leverage our [Depth Viewer](http://github.com/vimeo/depth-viewer) to livestream volumetric video (color-depth) using Vimeo Live
 - [x] Supports streams captured with an Intel RealSense D415/D435
@@ -117,4 +118,4 @@ Make pull requests, file bug reports, and make feature requests via a [GitHub is
 Working on a cool video project? [Let's talk!](mailto:labs@vimeo.com)
 
 # Thanks
-Special thanks to [three.js](https://github.com/mrdoob/three.js), [DepthKit](https://depthkit.tv) and [DepthKit.js](https://github.com/juniorxsound/DepthKit.js)
+Special thanks to [three.js](https://github.com/mrdoob/three.js), [Depthkit](https://depthkit.tv) and [Depthkit.js](https://github.com/juniorxsound/DepthKit.js)

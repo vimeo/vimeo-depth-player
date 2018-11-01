@@ -37,6 +37,10 @@ if (process.env.NODE_ENV !== 'production') {
   }
 }
 
+app.get('/', (request, response) => {
+  response.render('demo.html');
+});
+
 app.get('/demo', (request, response) => {
   response.render('demo.html');
 });
