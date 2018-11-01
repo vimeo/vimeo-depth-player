@@ -56,7 +56,7 @@ class API {
             if (this.selectedQuality === 'auto') {
               console.log(obj);
               if (Util.isiOS()) {
-                if (obj.live.status == 'streaming') {
+                if (obj.live.status === 'streaming') {
                   this.selectedQuality = 'hls'; // Unfortunetly this will still result in an unsecure opreation on iOS so we can only play progressive files for now
                 } else {
                   this.selectedQuality = 'progressive';
