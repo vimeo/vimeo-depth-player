@@ -63,12 +63,13 @@ export default class DepthPlayer extends EventEmitter {
     this.videoElement.id = 'vimeo-depth-player'; // TODO Must be unique ID
     this.videoElement.crossOrigin = 'anonymous';
     this.videoElement.setAttribute('crossorigin', 'anonymous');
-    this.videoElement.autoplay = false;
+    this.videoElement.muted = true;
+    this.videoElement.autoplay = true;
     this.videoElement.loop = true;
 
     // When the video is done loading, trigger the load event
     this.videoElement.addEventListener('loadeddata', function() {
-      if (this.videoElement.readyState >= 3) {
+      if (this.videoElement.readyState >= 2) {
         this.emit('load');
       }
     }.bind(this));
@@ -172,8 +173,6 @@ export default class DepthPlayer extends EventEmitter {
 
    // Make the shader material double sided
     this.material.side = THREE.DoubleSide;
-
-
 
     if (_type === DepthType.DepthKit) {
       this.material.defines.DEPTH_ORDER = '1.0';

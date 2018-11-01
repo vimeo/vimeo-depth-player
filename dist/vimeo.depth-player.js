@@ -376,12 +376,13 @@ var DepthPlayer = function (_EventEmitter) {
       this.videoElement.id = 'vimeo-depth-player'; // TODO Must be unique ID
       this.videoElement.crossOrigin = 'anonymous';
       this.videoElement.setAttribute('crossorigin', 'anonymous');
-      this.videoElement.autoplay = false;
+      this.videoElement.muted = true;
+      this.videoElement.autoplay = true;
       this.videoElement.loop = true;
 
       // When the video is done loading, trigger the load event
       this.videoElement.addEventListener('loadeddata', function () {
-        if (this.videoElement.readyState >= 3) {
+        if (this.videoElement.readyState >= 2) {
           this.emit('load');
         }
       }.bind(this));
@@ -1032,18 +1033,20 @@ var API = function () {
                 _this.props = null;
                 _this.type = _depthType2.default.RealSense;
               }
-
               if (_this.selectedQuality === 'auto') {
+                console.log(obj);
                 if (_util2.default.isiOS()) {
-
-                  // Iterate over the files and look for a 720p version in progressive format
-                  for (var file in _this.files.progressive) {
-                    if (_this.files.progressive[file].width > 600 && _this.files.progressive[file].width < 1000) {
-                      _this.selectedQuality = _this.files.progressive[file].width;
+                  if (obj.live.status == 'streaming') {
+                    _this.selectedQuality = 'hls'; // Unfortunetly this will still result in an unsecure opreation on iOS so we can only play progressive files for now
+                  } else {
+                    _this.selectedQuality = 'progressive';
+                    // Iterate over the files and look for a 720p version in progressive format
+                    for (var file in _this.files.progressive) {
+                      if (_this.files.progressive[file].width > 600 && _this.files.progressive[file].width < 1000) {
+                        _this.selectedQuality = _this.files.progressive[file].width;
+                      }
                     }
                   }
-
-                  // this.selectedQuality = 'hls'; // Unfortunetly this will still result in an unsecure opreation on iOS so we can only play progressive files for now
                 } else {
                   _this.selectedQuality = 'dash';
                 }

@@ -53,18 +53,20 @@ class API {
               this.props = null;
               this.type = DepthType.RealSense;
             }
-
             if (this.selectedQuality === 'auto') {
+              console.log(obj);
               if (Util.isiOS()) {
-
-                // Iterate over the files and look for a 720p version in progressive format
-                for (let file in this.files.progressive) {
-                  if (this.files.progressive[file].width > 600 && this.files.progressive[file].width < 1000) {
-                    this.selectedQuality = this.files.progressive[file].width;
+                if (obj.live.status == 'streaming') {
+                  this.selectedQuality = 'hls'; // Unfortunetly this will still result in an unsecure opreation on iOS so we can only play progressive files for now
+                } else {
+                  this.selectedQuality = 'progressive';
+                  // Iterate over the files and look for a 720p version in progressive format
+                  for (let file in this.files.progressive) {
+                    if (this.files.progressive[file].width > 600 && this.files.progressive[file].width < 1000) {
+                      this.selectedQuality = this.files.progressive[file].width;
+                    }
                   }
                 }
-
-                // this.selectedQuality = 'hls'; // Unfortunetly this will still result in an unsecure opreation on iOS so we can only play progressive files for now
               } else {
                 this.selectedQuality = 'dash';
               }

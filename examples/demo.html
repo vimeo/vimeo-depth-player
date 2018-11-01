@@ -5,12 +5,15 @@
   <title>Volumetric Video Demo - Vimeo</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  
+  <meta http-equiv="Content-Security-Policy"  
+  content="default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src *; style-src * 'unsafe-inline';"> 
 
   <link rel="icon" href="media/favicon.ico">
   <link rel="stylesheet" type="text/css" href="/css/client.css" />
 
   <script type="text/javascript" src="/js/dash.all.min.js"></script> <!-- Dash.js for playing back adaptive video -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/94/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/95/three.min.js"></script>
   <script type="text/javascript" src="/js/gltfloader.js"></script>
   <script type="text/javascript" src="/js/webvr.js"></script>
   <script type="text/javascript" src="/js/orbitcontrols.js"></script>

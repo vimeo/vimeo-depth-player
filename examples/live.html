@@ -82,7 +82,7 @@
       document.body.appendChild(renderer.domElement);
 
       // Create a new Vimeo Depth Player instance with the video ID as the first parameter (string)
-      depthPlayer = new Vimeo.DepthPlayer('280565863');
+      depthPlayer = new Vimeo.DepthPlayer('298414062');
 
       // Register on load event to hide the loader and show the play button
       depthPlayer.on('load', showPlayButton);
@@ -93,9 +93,9 @@
       // Load the video and add the mesh to the scene
       depthPlayer.load().then(function(response) {
 
-        if (!depthPlayer.videoUrl) {
-          alert('Video is not live yet!');
-        }
+        // if (!depthPlayer.videoUrl) {
+        //   alert('Video is not live yet!');
+        // }
 
         depthPlayer.mesh.rotation.z = -Math.PI / 2;
         depthPlayer.mesh.scale.set(0.85, 0.85, 0.85);
