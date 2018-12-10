@@ -19,7 +19,8 @@
     "express": "^4.16.4",
     "sync-request": "^6.0.0",
     "three": "^0.89.0",
-    "vimeo": "^2.1.1"
+    "vimeo": "^2.1.1",
+    "cached-path-relative": ">=1.0.2"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
