@@ -3,8 +3,8 @@
   "version": "0.0.1",
   "description": "A WebVR volumetric video player that uses color-depth based videos hosted on Vimeo.",
   "main": "server.js",
-  "engines" : { 
-    "node" : ">=0.12"
+  "engines": {
+    "node": ">=0.12"
   },
   "scripts": {
     "start": "node server.js",
@@ -16,27 +16,27 @@
   "license": "MIT",
   "dependencies": {
     "ejs": "^2.6.1",
-    "express": "^4.16.2",
+    "express": "^4.16.4",
     "sync-request": "^6.0.0",
     "three": "^0.89.0",
-    "vimeo": "^2.0.2"
+    "vimeo": "^2.1.1"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babelify": "^8.0.0",
     "browserify": "^15.2.0",
-    "concurrently": "^3.5.1",
-    "dat.gui": "^0.7.2",
-    "dotenv": "^6.0.0",
-    "eslint": "^5.2.0",
-    "eslint-config-prettier": "^2.9.0",
+    "concurrently": "^3.6.1",
+    "dat.gui": "^0.7.3",
+    "dotenv": "^6.2.0",
+    "eslint": "^5.10.0",
+    "eslint-config-prettier": "^2.10.0",
     "eslint-config-strongloop": "^2.1.0",
     "event-emitter-es6": "^1.1.5",
-    "glslify": "^6.1.0",
-    "nodemon": "^1.14.12",
+    "glslify": "^6.4.1",
+    "nodemon": "^1.18.7",
     "prettier": "1.13.7",
-    "uglify-js": "^3.3.9",
+    "uglify-js": "^3.4.9",
     "watchify": "^3.10.0"
   },
   "browserify": {
