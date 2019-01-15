@@ -544,17 +544,28 @@ var DepthPlayer = function (_EventEmitter) {
     key: 'loadPropsFromObject',
     value: function loadPropsFromObject(object) {
       // Update the shader based on the properties from the JSON
-      this.material.uniforms.width.value = object.textureWidth;
-      this.material.uniforms.height.value = object.textureHeight;
+      if (object.textureWidth || object.textureHeight) {
+        this.material.uniforms.width.value = object.textureWidth;
+        this.material.uniforms.height.value = object.textureHeight;
+      } else {
+        this.material.uniforms.width.value = object.depthImageSize.x;
+        this.material.uniforms.height.value = object.depthImageSize.y * 2;
+      }
+
       this.material.uniforms.mindepth.value = object.nearClip;
       this.material.uniforms.maxdepth.value = object.farClip;
       this.material.uniforms.focalLength.value = object.depthFocalLength;
       this.material.uniforms.principalPoint.value = object.depthPrincipalPoint;
       this.material.uniforms.imageDimensions.value = object.depthImageSize;
-      this.material.uniforms.crop.value = object.crop;
+
+      if (object.crop) {
+        this.material.uniforms.crop.value = object.crop;
+      }
 
       var ex = object.extrinsics;
-      this.material.uniforms.extrinsics.value.set(ex["e00"], ex["e10"], ex["e20"], ex["e30"], ex["e01"], ex["e11"], ex["e21"], ex["e31"], ex["e02"], ex["e12"], ex["e22"], ex["e32"], ex["e03"], ex["e13"], ex["e23"], ex["e33"]);
+      if (ex) {
+        this.material.uniforms.extrinsics.value.set(ex["e00"], ex["e10"], ex["e20"], ex["e30"], ex["e01"], ex["e11"], ex["e21"], ex["e31"], ex["e02"], ex["e12"], ex["e22"], ex["e32"], ex["e03"], ex["e13"], ex["e23"], ex["e33"]);
+      }
 
       // Create the collider
       var boxGeo = new THREE.BoxGeometry(object.boundsSize.x, object.boundsSize.y, object.boundsSize.z);
