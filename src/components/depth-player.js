@@ -227,12 +227,12 @@ export default class DepthPlayer extends EventEmitter {
 
   loadPropsFromObject(object) {
     // Update the shader based on the properties from the JSON
-    if (!object.textureWidth || !object.textureHeight) {
-      this.material.uniforms.width.value = object.depthImageSize.x;
-      this.material.uniforms.height.value = object.depthImageSize.y * 2;
-    } else {
+    if (object.textureWidth || object.textureHeight) { 
       this.material.uniforms.width.value = object.textureWidth;
       this.material.uniforms.height.value = object.textureHeight;
+    } else {
+      this.material.uniforms.width.value = object.depthImageSize.x;
+      this.material.uniforms.height.value = object.depthImageSize.y * 2;
     }
     
     this.material.uniforms.mindepth.value = object.nearClip;
