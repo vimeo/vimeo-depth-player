@@ -3,7 +3,6 @@ import DepthType from './depth-type'
 import RenderStyle from './render-style'
 import MeshDensity from './mesh-density'
 import Props from './props'
-import Util from './util'
 
 // Libraries
 const glsl = require('glslify')
