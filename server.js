@@ -54,47 +54,25 @@ app.get('/live', (request, response) => {
 });
 
 // The route for getting videos from the vimeo API
-// TODO: restrict requests to the server's domain
-app.get('/video/:id', (request, response) => {
-  // Create an API instance using your VIMEO_TOKEN from your .env file
+app.get('/vimeo/api', (request, response) => {
   let api = new Vimeo(null, null, process.env.VIMEO_TOKEN);
 
   api.request({
-    method: 'GET',
-    path: `/videos/${request.params.id}`,
-    headers: { Accept: 'application/vnd.vimeo.*+json;version=3.4' },
-  },
-  function(error, body, status_code, headers) {
-    if (error) {
-      response.status(500).send(error);
-      console.log('[Server] ' + error);
-    } else {
-      if (body['play'] == null) {
-        response.status(401).send({ error: "You don't have access to this video's files." });
-        return;
+      method: 'GET',
+      path: request.query.path,
+      headers: { Accept: 'application/vnd.vimeo.*+json;version=3.4' },
+    },
+    function(error, body, status_code, headers) {
+      if (error) {
+        response.status(500).send(error);
+        console.log('[Server] ' + error);
+      } else {
+        // Pass through the whole JSON response
+        response.status(200).send(body);
       }
-
-      // Sort the resolutions from highest to lowest
-      if (body['play']['progressive']) {
-        body['play']['progressive'] = body['play']['progressive'].sort(function(a, b) {
-          if (parseInt(a['height'], 10) > parseInt(b['height'], 10)) return -1;
-          return 1;
-        });
-      }
-
-      // Unfurl the Live links to hack around CORS issues
-      if (body.live && body.live.status === 'streaming') {
-        var sync_req = require('sync-request');
-
-        body.play.dash.link = sync_req('GET', body.play.dash.link).url;
-        body.play.hls.link = sync_req('GET', body.play.hls.link).url;
-      }
-
-      response.status(200).send(body);
     }
-  });
-
-});
+  );
+});;
 
 const listener = app.listen(process.env.PORT, () => {
   console.log(`[Server] Running on port: ${listener.address().port} 🚢`);

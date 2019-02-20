@@ -1,49 +1,48 @@
-import * as dat from 'dat.gui';
+import * as dat from 'dat.gui'
 
 export default class GuiManager {
-  constructor() {
+  constructor () {
     // Create the gui
-    this.gui = new dat.GUI();
+    this.gui = new dat.GUI()
 
-    this.guiFunctions = {};
+    this.guiFunctions = {}
   }
 
-  add(object, param, rangeMin, rangeMax) {
+  add (object, param, rangeMin, rangeMax) {
     if (rangeMin) {
-      this.gui.add(object, param, rangeMin, rangeMax);
+      this.gui.add(object, param, rangeMin, rangeMax)
     } else {
-      this.gui.add(object, param);
+      this.gui.add(object, param)
     }
   }
 
-  addVector3(vector, folder) {
+  addVector3 (vector, folder) {
     if (folder) {
-      this.folder = this.gui.addFolder(folder);
+      this.folder = this.gui.addFolder(folder)
     }
 
     for (let child in vector) {
       if (child === 'x' || child === 'y' || child === 'z') {
         if (folder) {
-          this.folder.add(vector, child);
+          this.folder.add(vector, child)
         } else {
-          this.gui.add(vector, child);
+          this.gui.add(vector, child)
         }
       }
     }
-
   }
 
-  addObject(object) {
+  addObject (object) {
     for (let child in object) {
-      this.gui.add(object, child);
+      this.gui.add(object, child)
     }
   }
 
-  addFunction(name, callback) {
-    let buttonName = name.toString();
+  addFunction (name, callback) {
+    let buttonName = name.toString()
     this.guiFunctions = {
-      [buttonName]: callback,
-    };
-    this.gui.add(this.guiFunctions, buttonName);
+      [buttonName]: callback
+    }
+    this.gui.add(this.guiFunctions, buttonName)
   }
 }
