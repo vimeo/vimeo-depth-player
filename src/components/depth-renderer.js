@@ -9,6 +9,14 @@ const glsl = require('glslify')
 import { Object3D } from 'three'
 
 export default class DepthRenderer extends Object3D {
+  /**
+   * @constructor - Create a new DepthRenderer instance
+   * @param {THREE.VideoTexture} _videoTexture - The three.js video texture object
+   * @param {object} _metadata - The metadata object to use for the depth displacement
+   * @param {DepthType} _depthType  - The type of depth stream to play (default is DepthType.DepthKit)
+   * @param {RenderStyle} _renderStyle - The render look (e.g Vimeo.RenderStyle.Points for pointcloud)
+   * @param {MeshDensity} _meshDensity - The mesh density (default is MeshDensity.Medium)
+   */
   constructor (_videoTexture = null,
     _metadata,
     _depthType = DepthType.DepthKit,
