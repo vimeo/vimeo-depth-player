@@ -46575,7 +46575,7 @@ if (window.THREE) {
     };
   }
 } else {
-  console.warn('[Vimep DepthRenderer] three.js was not found, did you forget to include it?');
+  console.warn('[Vimeo DepthRenderer] three.js was not found, did you forget to include it?');
 }
 
 },{"./components/depth-renderer":3,"./components/depth-type":4,"./components/render-style":7}]},{},[8]);
