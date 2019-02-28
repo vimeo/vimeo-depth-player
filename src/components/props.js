@@ -4,30 +4,30 @@ const _DepthKit = {
   boundsCenter: {
     x: 0,
     y: 0,
-    z: 1.03093326091766,
+    z: 1.03093326091766
   },
   boundsSize: {
     x: 3.14853119850159,
     y: 1.76878845691681,
-    z: 1.08638906478882,
+    z: 1.08638906478882
   },
   crop: {
     w: 1.02883338928223,
     x: 0.186250150203705,
     y: -0.0672345161437988,
-    z: 0.522190392017365,
+    z: 0.522190392017365
   },
   depthFocalLength: {
     x: 1919.83203125,
-    y: 1922.28527832031,
+    y: 1922.28527832031
   },
   depthImageSize: {
     x: 3840.0,
-    y: 2160.0,
+    y: 2160.0
   },
   depthPrincipalPoint: {
     x: 1875.52282714844,
-    y: 1030.56298828125,
+    y: 1030.56298828125
   },
   extrinsics: {
     e00: 1,
@@ -45,45 +45,45 @@ const _DepthKit = {
     e30: 0,
     e31: 0,
     e32: 0,
-    e33: 1,
+    e33: 1
   },
   farClip: 1.57412779331207,
   format: 'perpixel',
   nearClip: 0.487738698720932,
   numAngles: 1,
   textureHeight: 4096,
-  textureWidth: 2048,
-};
+  textureWidth: 2048
+}
 const _RealSense = {
   _versionMajor: 0,
   _versionMinor: 2,
   boundsCenter: {
     x: 0,
     y: 0,
-    z: 1.03093326091766,
+    z: 1.03093326091766
   },
   boundsSize: {
     x: 3.14853119850159,
     y: 1.76878845691681,
-    z: 1.08638906478882,
+    z: 1.08638906478882
   },
   crop: {
     w: 1.02883338928223,
     x: 0.186250150203705,
     y: -0.0672345161437988,
-    z: 0.522190392017365,
+    z: 0.522190392017365
   },
   depthFocalLength: {
     x: 1919,
-    y: 1923,
+    y: 1923
   },
   depthImageSize: {
     x: 3840.0,
-    y: 2160.0,
+    y: 2160.0
   },
   depthPrincipalPoint: {
     x: 1900.52282714844,
-    y: 1030.56298828125,
+    y: 1030.56298828125
   },
   extrinsics: {
     e00: Math.cos(Math.PI),
@@ -101,19 +101,19 @@ const _RealSense = {
     e30: 0,
     e31: 0,
     e32: 0,
-    e33: 1,
+    e33: 1
   },
   farClip: 2,
   format: 'perpixel',
   nearClip: 1,
   numAngles: 1,
   textureHeight: 4096,
-  textureWidth: 2048,
-};
+  textureWidth: 2048
+}
 
 const Props = {
   DepthKit: _DepthKit,
-  RealSense: _RealSense,
-};
+  RealSense: _RealSense
+}
 
-export default Props;
+export default Props
