@@ -46,7 +46,7 @@ For our full three.js player documentation [visit this page](https://github.com/
 > Streaming Vimeo videos requires video file access via the Vimeo API. Accessing video files is limited to [Vimeo Pro and Business](https://vimeo.com/upgrade) customers.
 
 ## Questions
-For questions and support, ask on [StackOverflow](https://stackoverflow.com/questions/ask/?tags=vimeo)
+For questions and support, open a [new issue on Github](https://github.com/vimeo/vimeo-depth-player/issues/new).
 
 ## Stay in Touch
 [Join our newsletter](https://vimeo.us6.list-manage.com/subscribe?u=a3cca16f9d09cecb87db4be05&id=28000dad3e) for more updates, or visit the [Creator Labs website](https://labs.vimeo.com) to learn more.
