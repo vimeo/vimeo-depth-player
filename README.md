@@ -48,9 +48,6 @@ For our full three.js player documentation [visit this page](https://github.com/
 ## Questions
 For questions and support, open a [new issue on Github](https://github.com/vimeo/vimeo-depth-player/issues/new).
 
-## Stay in Touch
-[Join our newsletter](https://vimeo.us6.list-manage.com/subscribe?u=a3cca16f9d09cecb87db4be05&id=28000dad3e) for more updates, or visit the [Creator Labs website](https://labs.vimeo.com) to learn more.
-
 ## License
 This software is free software and is distributed under an [MIT License](LICENSE).
 
